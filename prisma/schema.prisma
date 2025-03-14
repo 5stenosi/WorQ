@@ -9,6 +9,94 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
+}
+
+model Space {
+  id Int @id @default(autoincrement())
+  name String
+  agencyId Int
+  agency Agency @relation(fields: [agencyId], references: [id])
+  address Address?
+  description String
+  seats Int
+  numberOfSpaces Int
+  typology Typology
+  services Service[]
+  price Decimal
+  availability Availability
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  street String
+  number String
+  city String
+  zip String
+  country String
+  latitude Float
+  longitude Float
+  space Space @relation(fields: [spaceId], references: [id])
+  spaceId Int @unique
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+  detail String
+  spaces Space[]
+}
+
+enum Typology {
+  MEETING_ROOMS
+  PRIVATE_OFFICES
+  STUDY_ROOMS
+  OUTDOOR_SPACES
+}
+
+enum Availability {
+  HOURLY
+  DAILY
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  role Role
+  oauthProvider OAuthProvider
+  oauthId String
+  createdAt DateTime @default(now()) // necessaria?
+  client Client?
+  agency Agency?
+}
+
+model Client {
+  id Int @id @default(autoincrement())
+  name String
+  surname String
+  cellphone String
+  user User @relation(fields: [userId], references: [id])
+  userId Int @unique
+}
+
+model Agency {
+  id Int @id @default(autoincrement())
+  name String
+  vatNumber String
+  telephone String
+  spaces Space[]
+  user User @relation(fields: [userId], references: [id])
+  userId Int @unique
+}
+
+enum Role {
+  ADMIN // ?
+  CLIENT
+  AGENCY
+}
+
+enum OAuthProvider {
+  GOOGLE
+  FACEBOOK
+  APPLE
 }

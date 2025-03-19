@@ -17,6 +17,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@ionic/react": "^8.4.3",
     "@ionic/react-router": "^8.4.3",
+    "@prisma/client": "^6.5.0",
     "@tailwindcss/postcss": "^4.0.14",
     "leaflet": "^1.9.4",
     "next": "15.2.1",
@@ -34,7 +35,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.1",
-    "prisma": "^6.4.1",
+    "prisma": "^6.5.0",
     "typescript": "^5"
   }
 }

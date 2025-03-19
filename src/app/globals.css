@@ -1,42 +1,42 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@import "tailwindcss";
+
+@plugin "tailwindcss-motion";
+
+*::-webkit-scrollbar {
+  width: 0.5rem;
+  /* Larghezza della scrollbar */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*::-webkit-scrollbar-track {
+  border-radius: 9999px;
+  /* Arrotondamento del track */
+  background-color: #E7E5E4;
+  /* Colore del track (grigio chiaro) */
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+*::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  /* Arrotondamento del thumb */
+  background-color: #D6D3D1;
+  /* Colore del thumb (grigio medio) */
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.no-scrollbar {
+  scrollbar-width: none;
+  /* Nasconde la scrollbar in Firefox */
+  -ms-overflow-style: none;
+  /* Nasconde la scrollbar in IE/Edge */
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Nasconde la scrollbar nei browser WebKit */
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+button {
+  @apply cursor-pointer
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+nav button {
+  @apply rounded-2xl motion-scale-in-110 hover:motion-scale-out-110 px-10 py-4
 }

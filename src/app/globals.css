@@ -34,9 +34,9 @@
 }
 
 button {
-  @apply cursor-pointer
+  @apply cursor-pointer;
 }
 
 nav button {
-  @apply rounded-2xl motion-scale-in-110 hover:motion-scale-out-110 px-10 py-4
+  @apply rounded-2xl motion-scale-in-110 hover:motion-scale-out-110 px-10 py-4;
 }

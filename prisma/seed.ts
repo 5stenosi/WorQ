@@ -51,6 +51,7 @@ async function main() {
             isFullSpaceBooking: true,
             typology: 'MEETING_ROOMS',
             price: 100.0,
+            avgRating: 5,
             images: [
                 '/uploads/space1/image1.jpg',
                 '/uploads/space1/image2.jpg',
@@ -91,6 +92,7 @@ async function main() {
             clientId: clientUser.client!.id,
             spaceId: space.id,
             rating: 5,
+            comment: 'Spazio fantastico!',
         },
     });
 

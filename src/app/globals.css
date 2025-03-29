@@ -1,6 +1,32 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-motion";
+@plugin "tailwindcss-intersect";
+
+@theme {
+  --color-turquoise-blue-50: #eafffe;
+  --color-turquoise-blue-100: #cbffff;
+  --color-turquoise-blue-200: #9efcff;
+  --color-turquoise-blue-300: #5bf6ff;
+  --color-turquoise-blue-400: #00e5ff;
+  --color-turquoise-blue-500: #00c9e5;
+  --color-turquoise-blue-600: #00a0c0;
+  --color-turquoise-blue-700: #037f9b;
+  --color-turquoise-blue-800: #0d657d;
+  --color-turquoise-blue-900: #105469;
+  --color-turquoise-blue-950: #033749;
+
+  --color-west-side-50: #fff9ed;
+  --color-west-side-100: #fff2d4;
+  --color-west-side-200: #ffe2a9;
+  --color-west-side-300: #ffcc72;
+  --color-west-side-400: #fdaa3a;
+  --color-west-side-500: #fc9218;
+  --color-west-side-600: #ed7409;
+  --color-west-side-700: #c4570a;
+  --color-west-side-800: #9c4510;
+  --color-west-side-900: #7d3a11;
+  --color-west-side-950: #441c06;
+}
 
 *::-webkit-scrollbar {
   width: 0.5rem;
@@ -17,8 +43,13 @@
 *::-webkit-scrollbar-thumb {
   border-radius: 9999px;
   /* Arrotondamento del thumb */
-  background-color: #D6D3D1;
+  background-color: #c1bebc;
   /* Colore del thumb (grigio medio) */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #a9a6a4;
+  /* Colore del thumb più scuro al passaggio del mouse */
 }
 
 .no-scrollbar {
@@ -35,8 +66,4 @@
 
 button {
   @apply cursor-pointer;
-}
-
-nav button {
-  @apply rounded-2xl motion-scale-in-110 hover:motion-scale-out-110 px-10 py-4;
 }

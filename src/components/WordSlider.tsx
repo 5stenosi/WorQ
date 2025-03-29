@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const WordSlider = () => {
-    const words = ['Pisello🍆', 'Palle🥎🥎', 'Prostata🤘🏻', 'Sottopalla💦'];
+    const words = ['Pisello', 'Palle', 'Prostata', 'Sottopalla'];
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
     const nextWordIndex = (currentWordIndex + 1) % words.length;
@@ -24,9 +24,9 @@ const WordSlider = () => {
                         currentWord.classList.remove(...['transition-transform', 'duration-500', 'ease-in-out', '-translate-y-full']);
                         nextWord.classList.remove(...['transition-transform', 'duration-500', 'ease-in-out', '-translate-y-full']);
                     }
-                }, 600); // Durata dell'animazione
+                }, 600);
             }
-        }, 3000); // Mantieni il rapporto temporale (muovi ogni 6 secondi)
+        }, 2000);
 
         return () => {
             clearInterval(wordMoveInterval);
@@ -34,15 +34,15 @@ const WordSlider = () => {
     }, [words.length]);
 
     return (
-        <div className="w-full grid grid-cols-2 mb-5 overflow-hidden">
-            <p className="text-2xl mr-1 text-right">Filtra per </p>
-            <div className="relative flex flex-col items-start ml-1 text-2xl font-medium h-8">
+        <div className="w-full grid grid-cols-2 overflow-hidden *:py-3">
+            <p className="text-5xl mr-1 text-right">Filtra per </p>
+            <div className="relative flex flex-col items-start text-west-side-500 ml-1 text-5xl font-bold h-8">
                 {/* Parola corrente */}
-                <p id='current' className="">
+                <p id='current' className="pb-10">
                     {words[currentWordIndex]}
                 </p>
                 {/* Parola successiva */}
-                <p id='next' className="">
+                <p id='next' className="pb-10">
                     {words[nextWordIndex]}
                 </p>
             </div>

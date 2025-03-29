@@ -1,236 +1,258 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-
-import HorizontalOptions from '../components/HorizontalOptions';
-
+import React, { useState } from 'react';
+import Link from 'next/link';
+import HorizontalOptions from '@/components/HorizontalOptions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import MapComponent from '@/components/MapComponent';
+import { faMagnifyingGlass, faStar, faStarHalf } from '@fortawesome/free-solid-svg-icons';
 import WordSlider from '@/components/WordSlider';
+import ObserverProvider from '@/components/ObserverProvider';
 
 const HomePage = () => {
-
   const [searchText, setSearchText] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const images = [
-    '/offices/office (1).jpg',
-    '/offices/office (2).jpg',
-    '/offices/office (3).jpg',
-    '/offices/office (4).jpg',
-    '/offices/office (5).jpg',
-    '/offices/office (6).jpg',
-    '/offices/office (7).jpg',
-    '/offices/office (8).jpg',
-  ];
-
-  const words = ['Innovation', 'Collaboration', 'Productivity', 'Creativity', 'Focus'];
-
-  const handleNext = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % images.length;
-        return nextIndex;
-      });
-    }, 15000); // Cambia immagine ogni 15 secondi
-
-    return () => {
-      clearInterval(interval); // Pulisce l'intervallo delle immagini
-    };
-  }, [images.length]);
-
-  useEffect(() => {
-    const handleScroll = (e: WheelEvent) => {
-      e.preventDefault();
-      if (containerRef.current) {
-        const delta = e.deltaY;
-        containerRef.current.scrollBy({ top: delta, behavior: 'smooth' });
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        handleNext();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrev();
-      } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        const sections = document.querySelectorAll('section');
-        const currentSection = Array.from(sections).find((section) =>
-          section.getBoundingClientRect().top >= 0
-        );
-
-        if (currentSection) {
-          const currentIndex = Array.from(sections).indexOf(currentSection);
-          if (e.key === 'ArrowDown' && currentIndex < sections.length - 1) {
-            sections[currentIndex + 1].scrollIntoView({ behavior: 'smooth' });
-          } else if (e.key === 'ArrowUp' && currentIndex > 0) {
-            sections[currentIndex - 1].scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('wheel', handleScroll, { passive: false });
-    }
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      if (container) {
-        container.removeEventListener('wheel', handleScroll);
-      }
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
 
   // OSSERVAZIONI
-  // Ombre sm: si
   // Come gestiamo i tag <h1>, <h2>, <h3> ecc.? Chiediamo a DeepSeek alla fine.
-
   // Facciamo i filtri sticky?
-  // Provo il typwriter o animazioni Rombo per mostrare tutti i filtri
-  // Mettiamo uno sfondo alla navbar?
   // Per le animazioni le dobbiamo mettere solo per le persone che le vogliono vedere o per tutti?
-  // IMPORTANTE: come si gestisce la navbar Forc?
-  // Potremmo usare Framer Motion per animazioni on scroll
-  // Che ombra diamo al carosello?
-  // C'è un problema con lo scroll a sezioni: sulla mappa non scrolla, sulla navbar non scrolla e non è così tanto fluido come speravo
-  // Per far capire di scrollare lasciamo la scrollbar o mettiamo delle frecce in basso che fanno capire di dover scrollare?
+  // Bisogna togliere i <br /> al testo nella prima schermata
+  // Quando clicco un/a servizio/feature, devo essere reindirizzato alla sezione degli spazi e deve essere cercato nella navbar il servizio/feature corrispodente
+  // Forse è meglio fare in alto a sinistra il carosello, sotto il carosello le recensioni, a destra un'unica sezione con info generali, servizi e sistema di prenotazione?
 
   return (
-    <div id='home' className="h-screen overflow-y-scroll snap-y snap-mandatory no-scrollbar px-10">
-
-      {/* Sezione 1: Navbar e contenuto iniziale */}
-      <section className="h-screen pb-5 flex flex-col items-center justify-center snap-start">
-
-        {/* Navbar Placeholder */}
-        <nav className="z-50 w-full px-10 py-5 flex justify-between items-center invisible">
-          <button className="bg-stone-100">Mappa</button>
-        </nav>
-        {/* Navbar */}
-        <nav className="z-1000 w-full px-10 py-5 flex justify-between items-center fixed top-0">
-          <button className="bg-stone-100 shadow-sm">Mappa</button>
-          <h3 className="font-bold text-3xl absolute left-1/2 transform -translate-x-1/2">WorQ</h3>
-          <div className="flex gap-5">
-            <button className="bg-stone-900 text-stone-100 shadow-sm">Register</button>
-            <button className="bg-stone-900 text-stone-100 shadow-sm">Login</button>
+    <ObserverProvider>
+      <div id='home' className="overflow-y-auto">
+        {/* Landing Page */}
+        <section className="h-screen w-full relative z-20">
+          <img
+            src="/spaceTypes/offices/office6-enhanced.png"
+            alt="Landing Page"
+            className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-linear-to-t from-stone-900/75 via-transparent via-60% to-transparent"></div>
+          <div className="absolute flex flex-col gap-5 text-stone-100
+                          justify-end items-start sm:text-start inset-5 sm:inset-10 xl:inset-20 transition-all duration-500 *:transition-all *:duration-500">
+            {/* Titolo */}
+            <h1 className='font-medium
+                         text-4xl md:text-7xl w-full md:w-4/5 lg:w-3/5
+                         intersect-once intersect:motion-preset-slide-right motion-duration-1000'>Locate A Cozy Workspace</h1>
+            {/* Sottotitolo */}
+            <p className='text-balance
+                        text-base sm:text-lg w-full md:w-4/5 lg:w-3/5
+                        intersect-once intersect:motion-preset-slide-right motion-duration-1000 motion-delay-500'>From cost savings to increased collaboration opportunities, coworking spaces can make for idea offices, especially for small and growing businesses.</p>
           </div>
-        </nav>
+        </section>
 
-        {/* Carosello */}
-        <div className="relative w-full h-full overflow-hidden rounded-lg shadow-sm group">
-          <div
-            className="flex transition-transform duration-500"
-            style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
-            {images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Office ${index + 1}`}
-                className="w-full h-full object-cover flex-shrink-0"
-              />
-            ))}
+        {/* Bisogna creare un component, una funzione o prendere dal DB, è troppo grosso come blocco secondo me */}
+        {/* Griglia Features */}
+        <section className="w-full p-20 flex flex-col gap-20">
+
+          <div className='flex flex-col gap-20 overflow-clip'>
+            <h1 className='text-9xl font-bold
+                     intersect-once intersect:motion-preset-slide-right-lg'>Key Services</h1>
+            <p className='text-4xl font-medium w-2/3 pb-1
+                    intersect-once intersect:motion-preset-slide-right-lg'>Discover the perfect workspace tailored to your needs by exploring our key services and amenities.</p>
           </div>
-          <button
-            onClick={handlePrev}
-            className="absolute size-12 left-5 inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full
-                       -motion-translate-x-out-150 group-hover:-motion-translate-x-in-150">
-            <FontAwesomeIcon icon={faChevronLeft} />
-          </button>
-          <button
-            onClick={handleNext}
-            className="absolute size-12 right-5 inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full
-                       motion-translate-x-out-150 group-hover:motion-translate-x-in-150">
-            <FontAwesomeIcon icon={faChevronRight} />
-          </button>
-          {/* Indicatori */}
-          <div className="absolute bottom-5 inset-x-0 mx-auto bg-stone-900/25 backdrop-blur-sm p-2 rounded-full flex gap-2 w-fit *:cursor-pointer
-                    motion-translate-y-out-[200%] group-hover:motion-translate-y-in-[200%] duration-500">
-            {/* Palline opache */}
-            {images.map((_, index) => (
-              <div
-                key={index}
-                onClick={() => setCurrentImageIndex(index)} // Cambia immagine al click
-                className={`w-3 h-3 rounded-full bg-stone-100/25 hover:bg-stone-100/50 transition`}
-              ></div>
-            ))}
-            {/* Pallina principale */}
-            <div
-              className="w-3 h-3 rounded-full bg-stone-100 absolute transition-transform duration-500"
-              style={{ transform: `translateX(${currentImageIndex * 1.25}rem)` }}
-            ></div>
-          </div>
-        </div>
-      </section>
 
-      {/* Sezione 2: Contenuto aggiuntivo */}
-      <section className="h-screen pb-5 flex flex-col items-center justify-center snap-start">
-        {/* Navbar Placeholder */}
-        <nav className="z-50 w-full px-10 py-5 flex justify-between items-center invisible">
-          <button className="bg-stone-100">Mappa</button>
-        </nav>
-        <MapComponent />
-      </section>
-
-      {/* Sezione 3: Altra sezione */}
-      <section className="h-auto pb-5 flex flex-col items-center snap-start">
-        {/* Navbar Placeholder */}
-        <nav className="z-50 w-full px-10 py-5 flex justify-between items-center invisible">
-          <button className="bg-stone-100">Mappa</button>
-        </nav>
-
-        <WordSlider />
-
-        <div className="bg-stone-300 p-2 rounded-3xl flex gap-3">
-          <HorizontalOptions
-            options={['Meeting Rooms', 'Private Offices', 'Study Rooms', 'Outdoor Spaces']}
-            initialSelected={0}
-            backgroundColor="bg-stone-100"
-            optionClassName="px-5 h-full flex justify-center items-center"
-            containerClassName="bg-stone-300 rounded-2xl w-full overflow-hidden" />
-          <div className={`w-12 ${searchText ? 'w-80 pl-3' : 'hover:w-80 hover:pl-3 focus-within:pl-3 focus-within:w-80'} bg-stone-100 rounded-2xl flex transition-all duration-250`}>
-            <input type="text" placeholder="Cerca..." id="search-bar" className="w-full outline-0" onChange={(e) => setSearchText(e.target.value)} />
-            <button className="aspect-square size-12 bg-stone-100 text-2xl rounded-2xl">
-              <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </button>
-          </div>
-        </div>
-
-        <div className='w-full px-10 grid grid-cols-4 gap-4 mt-10 *:rounded-4xl *:cursor-pointer'>
-          {Array.from({ length: 25 }).map((_, index) => (
-            <div key={index} className='w-full h-100 bg-stone-100 col-span-1 overflow-hidden flex flex-col'>
-              <div className='h-1/2'>
-                <img src="/GreenWall.jpg" alt="Green Wall" className="w-full h-full object-cover" />
+          <div className='w-full h-[300vh] grid grid-cols-10 grid-rows-14 gap-10 text-stone-100 *:rounded-3xl *:shadow-sm'>
+            {/* Feature 1 */}
+            <div className='w-full h-full col-span-6 row-span-4 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Desktop</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Work seamlessly with our ready-to-use desktop computers, equipped with the latest software.</p>
               </div>
-
-              {/* Informazioni come titolo e location */}
-              <div className='p-5'>
-                <h3 className='font-bold text-xl'>Oxford Artisan</h3>
-                <p className='text-sm text-stone-500'>Location, Country</p>
-              </div>
-
-              {/* Stelle e prezzo in fondo */}
-              <div className='p-5 mt-auto flex justify-between items-end'>
-                <div className='flex items-center'>⭐⭐⭐⭐⭐</div>
-                <p className='font-bold text-4xl'>120€</p>
-              </div>
+              <img src="/features/desktop/desktop3.jpg" alt="desktop" className="w-full h-full object-cover group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
             </div>
-          ))}
-        </div>
-      </section>
-    </div>
+            {/* Feature 2 */}
+            <div className='w-full h-full col-span-4 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>WiFi</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Enjoy a fast and reliable WiFi connection to stay connected and productive throughout your day.</p>
+              </div>
+              <img src="/features/wifi/wifi2.png" alt="wifi" className="w-full h-full object-cover object-[0%_85%] group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 3 */}
+            <div className='w-full h-full col-span-4 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Stationery</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Access all the stationery supplies you need, from pens to notebooks, to support your work and creativity.</p>
+              </div>
+              <img src="/features/stationery/stationery4.jpg" alt="stationery" className="w-full h-full object-cover object-top group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 4 */}
+            <div className='w-full h-full col-span-5 row-span-3 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Disability Access</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Enjoy accessible facilities designed to accommodate people with disabilities, ensuring inclusivity for everyone.</p>
+              </div>
+              <img src="/features/disability/disability3.jpg" alt="disability access" className="w-full h-full object-cover object-bottom group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 5 */}
+            <div className='w-full h-full col-span-5 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Printer</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Take advantage of high-quality printers for all your printing needs, whether for documents or presentations.</p>
+              </div>
+              <img src="/features/printer/printer1.jpg" alt="Gabibbo" className="w-full h-full object-cover object-top group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 6 */}
+            <div className='w-full h-full col-span-5 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Projector</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Deliver professional presentations with our high-performance projectors, perfect for meetings and events.</p>
+              </div>
+              <img src="/features/projector/projector1.jpg" alt="projector" className="w-full h-full object-cover group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 7 */}
+            <div className='w-full h-full col-span-5 row-span-3 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Catering</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Enhance your events and meetings with our premium catering services, offering a variety of delicious options.</p>
+              </div>
+              <img src="/features/catering/catering5.png" alt="catering" className="w-full h-full object-cover group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 8 */}
+            <div className='w-full h-full col-span-5 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Child-friendly</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Relax in our child-friendly areas, providing a safe and engaging environment for families with children.</p>
+              </div>
+              <img src="/features/kids/kids4.jpg" alt="kids" className="w-full h-full object-cover object-right-bottom group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 9 */}
+            <div className='w-full h-full col-span-4 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Pet-friendly</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Bring your furry friends along to our pet-friendly spaces, designed for comfort and convenience.</p>
+              </div>
+              <img src="/features/pets/pets2.jpg" alt="pets" className="w-full h-full object-cover object-bottom -scale-x-100 group-hover:-scale-x-125 group-hover:scale-y-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 10 */}
+            <div className='w-full h-full col-span-3 row-span-4 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>White-board</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Collaborate and brainstorm effectively using our spacious and versatile whiteboards.</p>
+              </div>
+              <img src="/features/whiteboard/whiteboard3.png" alt="whiteboard" className="w-full h-full object-cover object-right group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 11 */}
+            <div className='w-full h-full col-span-3 row-span-4 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Video conference</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Host virtual meetings with confidence using our top-tier video conferencing equipment.</p>
+              </div>
+              <img src="/features/videoConference/videoConference3.png" alt="video conference" className="w-full h-full object-cover object-right group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+            {/* Feature 12 */}
+            <div className='w-full h-full col-span-4 row-span-2 overflow-hidden relative group
+              intersect:motion-preset-slide-up-lg intersect-once'>
+              <div className='absolute flex flex-col justify-end gap-5 z-10 inset-10'>
+                <h1 className='text-6xl font-bold
+               translate-y-full group-hover:translate-y-0 transition ease-out duration-1000'>Scanner</h1>
+                <p className='w-3/4 text-balance
+              translate-y-[200%] group-hover:-translate-y-0 transition ease-out duration-1000 delay-0 group-hover:delay-100'>Easily digitize your documents with our modern and efficient scanners.</p>
+              </div>
+              <img src="/features/printer/printer2.jpeg" alt="Gabibbo" className="w-full h-full object-cover object-bottom group-hover:scale-125 transition duration-1000 group-hover:duration-10000 ease-out" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/50 group-hover:from-stone-900 to-transparent transition duration-500"></div>
+            </div>
+          </div>
+        </section>
+
+        {/* Griglia Spazi */}
+        <section className="flex flex-col items-center">
+
+          <WordSlider />
+
+          <div className="bg-stone-300 p-2 mt-10 rounded-3xl flex gap-3">
+            <HorizontalOptions
+              options={['All Spaces', 'Meeting Rooms', 'Private Offices', 'Study Rooms', 'Outdoor Spaces']}
+              initialSelected={0}
+              backgroundColor="bg-stone-100"
+              optionClassName="px-5 h-full flex justify-center items-center"
+              containerClassName="bg-stone-300 rounded-2xl w-full overflow-hidden" />
+
+            <div className={`${searchText ? 'w-80 pl-3' : 'w-12 hover:w-80 hover:pl-3 focus-within:pl-3 focus-within:w-80'} bg-stone-100 rounded-2xl flex transition-all duration-250`}>
+              <input type="text" placeholder="Cerca..." id="search-bar" className="w-full outline-0" onChange={(e) => setSearchText(e.target.value)} />
+              <button className="aspect-square size-12 text-2xl rounded-2xl">
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </button>
+            </div>
+          </div>
+
+          <div className='w-full px-20 py-10 grid grid-cols-4 gap-5 *:rounded-4xl *:cursor-pointer
+                          *:hover:scale-105 *:transition-all'>
+            {Array.from({ length: 25 }).map((_, index) => (
+              <Link href="/spazio_nel_dettaglio" key={index} className='w-full h-100 bg-stone-100 col-span-1 overflow-hidden flex flex-col'>
+                <div className='h-1/2'>
+                  <img src="/spaceTypes/offices/office2-enhanced.png" alt="example image" className="w-full h-full object-cover" />
+                </div>
+
+                {/* Informazioni come titolo e location */}
+                <div className='p-5'>
+                  <h3 className='font-bold text-xl'>Oxford Artisan</h3>
+                  <p className='text-sm text-stone-500'>Location, Country</p>
+                </div>
+
+                {/* Stelle e prezzo in fondo */}
+                <div className='p-5 mt-auto flex justify-between items-center'>
+                  <div className='flex items-center text-lg text-yellow-400'>
+                    <FontAwesomeIcon icon={faStar} />
+                    <FontAwesomeIcon icon={faStar} />
+                    <FontAwesomeIcon icon={faStar} />
+                    <FontAwesomeIcon icon={faStar} />
+                    <FontAwesomeIcon icon={faStarHalf} />
+                  </div>
+                  <p className='flex font-bold text-2xl'>120€<span className='text-base align-super'>/day</span></p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+    </ObserverProvider>
   );
 };
 

@@ -18,7 +18,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
     const [selectedOption, setSelectedOption] = useState<number>(initialSelected);
 
     return (
-        <div className={`relative grid grid-cols-4 items-center ${containerClassName}`}> {/* Usa grid con 4 colonne */}
+        <div className={`relative grid grid-cols-5 items-center ${containerClassName}`}> {/* Usa grid con 4 colonne */}
             {/* Rettangolo colorato che si sposta */}
             <div
                 className={`absolute top-0 left-0 h-full rounded-2xl transition-all duration-500 ${backgroundColor}`}
@@ -32,7 +32,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
             {options.map((option, index) => (
                 <div
                     key={index}
-                    className={`relative text-center cursor-pointer z-10 whitespace-nowrap ${optionClassName}`}
+                    className={`relative text-center cursor-pointer z-10 whites ce-nowrap ${optionClassName}`}
                     onClick={() => setSelectedOption(index)}>
                     {option}
                 </div>

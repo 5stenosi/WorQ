@@ -13,19 +13,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// TODO: Capire come implementare le prenotazioni
 model Space {
   id Int @id @default(autoincrement())
   name String
   agencyId Int
-  agency Agency @relation(fields: [agencyId], references: [id])
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   address Address?
   description String
-  seats Int
-  numberOfSpaces Int
+  seats Int // Private Office = 1, Meeting Room = 10, Study Room = 10... 
+  numberOfSpaces Int // Posso avere più spazi di uguale tipologia
+  isFullSpaceBooking  Boolean // True se lo spazio deve essere prenotato interamente
   typology Typology
-  services Service[]
+  services Service[] 
   price Decimal
-  availability Availability
+  bookings Booking[]
+  images Json?
+  reviews Review[]
+  avgRating Int
 }
 
 model Address {
@@ -37,8 +42,8 @@ model Address {
   country String
   latitude Float
   longitude Float
-  space Space @relation(fields: [spaceId], references: [id])
   spaceId Int @unique
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 }
 
 model Service {
@@ -54,18 +59,13 @@ enum Typology {
   OUTDOOR_SPACES
 }
 
-enum Availability {
-  HOURLY
-  DAILY
-}
-
 model User {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
   email String @unique
   role Role
   oauthProvider OAuthProvider
   oauthId String
-  createdAt DateTime @default(now()) // necessaria?
+  createdAt DateTime @default(now())
   client Client?
   agency Agency?
 }
@@ -75,8 +75,10 @@ model Client {
   name String
   surname String
   cellphone String
-  user User @relation(fields: [userId], references: [id])
-  userId Int @unique
+  bookings Booking[]
+  reviews Review[]
+  userEmail String @unique
+  user User @relation(fields: [userEmail], references: [email])
 }
 
 model Agency {
@@ -85,12 +87,33 @@ model Agency {
   vatNumber String
   telephone String
   spaces Space[]
-  user User @relation(fields: [userId], references: [id])
-  userId Int @unique
+  userEmail String @unique
+  user User @relation(fields: [userEmail], references: [email])
+}
+
+model Booking {
+  id Int @id @default(autoincrement())
+  clientId Int
+  client Client @relation(fields: [clientId], references: [id])
+  spaceId Int
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  bookingDate DateTime // Data della prenotazione
+  seatsBooked Int // Numero di posti prenotati
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  clientId Int
+  client Client @relation(fields: [clientId], references: [id])
+  spaceId Int
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  rating Int // 1-5
+  comment String
+  createdAt DateTime @default(now())
 }
 
 enum Role {
-  ADMIN // ?
   CLIENT
   AGENCY
 }
@@ -99,4 +122,5 @@ enum OAuthProvider {
   GOOGLE
   FACEBOOK
   APPLE
+  // other
 }

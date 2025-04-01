@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
+// TODO: Ottenere solo informazioni necessarie
 // Handles GET requests to /api/spaces
 // Returns all spaces
 export async function GET() {

@@ -40,6 +40,25 @@ async function main() {
         include: { client: true },
     });
 
+    // Creazione di un cliente
+    const clientUser2 = await prisma.user.create({
+        data: {
+            id: 'client-user-2',
+            email: 'client2@example.com',
+            role: 'CLIENT',
+            oauthProvider: 'GOOGLE',
+            oauthId: 'oauth-client2-1',
+            client: {
+                create: {
+                    name: 'Luigi',
+                    surname: 'Verdi',
+                    cellphone: '3287654321',
+                },
+            },
+        },
+        include: { client: true },
+    });
+
     // Creazione di uno spazio
     const space = await prisma.space.create({
         data: {

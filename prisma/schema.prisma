@@ -30,7 +30,7 @@ model Space {
   bookings Booking[]
   images Json?
   reviews Review[]
-  avgRating Int
+  avgRating Decimal? @default(0)
 }
 
 model Address {
@@ -111,6 +111,7 @@ model Review {
   rating Int // 1-5
   comment String
   createdAt DateTime @default(now())
+  @@unique([clientId, spaceId])
 }
 
 enum Role {

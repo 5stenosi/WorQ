@@ -55,7 +55,7 @@ model Service {
 enum Typology {
   MEETING_ROOMS
   PRIVATE_OFFICES
-  STUDY_ROOMS
+  COMMON_AREAS
   OUTDOOR_SPACES
 }
 

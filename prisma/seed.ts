@@ -5,7 +5,6 @@ async function main() {
     // Creazione di un'agenzia
     const agencyUser = await prisma.user.create({
         data: {
-            id: 'agency-user-1',
             email: 'agency@example.com',
             role: 'AGENCY',
             oauthProvider: 'GOOGLE',
@@ -24,7 +23,6 @@ async function main() {
     // Creazione di un cliente
     const clientUser = await prisma.user.create({
         data: {
-            id: 'client-user-1',
             email: 'client@example.com',
             role: 'CLIENT',
             oauthProvider: 'GOOGLE',
@@ -43,7 +41,6 @@ async function main() {
     // Creazione di un cliente
     const clientUser2 = await prisma.user.create({
         data: {
-            id: 'client-user-2',
             email: 'client2@example.com',
             role: 'CLIENT',
             oauthProvider: 'GOOGLE',
@@ -59,47 +56,111 @@ async function main() {
         include: { client: true },
     });
 
-    // Creazione di uno spazio
-    const space = await prisma.space.create({
-        data: {
-            name: 'Spazio 1',
-            agencyId: agencyUser.agency!.id,
-            description: 'Un bellissimo spazio di coworking',
-            seats: 10,
-            numberOfSpaces: 1,
-            isFullSpaceBooking: true,
-            typology: 'MEETING_ROOMS',
-            price: 100.0,
-            avgRating: 5,
-            images: [
-                '/uploads/space1/image1.jpg',
-                '/uploads/space1/image2.jpg',
-            ],
-            address: {
-                create: {
-                    street: 'Via Roma',
-                    number: '10',
-                    city: 'Milano',
-                    zip: '20100',
-                    country: 'Italia',
-                    latitude: 45.4642,
-                    longitude: 9.19,
+    // Creazione di spazi multipli
+    const spaces = await Promise.all([
+        prisma.space.create({
+            data: {
+                name: 'Milano Meetings',
+                agencyId: agencyUser.agency!.id,
+                description: 'Un bellissimo spazio di coworking',
+                seats: 10,
+                numberOfSpaces: 1,
+                isFullSpaceBooking: true,
+                typology: 'MEETING_ROOMS',
+                price: 100.0,
+                avgRating: 5,
+                images: [
+                    '/uploads/space1/image1.jpg',
+                    '/uploads/space1/image2.jpg',
+                ],
+                address: {
+                    create: {
+                        street: 'Via Roma',
+                        number: '10',
+                        city: 'Milano',
+                        zip: '20100',
+                        country: 'Italia',
+                        latitude: 45.4642,
+                        longitude: 9.19,
+                    },
+                },
+                services: {
+                    create: [
+                        { detail: 'Wi-Fi gratuito' },
+                        { detail: 'Stampante' },
+                    ],
                 },
             },
-            services: {
-                create: [
-                    { detail: 'Wi-Fi gratuito' },
-                    { detail: 'Stampante' },
-                ],
+        }),
+        prisma.space.create({
+            data: {
+                name: 'RomOffice',
+                agencyId: agencyUser.agency!.id,
+                description: 'Un altro spazio di coworking',
+                seats: 15,
+                numberOfSpaces: 2,
+                isFullSpaceBooking: false,
+                typology: 'PRIVATE_OFFICES',
+                price: 150.0,
+                avgRating: null,
+                images: ['/uploads/space2/image1.jpg', '/uploads/space2/image2.jpg'],
+                address: {
+                    create: {
+                        street: 'Via Torino',
+                        number: '20',
+                        city: 'Roma',
+                        zip: '00100',
+                        country: 'Italia',
+                        latitude: 41.9028,
+                        longitude: 12.4964,
+                    },
+                },
+                services: {
+                    create: [
+                        { detail: 'Aria condizionata' },
+                        { detail: 'Caffè gratuito' },
+                    ],
+                },
             },
-        },
-    });
+        }),
+        prisma.space.create({
+            data: {
+                name: 'Naples Outdoor',
+                agencyId: agencyUser.agency!.id,
+                description: 'Uno spazio moderno e attrezzato',
+                seats: 20,
+                numberOfSpaces: 3,
+                isFullSpaceBooking: true,
+                typology: 'OUTDOOR_SPACES',
+                price: 200.0,
+                avgRating: null,
+                images: ['/uploads/space3/image1.jpg', '/uploads/space3/image2.jpg'],
+                address: {
+                    create: {
+                        street: 'Corso Venezia',
+                        number: '5',
+                        city: 'Napoli',
+                        zip: '80100',
+                        country: 'Italia',
+                        latitude: 40.8518,
+                        longitude: 14.2681,
+                    },
+                },
+                services: {
+                    create: [
+                        { detail: 'Proiettore' },
+                        { detail: 'Servizio catering' },
+                    ],
+                },
+            },
+        }),
+    ]);
 
     // Creazione di una prenotazione
     const booking = await prisma.booking.create({
         data: {
             clientId: clientUser.client!.id,
-            spaceId: space.id,
+            spaceId: spaces[0].id,
             bookingDate: new Date('2023-11-01T10:00:00Z'),
             seatsBooked: 5,
         },
@@ -109,7 +170,7 @@ async function main() {
     const review = await prisma.review.create({
         data: {
             clientId: clientUser.client!.id,
-            spaceId: space.id,
+            spaceId: spaces[0].id,
             rating: 5,
             comment: 'Spazio fantastico!',
         },

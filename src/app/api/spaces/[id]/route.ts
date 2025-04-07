@@ -85,7 +85,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             };
         }
 
-        if (body.typology && !['MEETING_ROOMS', 'PRIVATE_OFFICES', 'STUDY_ROOMS', 'OUTDOOR_SPACES'].includes(body.typology)) {
+        if (body.typology && !['MEETING_ROOMS', 'PRIVATE_OFFICES', 'COMMON_AREAS', 'OUTDOOR_SPACES'].includes(body.typology)) {
             return NextResponse.json(
                 { error: 'Tipologia non valida' },
                 { status: 400 }

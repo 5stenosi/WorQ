@@ -6,10 +6,12 @@ import { updateSpaceAvgRating } from '@/lib/reviewUtils';
 // Updates a review
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
     try {
+        const { id } = params;
 
-        const id = parseInt(params.id);
+        // Convert the ID to a number
+        const reviewId = parseInt(params.id);
 
-        if (isNaN(id)) {
+        if (isNaN(reviewId)) {
             return NextResponse.json(
                 { error: 'Invalid ID' },
                 { status: 400 }
@@ -27,7 +29,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         }
 
         const updatedReview = await prisma.review.update({
-            where: { id },
+            where: { id: reviewId },
             data: body,
         });
 
@@ -44,9 +46,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 // Deletes a review
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
-        const id = parseInt(params.id);
+        const { id } = params;
 
-        if (isNaN(id)) {
+        // Convert the ID to a number
+        const reviewId = parseInt(params.id);
+
+        if (isNaN(reviewId)) {
             return NextResponse.json(
                 { error: 'Invalid ID' },
                 { status: 400 }
@@ -54,7 +59,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         }
 
         const review = await prisma.review.delete({
-            where: { id },
+            where: { id: reviewId },
         });
 
         // Update the average rating of the associated space

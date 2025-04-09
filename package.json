@@ -12,6 +12,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.8.0",
     "@capacitor/cli": "^7.0.1",
     "@capacitor/core": "^7.0.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",

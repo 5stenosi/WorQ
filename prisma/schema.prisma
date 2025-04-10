@@ -21,8 +21,7 @@ model Space {
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   address Address?
   description String
-  seats Int // Private Office = 1, Meeting Room = 10, Study Room = 10... 
-  numberOfSpaces Int // Posso avere più spazi di uguale tipologia
+  seats Int
   isFullSpaceBooking  Boolean // True se lo spazio deve essere prenotato interamente
   typology Typology
   services Service[] 
@@ -63,11 +62,13 @@ model User {
   id String @id @default(uuid())
   email String @unique
   role Role
+  password String? // Hashed password for traditional authentication
   oauthProvider OAuthProvider
   oauthId String
   createdAt DateTime @default(now())
   client Client?
   agency Agency?
+  sessions Session[]
 }
 
 model Client {
@@ -98,7 +99,6 @@ model Booking {
   spaceId Int
   space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   bookingDate DateTime // Data della prenotazione
-  seatsBooked Int // Numero di posti prenotati
   createdAt DateTime @default(now())
 }
 
@@ -114,6 +114,14 @@ model Review {
   @@unique([clientId, spaceId])
 }
 
+model Session {
+  id String @id @default(cuid())
+  sessionToken String @unique
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+}
+
 enum Role {
   CLIENT
   AGENCY
@@ -121,7 +129,7 @@ enum Role {
 
 enum OAuthProvider {
   GOOGLE
-  FACEBOOK
-  APPLE
+  GITHUB
+  APP
   // other
 }

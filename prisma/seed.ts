@@ -2,7 +2,30 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    // Creazione di un'agenzia
+    // Services creation
+    const services = await Promise.all([
+        prisma.service.create({ data: { detail: 'Free Wi-Fi' } }),
+        prisma.service.create({ data: { detail: 'Stationery' } }),
+        prisma.service.create({ data: { detail: 'Printer' } }),
+        prisma.service.create({ data: { detail: 'Scanner' } }),
+        prisma.service.create({ data: { detail: 'Whiteboard' } }),
+        prisma.service.create({ data: { detail: 'Desktop' } }),
+        prisma.service.create({ data: { detail: 'Projector' } }),
+        prisma.service.create({ data: { detail: 'Disability Access' } }),
+        prisma.service.create({ data: { detail: 'Air Conditioning' } }),
+        prisma.service.create({ data: { detail: 'Quiet Zones' } }), // Focus Rooms
+        prisma.service.create({ data: { detail: 'Vending Machines' } }),
+        prisma.service.create({ data: { detail: 'Catering' } }),
+        prisma.service.create({ data: { detail: 'Video Conference' } }),
+        prisma.service.create({ data: { detail: 'Kitchenette' } }),
+        prisma.service.create({ data: { detail: 'Child-friendly' } }),
+        prisma.service.create({ data: { detail: 'Pet-friendly' } }),
+        prisma.service.create({ data: { detail: 'Parking' } }),
+        prisma.service.create({ data: { detail: 'Lockers' } }),
+        prisma.service.create({ data: { detail: 'Charging Stations' } }),
+    ]);
+
+    // Creation of an agency
     const agencyUser = await prisma.user.create({
         data: {
             email: 'agency@example.com',
@@ -11,7 +34,7 @@ async function main() {
             oauthId: 'oauth-agency-1',
             agency: {
                 create: {
-                    name: 'Agenzia 1',
+                    name: 'Agency 1',
                     vatNumber: '12345678901',
                     telephone: '1234567890',
                 },
@@ -20,7 +43,7 @@ async function main() {
         include: { agency: true },
     });
 
-    // Creazione di un cliente
+    // Creation of a client
     const clientUser = await prisma.user.create({
         data: {
             email: 'client@example.com',
@@ -38,7 +61,7 @@ async function main() {
         include: { client: true },
     });
 
-    // Creazione di un cliente
+    // Creation of another client
     const clientUser2 = await prisma.user.create({
         data: {
             email: 'client2@example.com',
@@ -56,15 +79,14 @@ async function main() {
         include: { client: true },
     });
 
-    // Creazione di spazi multipli
+    // Creation of multiple spaces
     const spaces = await Promise.all([
         prisma.space.create({
             data: {
                 name: 'Milano Meetings',
                 agencyId: agencyUser.agency!.id,
-                description: 'Un bellissimo spazio di coworking',
+                description: 'A beautiful coworking space',
                 seats: 10,
-                numberOfSpaces: 1,
                 isFullSpaceBooking: true,
                 typology: 'MEETING_ROOMS',
                 price: 100.0,
@@ -79,15 +101,15 @@ async function main() {
                         number: '10',
                         city: 'Milano',
                         zip: '20100',
-                        country: 'Italia',
+                        country: 'Italy',
                         latitude: 45.4642,
                         longitude: 9.19,
                     },
                 },
                 services: {
                     create: [
-                        { detail: 'Wi-Fi gratuito' },
-                        { detail: 'Stampante' },
+                        { detail: 'Free Wi-Fi' },
+                        { detail: 'Printer' },
                     ],
                 },
             },
@@ -96,9 +118,8 @@ async function main() {
             data: {
                 name: 'RomOffice',
                 agencyId: agencyUser.agency!.id,
-                description: 'Un altro spazio di coworking',
+                description: 'Another coworking space',
                 seats: 15,
-                numberOfSpaces: 2,
                 isFullSpaceBooking: false,
                 typology: 'PRIVATE_OFFICES',
                 price: 150.0,
@@ -108,17 +129,17 @@ async function main() {
                     create: {
                         street: 'Via Torino',
                         number: '20',
-                        city: 'Roma',
+                        city: 'Rome',
                         zip: '00100',
-                        country: 'Italia',
+                        country: 'Italy',
                         latitude: 41.9028,
                         longitude: 12.4964,
                     },
                 },
                 services: {
                     create: [
-                        { detail: 'Aria condizionata' },
-                        { detail: 'Caffè gratuito' },
+                        { detail: 'Air Conditioning' },
+                        { detail: 'Vending Machines' },
                     ],
                 },
             },
@@ -127,9 +148,8 @@ async function main() {
             data: {
                 name: 'Naples Outdoor',
                 agencyId: agencyUser.agency!.id,
-                description: 'Uno spazio moderno e attrezzato',
+                description: 'A modern and well-equipped space',
                 seats: 20,
-                numberOfSpaces: 3,
                 isFullSpaceBooking: true,
                 typology: 'OUTDOOR_SPACES',
                 price: 200.0,
@@ -139,44 +159,43 @@ async function main() {
                     create: {
                         street: 'Corso Venezia',
                         number: '5',
-                        city: 'Napoli',
+                        city: 'Naples',
                         zip: '80100',
-                        country: 'Italia',
+                        country: 'Italy',
                         latitude: 40.8518,
                         longitude: 14.2681,
                     },
                 },
                 services: {
                     create: [
-                        { detail: 'Proiettore' },
-                        { detail: 'Servizio catering' },
+                        { detail: 'Projector' },
+                        { detail: 'Catering' },
                     ],
                 },
             },
         }),
     ]);
 
-    // Creazione di una prenotazione
+    // Creation of a booking
     const booking = await prisma.booking.create({
         data: {
             clientId: clientUser.client!.id,
             spaceId: spaces[0].id,
             bookingDate: new Date('2023-11-01T10:00:00Z'),
-            seatsBooked: 5,
         },
     });
 
-    // Creazione di una recensione
+    // Creation of a review
     const review = await prisma.review.create({
         data: {
             clientId: clientUser.client!.id,
             spaceId: spaces[0].id,
             rating: 5,
-            comment: 'Spazio fantastico!',
+            comment: 'Fantastic space!',
         },
     });
 
-    console.log('Seed completato con successo!');
+    console.log('Seeding completed successfully!');
 }
 
 main()

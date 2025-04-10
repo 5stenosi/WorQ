@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { NextResponse, NextRequest } from 'next/server';
 
 // Handles GET requests to /api/spaces
@@ -121,22 +121,22 @@ export async function POST(request: Request) {
                     create: body.address,
                 },
                 // Connect or create services
-                services: {
-                    connectOrCreate: body.services.map((service: { id: string, detail: string }) => ({
-                        where: { id: service.id },
-                        create: { detail: service.detail },
-                    })),
-                },
-                // Connect services
                 // services: {
-                //     connect: body.services.map((serviceId: string) => ({ id: serviceId })),
+                //     connectOrCreate: body.services.map((service: { id: string, detail: string }) => ({
+                //         where: { id: service.id },
+                //         create: { detail: service.detail },
+                //     })),
                 // },
+                // Connect existing services by their IDs
+                services: {
+                    connect: body.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
+                },
                 // Images are optional
                 images: body.images ? body.images : undefined,
             },
         });
         return NextResponse.json(newSpace, { status: 201 });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to create space' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to create space' + error}, { status: 500 });
     }
 }

@@ -13,7 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// TODO: Capire come implementare le prenotazioni
 model Space {
   id Int @id @default(autoincrement())
   name String
@@ -22,7 +21,7 @@ model Space {
   address Address?
   description String
   seats Int
-  isFullSpaceBooking  Boolean // True se lo spazio deve essere prenotato interamente
+  isFullSpaceBooking  Boolean // True if the space must be booked entirely
   typology Typology
   services Service[] 
   price Decimal
@@ -98,8 +97,10 @@ model Booking {
   client Client @relation(fields: [clientId], references: [id])
   spaceId Int
   space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  bookingDate DateTime // Data della prenotazione
+  bookingDate DateTime // Booking date
   createdAt DateTime @default(now())
+
+  @@unique([clientId, spaceId, bookingDate])
 }
 
 model Review {

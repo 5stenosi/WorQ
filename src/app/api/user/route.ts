@@ -7,12 +7,9 @@ import { NextResponse } from 'next/server'
 export async function GET() {
   try {
     // const session = await auth()
-    const sessionId = "773f4a64-5e44-4880-8751-8c72f021caab" // Replace with session.id
-    const sessionRole = "CLIENT"; // Replace with session.role
 
-    const user = await prisma.user.findUnique({
-      where: { id: sessionId },
-    })
+    // Use Prisma's findFirst method to fetch the first record if needed
+    const user = await prisma.user.findFirst();
 
     // TODO: Check if the user is authenticated
 
@@ -35,6 +32,9 @@ export async function GET() {
         }
       })
       return NextResponse.json(agency)
+    }
+    else {
+      return NextResponse.json({ error: "Utente non trovato" }, { status: 404 })
     }
 
   } catch (error) {

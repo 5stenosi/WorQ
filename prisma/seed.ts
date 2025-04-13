@@ -181,7 +181,7 @@ async function main() {
         data: {
             clientId: clientUser.client!.id,
             spaceId: spaces[0].id,
-            bookingDate: new Date('2023-11-01T10:00:00Z'),
+            bookingDate: new Date('2025-04-20T10:00:00Z'),
         },
     });
 

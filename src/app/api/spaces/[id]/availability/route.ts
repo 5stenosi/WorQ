@@ -1,37 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
+import { getMonthlyAvailability } from "@/lib/spaceAvailability";
 
-// Handles GET requests to /api/spaces/[id]/availability?date=YYYY-MM-DD
-// Returns the availability of a space
+// Handles GET requests to /api/spaces/[id]/availability?year=YYYY&month=MM
+// Returns the availability of a space for a month
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+    const year = parseInt(request.nextUrl.searchParams.get("year") || "");
+    const month = parseInt(request.nextUrl.searchParams.get("month") || "");
 
-    const space = await prisma.space.findUnique({
-        where: { id: parseInt(params.id) },
-        select: { id: true, seats: true, isFullSpaceBooking: true }
-    });
+    const availableDates = await getMonthlyAvailability(parseInt(params.id), year, month);
 
-    if (!space) {
-        return NextResponse.json({ error: 'Space not found' }, { status: 404 });
+    if (!availableDates) {
+        return NextResponse.json({ error: "Space not found" }, { status: 404 });
     }
 
-    const date = request.nextUrl.searchParams.get("date");
-    const startOfDay = new Date(`${date}T00:00:00`);
-    const endOfDay = new Date(`${date}T23:59:59`);
-
-    const existingBookings = await prisma.booking.findMany({
-        where: {
-            spaceId: space.id,
-            bookingDate: { gte: startOfDay, lte: endOfDay },
-        }
-    });
-
-    const remainingSeats = space.isFullSpaceBooking ?
-        (existingBookings.length === 0 ? space.seats : 0) :
-        (space.seats - existingBookings.length);
-
-    return NextResponse.json({ 
-        isFullSpaceBooking: space.isFullSpaceBooking,
-        available: remainingSeats > 0, 
-        remainingSeats
-    });
-}
+    return NextResponse.json({ availableDates });
+}   

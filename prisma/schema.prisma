@@ -14,38 +14,38 @@ datasource db {
 }
 
 model Space {
-  id Int @id @default(autoincrement())
-  name String
-  agencyId Int
-  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  address Address?
-  description String
-  seats Int
-  isFullSpaceBooking  Boolean // True if the space must be booked entirely
-  typology Typology
-  services Service[] 
-  price Decimal
-  bookings Booking[]
-  images Json?
-  reviews Review[]
-  avgRating Decimal? @default(0)
+  id                 Int       @id @default(autoincrement())
+  name               String
+  agencyId           Int
+  agency             Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  address            Address?
+  description        String
+  seats              Int
+  isFullSpaceBooking Boolean // True if the space must be booked entirely
+  typology           Typology
+  services           Service[]
+  price              Decimal
+  bookings           Booking[]
+  images             Json?
+  reviews            Review[]
+  avgRating          Decimal?  @default(0)
 }
 
 model Address {
-  id Int @id @default(autoincrement())
-  street String
-  number String
-  city String
-  zip String
-  country String
-  latitude Float
+  id        Int    @id @default(autoincrement())
+  street    String
+  number    String
+  city      String
+  zip       String
+  country   String
+  latitude  Float
   longitude Float
-  spaceId Int @unique
-  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId   Int    @unique
+  space     Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 }
 
 model Service {
-  id Int @id @default(autoincrement())
+  id     Int     @id @default(autoincrement())
   detail String
   spaces Space[]
 }
@@ -58,69 +58,101 @@ enum Typology {
 }
 
 model User {
-  id String @id @default(uuid())
-  email String @unique
-  role Role
-  password String? // Hashed password for traditional authentication
+  id            String        @id @default(uuid())
+  email         String        @unique
+  role          Role
+  password      String? // Hashed password for traditional authentication
   oauthProvider OAuthProvider
-  oauthId String
-  createdAt DateTime @default(now())
-  client Client?
-  agency Agency?
-  sessions Session[]
+  oauthId       String
+  createdAt     DateTime      @default(now())
+  client        Client?
+  agency        Agency?
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Client {
-  id Int @id @default(autoincrement())
-  name String
-  surname String
+  id        Int       @id @default(autoincrement())
+  name      String
+  surname   String
   cellphone String
-  bookings Booking[]
-  reviews Review[]
-  userEmail String @unique
-  user User @relation(fields: [userEmail], references: [email])
+  bookings  Booking[]
+  reviews   Review[]
+  userEmail String    @unique
+  user      User      @relation(fields: [userEmail], references: [email])
 }
 
 model Agency {
-  id Int @id @default(autoincrement())
-  name String
+  id        Int     @id @default(autoincrement())
+  name      String
   vatNumber String
   telephone String
-  spaces Space[]
-  userEmail String @unique
-  user User @relation(fields: [userEmail], references: [email])
+  spaces    Space[]
+  userEmail String  @unique
+  user      User    @relation(fields: [userEmail], references: [email])
 }
 
 model Booking {
-  id Int @id @default(autoincrement())
-  clientId Int
-  client Client @relation(fields: [clientId], references: [id])
-  spaceId Int
-  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  client      Client   @relation(fields: [clientId], references: [id])
+  spaceId     Int
+  space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   bookingDate DateTime // Booking date
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 
   @@unique([clientId, spaceId, bookingDate])
 }
 
 model Review {
-  id Int @id @default(autoincrement())
-  clientId Int
-  client Client @relation(fields: [clientId], references: [id])
-  spaceId Int
-  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  rating Int // 1-5
-  comment String
+  id        Int      @id @default(autoincrement())
+  clientId  Int
+  client    Client   @relation(fields: [clientId], references: [id])
+  spaceId   Int
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  rating    Int // 1-5
+  comment   String
   createdAt DateTime @default(now())
+
   @@unique([clientId, spaceId])
 }
 
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+}
+
 model Session {
-  id String @id @default(cuid())
-  sessionToken String @unique
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  expiresAt DateTime
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 enum Role {

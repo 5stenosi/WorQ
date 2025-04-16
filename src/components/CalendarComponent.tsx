@@ -1,9 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const CalendarComponent: React.FC = () => {
+interface CalendarComponentProps {
+    onDateSelection?: (selectedDates: Set<string>) => void;
+}
+
+const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection }) => {
     const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
@@ -24,6 +28,12 @@ const CalendarComponent: React.FC = () => {
         });
     };
 
+    useEffect(() => {
+        if (onDateSelection) {
+            onDateSelection(selectedDates);
+        }
+    }, [selectedDates, onDateSelection]);
+
     const handlePreviousMonth = () => {
         if (currentMonth === 0) {
             setCurrentMonth(11);
@@ -43,26 +53,26 @@ const CalendarComponent: React.FC = () => {
     };
 
     const monthNames = [
-        'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     return (
-        <div className="p-2 bg-stone-200 rounded-2xl w-100">
-            <div className="flex justify-between items-center mb-2">
-                <button onClick={handlePreviousMonth} className="aspect-square size-10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
+        <div className="">
+            <div className="flex justify-between items-center">
+                <button onClick={handlePreviousMonth} className="aspect-square size-8 text-sm border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 <div className="text-lg font-bold">
                     {monthNames[currentMonth]} {currentYear}
                 </div>
-                <button onClick={handleNextMonth} className="aspect-square size-10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
+                <button onClick={handleNextMonth} className="aspect-square size-8 text-sm border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7">
                 {['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map((dayName, index) => (
-                    <div key={index} className="text-center font-bold">
+                    <div key={index} className="text-sm text-center font-bold py-2">
                         {dayName}
                     </div>
                 ))}
@@ -72,8 +82,15 @@ const CalendarComponent: React.FC = () => {
 
                     return (
                         <button key={date} onClick={() => toggleDateSelection(date)}
-                            className={`flex items-center justify-center rounded-lg aspect-square hover:bg-blue-100
-                                ${isSelected ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 border-gray-300'}`}>
+                            className={`flex items-center justify-center h-10 w-10 transition
+
+
+
+                                duration-500 hover:duration-150 delay-250 hover:delay-0
+                                ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'hover:bg-west-side-200 hover:text-west-side-900'}
+                                ${[1].includes(day) ? 'rounded-tl-md' : ''}
+                                ${[7].includes(day) ? 'rounded-tr-md' : ''}
+                                ${[29].includes(day) ? 'rounded-bl-md' : ''}`}>
                             {day}
                         </button>
                     );

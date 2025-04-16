@@ -4,30 +4,31 @@ import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 
-// Dynamically import Leaflet to avoid SSR issues
 const MapComponent: React.FC = () => {
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const L = require('leaflet'); // Dynamically require Leaflet
+            const L = require('leaflet');
 
-            // Initialize the map
-            const map = L.map('map').setView([45.4642, 9.19], 13); // Coordinates of Milan, zoom 13
-
-            // Add the OpenStreetMap layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-            }).addTo(map);
-
-            // Define a custom red marker icon
-            const redIcon = L.icon({
-                iconUrl: '/markers/red-marker.png', // Replace with the actual path to your red marker image
-                iconSize: [50, 50], // Size of the icon
-                iconAnchor: [25, 50], // Point of the icon which will correspond to marker's location
-                popupAnchor: [0, -25], // Point from which the popup should open relative to the iconAnchor
+            // Fix for marker icons not appearing
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+                iconUrl: require('leaflet/dist/images/marker-icon.png'),
+                shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
             });
 
-            // Add the custom marker to the map
-            L.marker([45.4642, 9.19], { icon: redIcon })
+            // Initialize the map
+            const map = L.map('map').setView([45.4642, 9.19], 13);
+
+            // Add the Stadia.AlidadeSmoothDark layer
+            L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}', {
+                minZoom: 0,
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                ext: 'png',
+            }).addTo(map);
+
+            // Add the default marker to the map
+            L.marker([45.4642, 9.19])
                 .addTo(map)
                 .bindPopup('Milano, Italia')
                 .openPopup();
@@ -41,11 +42,8 @@ const MapComponent: React.FC = () => {
 
     return (
         <div className="flex w-full h-full">
-            {/* Map Section */}
             <div id="map" className="w-3/4 h-full rounded-2xl shadow-sm"></div>
-
-            {/* Card Section */}
-            <div className="w-1/4 h-full p-4 ml-4 bg-white rounded-2xl shadow-sm">
+            <div className="w-1/4 h-full p-4 ml-4 bg-stone-100 rounded-2xl shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Seleziona un marker...</h2>
                 <p>...verranno mostrate le informazioni dello spazio di coworking selezionato.</p>
             </div>

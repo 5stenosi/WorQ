@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 
 interface HorizontalOptionsProps {
@@ -11,7 +13,7 @@ interface HorizontalOptionsProps {
 const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
     options,
     initialSelected = 0,
-    backgroundColor = 'bg-white',
+    backgroundColor = 'bg-stone-100',
     optionClassName = '',
     containerClassName = '',
 }) => {
@@ -32,7 +34,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
             {options.map((option, index) => (
                 <div
                     key={index}
-                    className={`relative text-center cursor-pointer z-10 whites ce-nowrap ${optionClassName}`}
+                    className={`relative text-center cursor-pointer z-10 ${optionClassName}`}
                     onClick={() => setSelectedOption(index)}>
                     {option}
                 </div>

@@ -64,6 +64,16 @@
   /* Nasconde la scrollbar nei browser WebKit */
 }
 
+.no-spinner {
+  -moz-appearance: textfield; /* Per Firefox */
+}
+
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Per Chrome, Safari, Edge */
+  margin: 0;
+}
+
 button {
   @apply cursor-pointer;
 }

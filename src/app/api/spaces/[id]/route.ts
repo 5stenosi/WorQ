@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { error } from 'console';
 import { NextResponse } from 'next/server';
 
@@ -6,11 +6,13 @@ import { NextResponse } from 'next/server';
 // Returns a single space
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     try {
+        const { id } = await params;
+
         // Convert the ID to a number
-        const id = parseInt(params.id);
+        const spaceId = parseInt(id);
 
         // Check if the ID is valid
-        if (isNaN(id)) {
+        if (isNaN(spaceId)) {
             return NextResponse.json(
                 { error: 'Invalid ID' },
                 { status: 400 }
@@ -18,7 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         }
 
         const space = await prisma.space.findUnique({
-            where: { id },
+            where: { id: spaceId },
             include: { address: true, services: true, bookings: true, reviews: true }
         });
 
@@ -36,9 +38,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
 // Updates a single space
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
     try {
-        const id = parseInt(params.id);
+        const { id } = params;
 
-        if (isNaN(id)) {
+        // Convert the ID to a number
+        const spaceId = parseInt(id);
+
+        if (isNaN(spaceId)) {
             return NextResponse.json(
                 { error: 'Invalid ID' },
                 { status: 400 }
@@ -80,7 +85,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             };
         }
 
-        if (body.typology && !['MEETING_ROOMS', 'PRIVATE_OFFICES', 'STUDY_ROOMS', 'OUTDOOR_SPACES'].includes(body.typology)) {
+        if (body.typology && !['MEETING_ROOMS', 'PRIVATE_OFFICES', 'COMMON_AREAS', 'OUTDOOR_SPACES'].includes(body.typology)) {
             return NextResponse.json(
                 { error: 'Tipologia non valida' },
                 { status: 400 }
@@ -88,7 +93,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         }
 
         const updatedSpace = await prisma.space.update({
-            where: { id },
+            where: { id: spaceId },
             data: updateData
         });
 
@@ -102,9 +107,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 // Deletes a single space
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
-        const id = parseInt(params.id);
+        const { id } = params;
 
-        if (isNaN(id)) {
+        // Convert the ID to a number
+        const spaceId = parseInt(id);
+
+        if (isNaN(spaceId)) {
             return NextResponse.json(
                 { error: 'Invalid ID' },
                 { status: 400 }
@@ -112,7 +120,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         }
 
         const deletedSpace = await prisma.space.delete({
-            where: { id },
+            where: { id: spaceId },
         });
 
         return NextResponse.json(deletedSpace);

@@ -1,80 +1,61 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
-import { SaltAndHashPassword } from "@/lib/auth";
-import { getUserFromDB } from "@/lib/auth";
-import { ZodError } from "zod";
-import { signInSchema } from "./lib/zod";
-import { ComparePassword } from "@/lib/auth";
+import { saltAndHashPassword, getUserFromDb } from "@/lib/password";
+import { isUserProfileComplete } from "./lib/checkUserCompletation";
+//import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma), // per salvare gli utenti nel database
+  adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-    }),
-
+    Google,
+    GitHub,
     Credentials({
-      credentials: { // Funzione di autenticazione con credenziali
-        email: {},
-        password: {},
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+        //name: { label: "Name", type: "text" },
+        //telephone: { label: "Telephone", type: "text" },
+        //vatNumber: { label: "VAT Number", type: "text" },
       },
       authorize: async (credentials) => {
-        if (!credentials?.email || !credentials?.password) {
-          return null; // Se mancano email o password, ritorna null
+        let user = null;
+
+        // logic to salt and hash password
+        const pwHash = saltAndHashPassword(credentials.password);
+
+        // logic to verify if the user exists
+        user = await getUserFromDb(credentials.email, await pwHash);
+
+        if (!user) {
+          // No user found, so this is their first attempt to login
+          // Optionally, this is also the place you could do a user registration
+          throw new Error("Invalid credentials.");
         }
 
-        try {
-          // Valida le credenziali con Zod
-          const { email, password } = await signInSchema.parseAsync(credentials);
-
-          // Trova l'utente nel database
-          const user = await getUserFromDB(email);
-          if (!user) {
-            return null; // Nessun utente trovato
-          }
-
-          // Confronta la password inserita con l'hash salvato nel database
-          const isValid = await ComparePassword(password, user.password);
-          if (!isValid) {
-            return null; // Password errata
-          }
-
-          return user; // Autenticazione riuscita
-        } catch (error) {
-          if (error instanceof ZodError) {
-            return null; // Se la validazione fallisce, ritorna null
-          }
-          console.error("Errore nell'autenticazione:", error);
-          return null;
-        }
-      }
+        // return user object with their profile data
+        return user;
+      },
     }),
-
   ],
-  //secret: process.env.AUTH_SECRET, // Chiave segreta per crittografare sessioni e token (utile se si usa JWT)
-  session: {
-    strategy: "database", // memorizza la sessione nel database
-  },
-});
-
-/* ALTERNATIVA (?)
-
-// Define your configuration in a separate variable and pass it to NextAuth()
-// This way we can also 'export const config' for use later
-export const config = {
-  adapter: PrismaAdapter(prisma),
-  providers: [Google],
   pages: {
     signIn: "/login",
+    //signOut: "/logout",
+    //error: "/auth/error", // Error code passed in query string as ?error=
   },
-  // ...
-}
-export const { signIn, signOut, handle } = NextAuth(config)
-*/
+  callbacks: {
+    async signIn({ user }) {
+      const isComplete = await isUserProfileComplete(user.email!);
+      if (!isComplete) {
+        // First time signing in, redirect to complete profile
+        return "/complete-profile";
+      }
+      return true;
+    },
+  },
+});

@@ -64,7 +64,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             name: body.name,
             description: body.description,
             seats: body.seats,
-            numberOfSpaces: body.numberOfSpaces,
             isFullSpaceBooking: body.isFullSpaceBooking,
             typology: body.typology,
             price: parseFloat(body.price) || undefined,

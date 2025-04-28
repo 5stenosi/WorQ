@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
-async function saltAndHashPassword(password: unknown): Promise<string> {
+async function saltAndHashPassword(password: string): Promise<string> {
   if (typeof password !== "string") {
     throw new Error("Password must be a string.");
   }
@@ -12,7 +12,7 @@ async function saltAndHashPassword(password: unknown): Promise<string> {
   return hashedPassword;
 }
 
-async function getUserFromDb(email: unknown, plainPassword: string) {
+async function getUserFromDb(email: string, plainPassword: string) {
   if (typeof email !== "string") {
     throw new Error("Email must be a string.");
   }

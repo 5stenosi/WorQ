@@ -1,8 +1,11 @@
 "use client";
 
+import { useAuthErrorMessage } from "@/lib/useAuthErrorMessage";
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
+  const errorMessage = useAuthErrorMessage();
+
   const credentialsAction = (formData: FormData) => {
     signIn("credentials", {
       email: formData.get("email"),
@@ -12,10 +15,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-sm mx-auto mt-10 border p-6 rounded-xl shadow">
+    <div className="flex flex-col gap-6 max-w-sm mx-auto pt-35 border p-6 rounded-xl shadow">
       <h2 className="text-xl font-semibold text-center">
         Login into your account
       </h2>
+
+      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
       {/* Google Sign-In */}
       <button

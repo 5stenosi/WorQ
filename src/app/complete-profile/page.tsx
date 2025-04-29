@@ -11,30 +11,9 @@ export default function CompleteProfile() {
   const [role, setRole] = useState<"CLIENT" | "AGENCY">();
   const [formData, setFormData] = useState({});
   const router = useRouter();
-  /*
-  useEffect(() => {
-    
-    if (status === "unauthenticated") {
-      router.push("/login?callbackUrl=/complete-profile");
-    }
-      
 
-    if (status === "authenticated" && session?.user) {
-      // a questo punto l'utente è autenticato
-      const checkProfileCompletion = async () => {
-        if (session.user) {
-          const isComplete = await isUserProfileComplete(session.user.email!);
-          if (isComplete) {
-            // Se il profilo è completo, reindirizza alla homepage
-            router.push("/");
-          }
-        }
-      };
-      checkProfileCompletion();
-    }
-  }, [status, session, router]);
-  */
-
+  // Controlla se l'email è già presente nella sessione o nei query params
+  // Se non è presente, reindirizza alla pagina di login
   useEffect(() => {
     // Ottieni l'email dalla sessione o dai query params
     const sessionEmail = session?.user?.email;
@@ -50,6 +29,7 @@ export default function CompleteProfile() {
     }
   }, [status, session, searchParams, router]);
 
+  // Controlla attraverso la mail se il profilo è già completo, se sì, reindirizza alla home
   useEffect(() => {
     if (email) {
       const checkProfile = async () => {
@@ -64,6 +44,7 @@ export default function CompleteProfile() {
 
   const handleSubmit = async () => {
     if (!email || !role) {
+      // possibilità di sostituire alert con react-hot-toast
       alert("Missing data. Please select your role and fill the form.");
       return;
     }
@@ -78,8 +59,6 @@ export default function CompleteProfile() {
       body: JSON.stringify({ role, ...formData, email }),
     });
 
-    console.log("Email inviata al server:", session?.user?.email); // Debug
-
     if (res.ok) {
       router.push("/");
     } else {
@@ -89,13 +68,6 @@ export default function CompleteProfile() {
 
   if (status === "loading") return <p>Loading...</p>;
   if (!email) return <p>Verifying your session...</p>;
-
-  /*
-  if (!session?.user?.email) {
-    alert("Missing email. Please log in again.");
-    return;
-  }
-    */
 
   return (
     <div className="max-w-md mx-auto pt-35">

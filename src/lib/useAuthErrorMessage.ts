@@ -19,7 +19,7 @@ export function useAuthErrorMessage() {
       errorMessage = "You must be logged in to access this page.";
       break;
     default:
-      errorMessage = "";
+      return null;
   }
 
   return errorMessage;

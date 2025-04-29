@@ -9,7 +9,6 @@ export async function isUserProfileComplete(email: string) {
     });
 
     if (!user) {
-      console.log("Utente non trovato per l'email:", email); // Debug
       return false; // Se l'utente non esiste, restituisci false
     }
 

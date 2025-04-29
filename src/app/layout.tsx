@@ -53,7 +53,7 @@ export default function RootLayout({
               {/* <button onClick={handleScrollToBottom} className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
                 Contact us
               </button> */}
-              <a href="/coworkingSpaces" className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
+              <a href="/spaces" className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
                 Spaces
               </a>
               <a href="/profile" className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">

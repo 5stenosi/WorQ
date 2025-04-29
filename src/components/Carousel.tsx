@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
+// Aggiunto supporto per un bottone opzionale per eliminare le immagini, visibile solo in determinati contesti
 interface CarouselProps {
     images: string[];
     autoPlay?: boolean;
@@ -9,6 +10,7 @@ interface CarouselProps {
     buttonSize?: string; // Dimensione dei pulsanti di navigazione
     dotSize?: string; // Dimensione dei pallini
     chevronSize?: string; // Dimensione delle frecce
+    onClearImages?: () => void; // Funzione opzionale per eliminare le immagini
 }
 
 const Carousel: React.FC<CarouselProps> = ({
@@ -18,6 +20,7 @@ const Carousel: React.FC<CarouselProps> = ({
     buttonSize = '', // Valore predefinito per i pulsanti
     dotSize = '', // Valore predefinito per i pallini
     chevronSize = '', // Valore predefinito per le frecce
+    onClearImages, // Funzione opzionale per eliminare le immagini
 }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -58,16 +61,26 @@ const Carousel: React.FC<CarouselProps> = ({
                 </div>
                 {/* Pulsante per immagine precedente */}
                 <button
+                    type='button'
                     onClick={handlePrev}
                     className={`absolute ${buttonSize} ${chevronSize} -left-full group-hover:left-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
                 {/* Pulsante per immagine successiva */}
                 <button
+                    type='button'
                     onClick={handleNext}
                     className={`absolute ${buttonSize} ${chevronSize} -right-full group-hover:right-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
+                {/* Bottone per eliminare tutte le immagini */}
+                {onClearImages && (
+                    <button
+                        onClick={onClearImages}
+                        className={`absolute ${buttonSize} -top-full group-hover:top-[5%] inset-x-0 mx-auto bg-stone-900/25 hover:bg-red-500 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
+                        <FontAwesomeIcon icon={faTrashCan} />
+                    </button>
+                )}
                 {/* Indicatori di navigazione (pallini) */}
                 <div className="absolute -bottom-full group-hover:bottom-[5%] transition-all duration-300 inset-x-0 mx-auto bg-stone-900/25 backdrop-blur-sm p-2 rounded-full flex gap-2 w-fit">
                     {images.map((_, index) => (

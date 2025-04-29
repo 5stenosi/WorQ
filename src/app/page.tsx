@@ -61,12 +61,12 @@ const HomePage = () => {
 
           <div className='flex flex-col gap-5 md:gap-20 overflow-clip'>
             <h1 className='text-center sm:text-start text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold
-                     intersect-once intersect:motion-preset-slide-right-lg'>Key Services</h1>
+                     intersect-once intersect:motion-preset-slide-right-lg'>Key <span className='underline decoration-west-side-500'>Services</span></h1>
             <p className='text-center sm:text-start text-lg lg:text-4xl font-medium w-full lg:w-2/3 pb-1
                     intersect-once intersect:motion-preset-slide-right-lg'>Discover the perfect workspace tailored to your needs by exploring our key services and amenities.</p>
           </div>
 
-          <div className='w-full h-[300vh] grid grid-cols-10 grid-rows-14 gap-10 text-stone-100 *:rounded-3xl *:transition-shadow *:shadow-sm *:hover:shadow-md'>
+          <div className='w-full h-[300vh] grid grid-cols-10 grid-rows-14 gap-10 text-stone-100 *:rounded-3xl *:transition-all *:shadow-sm *:hover:shadow-lg *:hover:scale-105'>
             {/* Feature 1 */}
             <div className='w-full h-full col-span-6 row-span-4 overflow-hidden relative group
               intersect:motion-preset-slide-up-lg intersect-once'>
@@ -224,12 +224,12 @@ const HomePage = () => {
 
           <div className='flex flex-col gap-5 md:gap-20 overflow-clip'>
             <h1 className='text-center sm:text-start text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold
-                     intersect-once intersect:motion-preset-slide-right-lg'>Space Types</h1>
+                     intersect-once intersect:motion-preset-slide-right-lg'>Space <span className='underline decoration-west-side-500'>Types</span></h1>
             <p className='text-center sm:text-start text-lg lg:text-4xl font-medium w-full lg:w-2/3 pb-1
                 intersect-once intersect:motion-preset-slide-right-lg'>Explore our diverse spaces to find the ideal environment for your work, meetings, or events.</p>
           </div>
 
-          <div className='w-full h-screen grid grid-cols-11 grid-rows-2 gap-10 text-stone-100 *:rounded-3xl *:transition-shadow *:shadow-sm *:hover:shadow-md'>
+          <div className='w-full h-screen grid grid-cols-11 grid-rows-2 gap-10 text-stone-100 *:rounded-3xl *:transition-all *:shadow-sm *:hover:shadow-lg *:hover:scale-105'>
             {/* Meeting Rooms */}
             <div className='w-full h-full col-span-6 row-span-1 overflow-hidden relative group
               intersect:motion-preset-slide-up-lg intersect-once'>
@@ -288,14 +288,16 @@ const HomePage = () => {
                                              mt-10 md:mt-0">
           <div className='flex flex-col gap-5 md:gap-20 overflow-clip'>
             <h1 className='text-center sm:text-start text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold
-                           intersect-once intersect:motion-preset-slide-right-lg'>Find your Space</h1>
+                           intersect-once intersect:motion-preset-slide-right-lg'><span className='underline decoration-west-side-500'>Find</span> your Space</h1>
             <p className='text-center text-balance sm:text-start text-lg lg:text-4xl font-medium w-full lg:w-2/3 pb-1
                           intersect-once intersect:motion-preset-slide-right-lg'>Locate our coworking spaces easily with the interactive map below.</p>
           </div>
 
-          <MapComponent />
+          <div className='w-full h-full intersect:motion-preset-focus-lg'>
+            <MapComponent />
+          </div>
         </section>
-      </div >
+      </div>
     </ObserverProvider >
   );
 };

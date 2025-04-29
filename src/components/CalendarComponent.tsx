@@ -71,7 +71,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection }
                 </button>
             </div>
             <div className="grid grid-cols-7">
-                {['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map((dayName, index) => (
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName, index) => (
                     <div key={index} className="text-sm text-center font-bold py-2">
                         {dayName}
                     </div>

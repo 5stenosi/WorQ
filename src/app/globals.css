@@ -65,6 +65,7 @@
 }
 
 .no-spinner {
+  appearance: textfield; /* Standard property for compatibility */
   -moz-appearance: textfield; /* Per Firefox */
 }
 

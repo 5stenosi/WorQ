@@ -5,9 +5,8 @@ import Link from 'next/link';
 import HorizontalOptions from '@/components/HorizontalOptions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faStar, faStarHalf } from '@fortawesome/free-solid-svg-icons';
-import WordSlider from '@/components/WordSlider';
 
-const CoworkingSpaces = () => {
+const Spaces = () => {
   const [searchText, setSearchText] = useState('');
 
   return (
@@ -32,10 +31,10 @@ const CoworkingSpaces = () => {
         </div>
 
         {/* Griglia Spazi */}
-        <div className='w-full px-20 py-10 grid grid-cols-4 gap-5 *:rounded-4xl *:cursor-pointer *:shadow-sm *:hover:shadow-md
-                          *:hover:scale-105 *:transition-all'>
+        <div className='w-full px-20 py-10 grid grid-cols-4 gap-5'>
           {Array.from({ length: 25 }).map((_, index) => (
-            <Link href="/spazio_nel_dettaglio" key={index} className='w-full h-100 bg-stone-100 col-span-1 overflow-hidden flex flex-col'>
+            <Link href="/spazioNelDettaglio" key={index} className='w-full h-100 bg-stone-100 col-span-1 overflow-hidden flex flex-col
+                                                                    rounded-4xl cursor-pointer shadow-sm hover:shadow-md hover:scale-105 transition-all'>
               <div className='h-1/2'>
                 <img src="/spaceTypes/offices/office2-enhanced.png" alt="example image" className="w-full h-full object-cover" />
               </div>
@@ -65,4 +64,4 @@ const CoworkingSpaces = () => {
   );
 };
 
-export default CoworkingSpaces;
+export default Spaces;

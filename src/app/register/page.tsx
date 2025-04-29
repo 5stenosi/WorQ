@@ -49,7 +49,7 @@ function ClientForm() {
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientRegisterSchema),
   });
-  //const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const onSubmit = async (data: ClientFormValues) => {
     const res = await fetch("/api/register", {
@@ -63,18 +63,16 @@ function ClientForm() {
         password: data.password,
         callbackUrl: "/",
       });
-      //setSuccess(true);
+      setSuccess(true);
     }
   };
 
-  /*
   return success ? (
     <p className="text-green-600">
       Signed up successfully! You can now log in.
     </p>
   ) : (
-  */
-  return (
+    //return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <input
         {...register("email")}
@@ -142,7 +140,7 @@ function AgencyForm() {
   } = useForm<AgencyFormValues>({
     resolver: zodResolver(agencyRegisterSchema),
   });
-  //const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const onSubmit = async (data: AgencyFormValues) => {
     const res = await fetch("/api/register", {
@@ -156,18 +154,16 @@ function AgencyForm() {
         password: data.password,
         callbackUrl: "/",
       });
-      //setSuccess(true);
+      setSuccess(true);
     }
   };
 
-  /*
   return success ? (
     <p className="text-green-600">
       Signed up successfully! You can now log in.
     </p>
   ) : (
-  */
-  return (
+    //return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <input
         {...register("email", { required: true })}

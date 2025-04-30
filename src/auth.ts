@@ -6,9 +6,7 @@ import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
 import { isUserProfileComplete } from "./lib/checkUserCompletation";
 import { getUserFromDb } from "./lib/password";
-import { OAuthProvider } from "@prisma/client";
-//import { OAuthProvider } from "@prisma/client";
-//import { PrismaClient } from "@prisma/client";
+import { createUserAndAccount } from "./lib/createUserAndAccount";
 
 //const prisma = new PrismaClient();
 
@@ -21,21 +19,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        //name: { label: "Name", type: "text" },
-        //telephone: { label: "Telephone", type: "text" },
-        //vatNumber: { label: "VAT Number", type: "text" },
       },
       authorize: async (credentials) => {
-        const email = credentials?.email as string;
-        const password = credentials?.password as string;
+        try {
+          const email = credentials?.email as string;
+          const password = credentials?.password as string;
 
-        const user = await getUserFromDb(email, password);
+          const user = await getUserFromDb(email, password);
 
-        if (!user) {
-          throw new Error("Invalid credentials.");
+          if (!user) {
+            return null; // NextAuth si aspetta null per credenziali invalide
+          }
+
+          return user;
+        } catch (error) {
+          console.error("Authorization error:", error);
+          return null;
         }
-
-        return user;
       },
     }),
   ],
@@ -44,57 +44,47 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     //signOut: "/logout",
     //error: "/auth/error", // Error code passed in query string as ?error=
   },
+  session: {
+    strategy: "jwt", // importante per il provider Credentials
+  },
+  secret: process.env.AUTH_SECRET,
+
   callbacks: {
     async jwt({ token, user, account }) {
-      if (user?.email) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
         token.email = user.email;
+
+        // Recupera il ruolo dal DB se mancante
+        if (!user.role && user.email) {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+          token.role = dbUser?.role || null;
+        } else {
+          token.role = user.role;
+        }
+
+        token.provider = account?.provider || "credentials";
+        token.providerAccountId = account?.providerAccountId;
       }
-      // Aggiungi il provider al token se è OAuth
-      if (account?.provider) {
-        token.provider = account.provider;
-      }
+
       return token;
     },
 
     async session({ session, token }) {
-      if (token?.email) {
-        session.user.email = token.email;
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+        session.user.role = (token.role as string) || "CLIENT"; // Imposta un valore di default se non presente
+        //session.user.provider = token.provider as string;
+        //session.user.providerAccountId = token.providerAccountId as string;
       }
       return session;
     },
-    /*
-    async signIn({ user, account }) {
-      if (!account || !user.email) {
-        console.error("Missing account or user email.");
-        return false;
-      }
 
-      const existingUser = await prisma.user.findUnique({
-        where: { email: user.email },
-      });
-
-      if (!existingUser) {
-        console.log("Utente non trovato per l'email:", user.email);
-        await prisma.user.create({
-          data: {
-            email: user.email,
-            oauthProvider: account.provider.toUpperCase() as OAuthProvider,
-            oauthId: account.providerAccountId,
-            role: "CLIENT", // default temporaneo
-          },
-        });
-        console.log("Utente creato per la prima volta:", user.email);
-        return "/complete-profile";
-      }
-
-      const isComplete = await isUserProfileComplete(user.email);
-      if (!isComplete) {
-        return "/complete-profile";
-      }
-
-      return true;
-    },
-    */
     async signIn({ user, account }) {
       if (account?.provider === "credentials") {
         return true;
@@ -105,33 +95,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // Cerca l'utente nel database
-      let existingUser = await prisma.user.findUnique({
+      const existingUser = await prisma.user.findUnique({
         where: { email: user.email },
       });
 
       if (!existingUser) {
-        // Crea il nuovo utente
-        existingUser = await prisma.user.create({
-          data: {
-            email: user.email,
-            oauthProvider: account.provider.toUpperCase() as OAuthProvider,
-            oauthId: account.providerAccountId,
-            role: "CLIENT", // default temporaneo
-          },
-        });
-
-        // Collega anche l'account OAuth
-        await prisma.account.create({
-          data: {
-            userId: existingUser.id,
-            type: "oauth",
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-            access_token: account.access_token,
-            token_type: account.token_type,
-            id_token: account.id_token,
-            scope: account.scope,
-          },
+        await createUserAndAccount({
+          email: user.email,
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
         });
 
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
@@ -149,7 +121,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
-      return "/"; // Redirect to home page if profile is complete
+      return true; // Redirect to home page if profile is complete
+      // o return true ??
+    },
+
+    async redirect({ url, baseUrl }) {
+      // Se l'utente è già loggato e il profilo è completo, reindirizza alla home
+      if (url === "/complete-profile") {
+        return baseUrl; // Redirect to home page
+      }
+      return baseUrl; // Default redirect to base URL
+      // o return url ??
     },
   },
 });

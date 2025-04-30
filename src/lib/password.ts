@@ -34,7 +34,11 @@ async function getUserFromDb(email: string, plainPassword: string) {
     return null;
   }
 
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  };
 }
 
 export { saltAndHashPassword, getUserFromDb };

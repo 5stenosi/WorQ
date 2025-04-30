@@ -5,7 +5,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { role, email, ...rest } = body;
-    console.log("Email ricevuta dal body:", email); // Debug
 
     if (!email) {
       return NextResponse.json(

@@ -6,12 +6,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<"CLIENT" | "AGENCY" | "">("");
 
   return (
-    <div className="p-4 max-w-xl mx-auto mt-10 border rounded-xl shadow">
+    <div className="p-4 max-w-xl mx-auto pt-20 border rounded-xl shadow">
       <h2 className="text-xl font-semibold mb-4">Sign Up</h2>
 
       {!role ? (
@@ -33,7 +34,15 @@ export default function RegisterPage() {
           </div>
         </>
       ) : (
-        <>{role === "CLIENT" ? <ClientForm /> : <AgencyForm />}</>
+        <>
+          <button
+            onClick={() => setRole("")}
+            className="text-sm text-gray-500 mb-4 underline"
+          >
+            ← Go back
+          </button>
+          {role === "CLIENT" ? <ClientForm /> : <AgencyForm />}
+        </>
       )}
     </div>
   );
@@ -45,11 +54,14 @@ function ClientForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientRegisterSchema),
   });
-  const [success, setSuccess] = useState(false);
+
+  const router = useRouter();
+  //const [success, setSuccess] = useState(false);
 
   const onSubmit = async (data: ClientFormValues) => {
     const res = await fetch("/api/register", {
@@ -57,22 +69,29 @@ function ClientForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, role: "CLIENT" }),
     });
+
+    if (res.status === 409) {
+      // Email già usata
+      setError("email", { type: "manual", message: "Email già registrata." });
+      return;
+    }
+
     if (res.ok) {
-      await signIn("credentials", {
+      const loginRes = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        callbackUrl: "/",
+        redirect: false,
       });
-      setSuccess(true);
+      //setSuccess(true);
+      if (loginRes?.ok) {
+        router.push("/");
+      } else {
+        console.error("Login failed", loginRes);
+      }
     }
   };
 
-  return success ? (
-    <p className="text-green-600">
-      Signed up successfully! You can now log in.
-    </p>
-  ) : (
-    //return (
+  return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <input
         {...register("email")}
@@ -136,11 +155,14 @@ function AgencyForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<AgencyFormValues>({
     resolver: zodResolver(agencyRegisterSchema),
   });
-  const [success, setSuccess] = useState(false);
+
+  const router = useRouter();
+  //const [success, setSuccess] = useState(false);
 
   const onSubmit = async (data: AgencyFormValues) => {
     const res = await fetch("/api/register", {
@@ -148,22 +170,29 @@ function AgencyForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, role: "AGENCY" }),
     });
+
+    if (res.status === 409) {
+      // Email già usata
+      setError("email", { type: "manual", message: "Email già registrata." });
+      return;
+    }
+
     if (res.ok) {
-      await signIn("credentials", {
+      const loginRes = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        callbackUrl: "/",
+        redirect: false,
       });
-      setSuccess(true);
+      //setSuccess(true);
+      if (loginRes?.ok) {
+        router.push("/");
+      } else {
+        console.error("Login failed", loginRes);
+      }
     }
   };
 
-  return success ? (
-    <p className="text-green-600">
-      Signed up successfully! You can now log in.
-    </p>
-  ) : (
-    //return (
+  return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <input
         {...register("email", { required: true })}

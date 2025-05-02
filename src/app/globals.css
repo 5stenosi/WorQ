@@ -3,6 +3,13 @@
 @plugin "tailwindcss-intersect";
 
 @theme {
+
+  --color-google-blue: #4285F4;
+  --color-google-red: #EA4335;
+  --color-google-yellow: #FBBC05;
+  --color-google-green: #34A853;
+  --color-github: #1B1F22;
+
   --color-turquoise-blue-50: #eafffe;
   --color-turquoise-blue-100: #cbffff;
   --color-turquoise-blue-200: #9efcff;
@@ -26,6 +33,11 @@
   --color-west-side-800: #9c4510;
   --color-west-side-900: #7d3a11;
   --color-west-side-950: #441c06;
+}
+
+/* SNAKE */
+.snake-hover {
+  @apply bg-west-side-200 text-west-side-900;
 }
 
 *::-webkit-scrollbar {
@@ -65,14 +77,55 @@
 }
 
 .no-spinner {
-  appearance: textfield; /* Standard property for compatibility */
-  -moz-appearance: textfield; /* Per Firefox */
+  appearance: textfield;
+  /* Standard property for compatibility */
+  -moz-appearance: textfield;
+  /* Per Firefox */
 }
 
 .no-spinner::-webkit-inner-spin-button,
 .no-spinner::-webkit-outer-spin-button {
-  -webkit-appearance: none; /* Per Chrome, Safari, Edge */
+  -webkit-appearance: none;
+  /* Per Chrome, Safari, Edge */
   margin: 0;
+}
+
+/* Slider */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 0.5rem;
+  background: var(--color-stone-100);
+  border-radius: 9999px;
+  cursor: pointer;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--color-stone-900);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--color-west-side-500);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]::-ms-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--color-stone-900);
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 button {

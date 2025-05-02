@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         // }
 
         // Filter by price
-        if(maxPrice) {
+        if (maxPrice) {
             where.price = {
                 lte: parseFloat(maxPrice)
             };
@@ -43,17 +43,17 @@ export async function GET(request: NextRequest) {
         if (searchQuery) {
             where.OR = [
                 { name: { contains: searchQuery, lte: 'insensitive' } },
-                { 
+                {
                     address: {
                         city: { contains: searchQuery, lte: 'insensitive' }
                     }
                 },
-                { 
+                {
                     address: {
                         country: { contains: searchQuery, lte: 'insensitive' }
                     }
                 },
-                { 
+                {
                     services: {
                         some: {
                             detail: { contains: searchQuery, lte: 'insensitive' }
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(spaces);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch spaces'}, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch spaces' }, { status: 500 });
     }
 }
 
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
                 name: body.name,
                 agencyId: body.agencyId,
                 description: body.description,
-                seats: body.seats,                
+                seats: body.seats,
                 isFullSpaceBooking: body.isFullSpaceBooking,
                 typology: body.typology,
                 price: body.price,
@@ -136,6 +136,6 @@ export async function POST(request: Request) {
         });
         return NextResponse.json(newSpace, { status: 201 });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to create space' + error}, { status: 500 });
+        return NextResponse.json({ error: 'Failed to create space' + error }, { status: 500 });
     }
 }

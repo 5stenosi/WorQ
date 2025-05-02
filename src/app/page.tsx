@@ -24,8 +24,6 @@ const HomePage = () => {
   // Come gestiamo i tag <h1>, <h2>, <h3> ecc.? Chiediamo a DeepSeek alla fine.
   // Facciamo i filtri sticky?
 
-  // Bisogna creare un component, una funzione o prendere dal DB, è troppo grosso come blocco secondo me
-
   // Per le animazioni le dobbiamo mettere solo per le persone che le vogliono vedere o per tutti?
   // Bisogna togliere i <br /> al testo nella prima schermata
   // Quando clicco un/a servizio/feature, devo essere reindirizzato alla sezione degli spazi e deve essere cercato nella barra di ricerca il servizio/feature corrispodente
@@ -284,7 +282,7 @@ const HomePage = () => {
 
         {/* Map */}
         <section id='map-section' className="w-full h-[140vh] flex flex-col gap-20
-                                             p-5 md:px-20 md:pb-20 md:pt-0
+                                             p-5 md:px-20 md:pb-8 md:pt-0
                                              mt-10 md:mt-0">
           <div className='flex flex-col gap-5 md:gap-20 overflow-clip'>
             <h1 className='text-center sm:text-start text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold

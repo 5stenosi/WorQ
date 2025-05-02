@@ -22,7 +22,7 @@ export default function Profile() {
                         </div>
                         <h1 className="text-3xl font-bold text-stone-800">Luca Tesei</h1>
                         <p className="text-lg text-stone-600">email@example.com</p>
-                        <p className="text-lg text-stone-600">+39 123 456 7890</p>
+                        <p className="text-lg text-stone-600">238 451 1240</p>
 
                         {/* Publish Space Button */}
                         <button

@@ -2,32 +2,34 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    // Services creation
+    // Ensure all services have a valid iconName during seeding
     const services = await Promise.all([
-        prisma.service.create({ data: { detail: 'Free Wi-Fi' } }),
-        prisma.service.create({ data: { detail: 'Stationery' } }),
-        prisma.service.create({ data: { detail: 'Printer' } }),
-        prisma.service.create({ data: { detail: 'Scanner' } }),
-        prisma.service.create({ data: { detail: 'Whiteboard' } }),
-        prisma.service.create({ data: { detail: 'Desktop' } }),
-        prisma.service.create({ data: { detail: 'Projector' } }),
-        prisma.service.create({ data: { detail: 'Disability Access' } }),
-        prisma.service.create({ data: { detail: 'Air Conditioning' } }),
-        prisma.service.create({ data: { detail: 'Quiet Zones' } }), // Focus Rooms
-        prisma.service.create({ data: { detail: 'Vending Machines' } }),
-        prisma.service.create({ data: { detail: 'Catering' } }),
-        prisma.service.create({ data: { detail: 'Video Conference' } }),
-        prisma.service.create({ data: { detail: 'Kitchenette' } }),
-        prisma.service.create({ data: { detail: 'Child-friendly' } }),
-        prisma.service.create({ data: { detail: 'Pet-friendly' } }),
-        prisma.service.create({ data: { detail: 'Parking' } }),
-        prisma.service.create({ data: { detail: 'Lockers' } }),
-        prisma.service.create({ data: { detail: 'Charging Stations' } }),
+        prisma.service.create({ data: { detail: 'Free Wi-Fi', iconName: 'wifi' } }),
+        prisma.service.create({ data: { detail: 'Stationery', iconName: 'pen' } }),
+        prisma.service.create({ data: { detail: 'Printer', iconName: 'print' } }),
+        prisma.service.create({ data: { detail: 'Scanner', iconName: 'print' } }),
+        prisma.service.create({ data: { detail: 'Whiteboard', iconName: 'chalkboard' } }),
+        prisma.service.create({ data: { detail: 'Desktop', iconName: 'desktop' } }),
+        prisma.service.create({ data: { detail: 'Projector', iconName: 'video' } }),
+        prisma.service.create({ data: { detail: 'Disability Access', iconName: 'wheelchair' } }),
+        prisma.service.create({ data: { detail: 'Air Conditioning', iconName: 'snowflake' } }),
+        prisma.service.create({ data: { detail: 'Quiet Zones', iconName: 'volume-xmark' } }),
+        prisma.service.create({ data: { detail: 'Vending Machines', iconName: 'coffee' } }),
+        prisma.service.create({ data: { detail: 'Catering', iconName: 'utensils' } }),
+        prisma.service.create({ data: { detail: 'Video Conference', iconName: 'videocamera' } }),
+        prisma.service.create({ data: { detail: 'Kitchenette', iconName: 'kitchenset' } }),
+        prisma.service.create({ data: { detail: 'Child-friendly', iconName: 'child' } }),
+        prisma.service.create({ data: { detail: 'Pet-friendly', iconName: 'dog' } }),
+        prisma.service.create({ data: { detail: 'Parking', iconName: 'parking' } }),
+        prisma.service.create({ data: { detail: 'Lockers', iconName: 'lock' } }),
+        prisma.service.create({ data: { detail: 'Charging Stations', iconName: 'bolt' } }),
     ]);
 
     // Creation of an agency
-    const agencyUser = await prisma.user.create({
-        data: {
+    const agencyUser = await prisma.user.upsert({
+        where: { email: 'agency@example.com' },
+        update: {}, // No updates for now
+        create: {
             email: 'agency@example.com',
             role: 'AGENCY',
             oauthProvider: 'GOOGLE',
@@ -44,8 +46,10 @@ async function main() {
     });
 
     // Creation of a client
-    const clientUser = await prisma.user.create({
-        data: {
+    const clientUser = await prisma.user.upsert({
+        where: { email: 'client@example.com' },
+        update: {}, // No updates for now
+        create: {
             email: 'client@example.com',
             role: 'CLIENT',
             oauthProvider: 'GOOGLE',
@@ -62,8 +66,10 @@ async function main() {
     });
 
     // Creation of another client
-    const clientUser2 = await prisma.user.create({
-        data: {
+    const clientUser2 = await prisma.user.upsert({
+        where: { email: 'client2@example.com' },
+        update: {}, // No updates for now
+        create: {
             email: 'client2@example.com',
             role: 'CLIENT',
             oauthProvider: 'GOOGLE',
@@ -107,7 +113,7 @@ async function main() {
                     },
                 },
                 services: {
-                    create: [
+                    connect: [
                         { detail: 'Free Wi-Fi' },
                         { detail: 'Printer' },
                     ],
@@ -137,7 +143,7 @@ async function main() {
                     },
                 },
                 services: {
-                    create: [
+                    connect: [
                         { detail: 'Air Conditioning' },
                         { detail: 'Vending Machines' },
                     ],
@@ -167,7 +173,7 @@ async function main() {
                     },
                 },
                 services: {
-                    create: [
+                    connect: [
                         { detail: 'Projector' },
                         { detail: 'Catering' },
                     ],

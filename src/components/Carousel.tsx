@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
@@ -47,18 +48,21 @@ const Carousel: React.FC<CarouselProps> = ({
             {/* Contenitore principale del carosello */}
             <div className="relative w-full h-full flex overflow-hidden group">
                 {/* Contenitore delle immagini con transizione */}
-                <div
-                    className="flex transition-transform duration-500"
-                    style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
+                <div className="flex transition-transform duration-500 w-full h-full" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
                     {images.map((image, index) => (
-                        // Ogni immagine del carosello
-                        <img
-                            key={index}
-                            src={image}
-                            alt={`Slide ${index + 1}`}
-                            className="w-full object-cover object-center flex-shrink-0" />
+                        <div key={index} className="relative w-full h-full flex-shrink-0">
+                            <Image
+                                src={image}
+                                alt={`Slide ${index + 1}`}
+                                fill
+                                sizes="100%"
+                                priority={index === 0}
+                                className="object-cover object-center"
+                            />
+                        </div>
                     ))}
                 </div>
+
                 {/* Pulsante per immagine precedente */}
                 <button
                     type='button'

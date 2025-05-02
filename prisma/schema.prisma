@@ -45,9 +45,10 @@ model Address {
 }
 
 model Service {
-  id     Int     @id @default(autoincrement())
-  detail String
-  spaces Space[]
+  id       Int     @id @default(autoincrement())
+  detail   String  @unique
+  spaces   Space[]
+  iconName String?
 }
 
 enum Typology {

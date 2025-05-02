@@ -8,6 +8,7 @@ interface HorizontalOptionsProps {
     backgroundColor?: string; // Colore di sfondo del rettangolo (opzionale)
     optionClassName?: string; // Classe personalizzata per le opzioni (opzionale)
     containerClassName?: string; // Classe personalizzata per il contenitore (opzionale)
+    onOptionSelect?: (selectedOption: string) => void; // Callback per l'opzione selezionata
 }
 
 const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
@@ -16,8 +17,16 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
     backgroundColor = 'bg-stone-100',
     optionClassName = '',
     containerClassName = '',
+    onOptionSelect,
 }) => {
     const [selectedOption, setSelectedOption] = useState<number>(initialSelected);
+
+    const handleOptionClick = (index: number) => {
+        setSelectedOption(index);
+        if (onOptionSelect) {
+            onOptionSelect(options[index]);
+        }
+    };
 
     return (
         <div className={`relative grid grid-cols-5 items-center ${containerClassName}`}> {/* Usa grid con 4 colonne */}
@@ -35,7 +44,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
                 <div
                     key={index}
                     className={`relative text-center cursor-pointer z-10 ${optionClassName}`}
-                    onClick={() => setSelectedOption(index)}>
+                    onClick={() => handleOptionClick(index)}>
                     {option}
                 </div>
             ))}

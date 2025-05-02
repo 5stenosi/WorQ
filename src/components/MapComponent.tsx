@@ -42,11 +42,11 @@ const MapComponent: React.FC = () => {
 
     return (
         <div className="flex w-full h-full">
-            <div id="map" className="w-3/4 h-full rounded-2xl shadow-sm"></div>
-            <div className="w-1/4 h-full p-4 ml-4 bg-stone-100 rounded-2xl shadow-sm">
+            <div id="map" className="w-full h-full rounded-2xl shadow-sm"></div>
+            {/* <div className="max-w-1/4 h-full p-4 ml-4 bg-stone-100 rounded-2xl shadow-sm">
                 <h2 className="text-xl font-bold mb-4">Seleziona un marker...</h2>
                 <p>...verranno mostrate le informazioni dello spazio di coworking selezionato.</p>
-            </div>
+            </div> */}
         </div>
     );
 };

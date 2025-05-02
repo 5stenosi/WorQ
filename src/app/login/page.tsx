@@ -2,84 +2,136 @@
 
 import { useAuthErrorMessage } from "@/lib/useAuthErrorMessage";
 import { signIn } from "next-auth/react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faArrowLeft, faArrowRight, faEye, faSlash } from '@fortawesome/free-solid-svg-icons';
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function LoginPage() {
+  const [randomNumber, setRandomNumber] = useState<number | null>(null);
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const errorMessage = useAuthErrorMessage();
 
   const credentialsAction = (formData: FormData) => {
     signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
-      callbackUrl: "/", // redirect to the homepage after login
+      callbackUrl: "/",
     });
   };
 
+  useEffect(() => {
+    const number = Math.floor(Math.random() * 4) + 1;
+    setRandomNumber(number);
+    console.log("Random number:", number); // Log the random number to the console
+
+    const timer = setTimeout(() => {
+      const googleButton = document.getElementById("google");
+      const githubButton = document.getElementById("github");
+
+      if (googleButton) {
+        googleButton.classList.remove("motion-preset-expand", "motion-delay-150");
+      }
+      if (githubButton) {
+        githubButton.classList.remove("motion-preset-expand", "motion-delay-150");
+      }
+    }, 750);
+
+    return () => clearTimeout(timer); // Cleanup the timer on component unmount
+  }, []);
+
   return (
-    <div className="flex flex-col gap-6 max-w-sm mx-auto pt-35 border p-6 rounded-xl shadow">
-      <h2 className="text-xl font-semibold text-center">
-        Login into your account
-      </h2>
+    <div id="login" className="px-10">
+      <section className="w-full h-screen flex justify-center items-center pt-24 pb-3">
+        <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-10 flex flex-col gap-10">
+          {/* Titolo */}
+          <h2 className="text-center text-2xl font-bold">Log into your account</h2>
+          {/* Auth */}
+          <div className="flex gap-5">
+            {/* Google */}
+            <button id="google" className={`w-full flex justify-center items-center py-4 border-2 hover:text-stone-100 font-medium rounded-lg
+                                motion-preset-expand motion-delay-150
+                                transition-all duration-150 ease-out active:scale-90 hover:scale-105
+                 ${randomNumber === 1 ? "border-google-blue hover:bg-google-blue text-google-blue" : ""}
+                 ${randomNumber === 2 ? "border-red-500 hover:bg-red-500 text-red-500" : ""}
+                 ${randomNumber === 3 ? "border-green-500 hover:bg-green-500 text-green-500" : ""}
+                 ${randomNumber === 4 ? "border-yellow-500 hover:bg-yellow-500 text-yellow-500" : ""}`}
+              onClick={() => signIn("google")}>
+              <FontAwesomeIcon icon={faGoogle} className="mr-2 text-2xl" />
+              Login with Google
+            </button>
+            {/* Github */}
+            <button id="github" className="w-full flex justify-center items-center py-4 border-2 border-github hover:bg-github text-github hover:text-stone-100 font-medium rounded-lg
+                                motion-preset-expand motion-delay-150
+                                transition-all duration-150 ease-out active:scale-90 hover:scale-105"
+              onClick={() => signIn("github")}>
+              <FontAwesomeIcon icon={faGithub} className="mr-2 text-2xl" />
+              Login with GitHub
+            </button>
+          </div>
+          {/* Form */}
+          <form action={credentialsAction} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5">
+              <div className="w-full flex flex-col">
+                <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
+                  placeholder="Enter your email" />
+              </div>
+              <div className="w-full flex flex-col ">
+                <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
+                  Password
+                </label>
+                <div className="w-full relative">
+                  <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  required
+                  className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50 pr-10"
+                  placeholder="Enter your password" />
+                  <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 aspect-square h-full flex items-center text-stone-500 hover:text-stone-700 focus:outline-none">
+                  <FontAwesomeIcon icon={faEye} className="fa-stack-1x text-stone-500" />
+                  {showPassword
+                    ? <FontAwesomeIcon icon={faSlash} className="fa-stack-1x text-red-500" />
+                    : ""}
+                  </button>
+                </div>
+              </div>
+            </div>
 
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            {errorMessage && <p className="text-red-500 text-center font-medium">{errorMessage}</p>}
 
-      {/* Google Sign-In */}
-      <button
-        onClick={() => signIn("google")}
-        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-      >
-        Login with Google
-      </button>
-
-      {/* GitHub Sign-In */}
-      <button
-        onClick={() => signIn("github")}
-        className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900"
-      >
-        Login with GitHub
-      </button>
-
-      {/* Divider */}
-      <div className="text-center text-sm text-gray-500">or</div>
-
-      {/* Credentials Sign-In */}
-      <form action={credentialsAction} className="flex flex-col gap-3">
-        <label htmlFor="email" className="font-medium">
-          Email
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          required
-          className="px-3 py-2 border rounded-lg"
-        />
-
-        <label htmlFor="password" className="font-medium">
-          Password
-        </label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required
-          className="px-3 py-2 border rounded-lg"
-        />
-
-        <button
-          type="submit"
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mt-2"
-        >
-          Login with Credentials
-        </button>
-      </form>
-
-      {/* Link di registrazione */}
-      <p className="text-center text-sm mt-4">
-        Don&apos;t have an account?{" "}
-        <a href="/register" className="text-blue-600 underline">
-          Sign up here
-        </a>
-      </p>
+            {/* Buttons */}
+            <div className="flex gap-5 mt-5">
+              {/* Signup Button */}
+              <Link href={"/register"} className="w-full font-medium h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-stone-100
+                                                  transition-all duration-150 ease-out active:scale-90 hover:scale-105 group">
+                <FontAwesomeIcon icon={faArrowLeft} className="text-lg group-hover:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-150 group-hover:duration-500" />
+                Signup
+                <FontAwesomeIcon icon={faArrowLeft} className="text-lg opacity-0" />
+              </Link>
+              {/* Login Button */}
+              <button type="submit" className="w-full font-medium h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500 hover:bg-west-side-500 hover:text-stone-100
+                                                transition-all duration-150 ease-out active:scale-90 hover:scale-105 group">
+                <FontAwesomeIcon icon={faArrowRight} className="text-lg opacity-0" />
+                Login with credentials
+                <FontAwesomeIcon icon={faArrowRight} className="text-lg group-hover:translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-150 group-hover:duration-500" />
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
     </div>
   );
 }

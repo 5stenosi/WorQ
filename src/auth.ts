@@ -75,12 +75,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string;
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
-        session.user.role = (token.role as string) || "CLIENT"; // Imposta un valore di default se non presente
-        //session.user.provider = token.provider as string;
-        //session.user.providerAccountId = token.providerAccountId as string;
+        session.user = {
+          id: token.id as string,
+          name: token.name as string,
+          email: token.email as string,
+          role: (token.role as string) || "CLIENT",
+          emailVerified: null, // Aggiunto per compatibilità con AdapterUser
+        };
       }
       return session;
     },
@@ -105,8 +106,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
         });
-
-        return `/complete-profile?email=${encodeURIComponent(user.email)}`;
+        return true; // L'utente è stato creato con successo
+        //return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
       // Se esiste ma il provider è diverso
@@ -121,17 +122,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
-      return true; // Redirect to home page if profile is complete
-      // o return true ??
+      return true;
     },
 
     async redirect({ url, baseUrl }) {
-      // Se l'utente è già loggato e il profilo è completo, reindirizza alla home
-      if (url === "/complete-profile") {
-        return baseUrl; // Redirect to home page
+      if (url.startsWith("/complete-profile")) {
+        return `${baseUrl}${url}`;
       }
-      return baseUrl; // Default redirect to base URL
-      // o return url ??
+
+      // Se url è una URL assoluta, assicurati che sia del tuo dominio
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+
+      return baseUrl;
     },
   },
 });

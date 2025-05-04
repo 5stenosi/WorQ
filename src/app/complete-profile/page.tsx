@@ -2,7 +2,6 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { isUserProfileComplete } from "@/lib/checkUserCompletation";
 
 export default function CompleteProfile() {
   const { data: session, status } = useSession();
@@ -33,11 +32,18 @@ export default function CompleteProfile() {
   useEffect(() => {
     if (email) {
       const checkProfile = async () => {
-        const isComplete = await isUserProfileComplete(email);
-        if (isComplete) {
+        const res = await fetch("/api/check-profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+
+        if (data.complete) {
           router.replace("/"); // replace invece di push, così non torna più indietro
         }
       };
+
       checkProfile();
     }
   }, [email, router]);

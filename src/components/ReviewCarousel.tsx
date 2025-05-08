@@ -6,26 +6,43 @@ import { faStar, faStarHalf, faArrowLeftLong, faArrowRightLong } from '@fortawes
 type Review = {
     name: string;
     text: string;
+    rating: number;
 };
 
-type Spacer = {
-    id: string;
-    isSpacer: true;
-    width: string;
+const reviews = [
+    { name: "Alice Johnson", text: "The coworking space is fantastic! The environment is so inspiring and the facilities are top-notch. Highly recommend!", rating: 5 },
+    { name: "Michael Brown", text: "Great place to work! The meeting rooms are well-equipped and the staff is very friendly. Will definitely come back.", rating: 4.5 },
+    { name: "Sophia Davis", text: "I love the flexibility this coworking space offers. The booking process is seamless and the ambiance is perfect for productivity.", rating: 4 },
+    { name: "James Wilson", text: "The internet speed is excellent, and the coffee is a nice touch. However, the noise level can be distracting at times.", rating: 3.5 },
+    { name: "Emma Martinez", text: "The coworking space is clean, modern, and has everything you need. The community vibe is also a big plus!", rating: 5 },
+    { name: "Oliver Garcia", text: "I was able to find and book a private office easily. The space exceeded my expectations. Highly recommend!", rating: 5 },
+    { name: "Isabella Rodriguez", text: "The coworking space is very well-organized. The seating options are comfortable, but the lighting could be improved.", rating: 4 },
+    { name: "Liam Hernandez", text: "This platform made it so easy to find a space that fits my needs. The coworking space I booked was perfect!", rating: 4.5 },
+    { name: "Mia Lopez", text: "I had a good experience booking a meeting room. The process was smooth, but the room lacked some essential equipment.", rating: 3.5 }
+];
+
+const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+
+    return (
+        <div className="flex items-center mb-1 sm:mb-2 md:mb-3">
+            {[...Array(fullStars)].map((_, index) => (
+                <FontAwesomeIcon
+                    key={`full-${index}`}
+                    icon={faStar}
+                    className="text-yellow-400 mr-0.5 sm:mr-1 md:mr-2"
+                />
+            ))}
+            {halfStar && (
+                <FontAwesomeIcon
+                    icon={faStarHalf}
+                    className="text-yellow-400 mr-0.5 sm:mr-1 md:mr-2"
+                />
+            )}
+        </div>
+    );
 };
-
-type ReviewItem = {
-    id: string;
-    isSpacer: false;
-    width: string;
-} & Review;
-
-type CarouselItem = Spacer | ReviewItem;
-
-const reviews = Array.from({ length: 10 }, (_, i) => ({
-    name: `Reviewer ${i + 1}`,
-    text: `This is a sample review text for reviewer ${i + 1}. The coworking space is amazing!`,
-}));
 
 const ReviewCarousel = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -34,20 +51,8 @@ const ReviewCarousel = () => {
     const [rightArrowClicked, setRightArrowClicked] = useState(false);
 
     // Dimensions
-    const reviewWidth = 500; // Width of a review in px
-    const gap = 20; // Gap between reviews in px
-
-    // Add virtual padding with invisible elements
-    const paddedReviews: CarouselItem[] = [
-        { id: 'start-spacer', isSpacer: true, width: `calc(50% - ${reviewWidth / 2}px)` },
-        ...reviews.map((review, index) => ({
-            ...review,
-            id: `review-${index}`,
-            isSpacer: false,
-            width: `${reviewWidth}px`
-        })),
-        { id: 'end-spacer', isSpacer: true, width: `calc(50% - ${reviewWidth / 2}px)` }
-    ];
+    const reviewWidth = 500; // Larghezza di una recensione in px
+    const gap = 20; // Spazio tra le recensioni in px
 
     const updateCenteredReview = () => {
         if (scrollContainerRef.current) {
@@ -65,7 +70,7 @@ const ReviewCarousel = () => {
                 const elementRight = elementLeft + element.offsetWidth;
 
                 if (scrollPosition >= elementLeft && scrollPosition <= elementRight) {
-                    centeredIndex = parseInt(element.dataset.index || '0', 10);
+                    centeredIndex = i;
                     break;
                 }
             }
@@ -77,33 +82,48 @@ const ReviewCarousel = () => {
     const scrollLeft = () => {
         if (scrollContainerRef.current && centeredReviewIndex !== null && centeredReviewIndex > 0) {
             setLeftArrowClicked(true);
-            const scrollAmount = reviewWidth + gap;
-            scrollContainerRef.current.scrollBy({
-                left: -scrollAmount,
-                behavior: 'smooth'
-            });
-            setTimeout(() => setLeftArrowClicked(false), 250); // Resetta dopo l'animazione
+            const container = scrollContainerRef.current;
+            const reviewElements = Array.from(container.querySelectorAll('[data-is-review="true"]'));
+
+            if (reviewElements[centeredReviewIndex - 1]) {
+                const targetElement = reviewElements[centeredReviewIndex - 1] as HTMLElement;
+                const targetPosition = targetElement.offsetLeft - (container.clientWidth / 2) + (targetElement.offsetWidth / 2);
+
+                container.scrollTo({
+                    left: targetPosition,
+                    behavior: 'smooth',
+                });
+            }
+
+            setTimeout(() => setLeftArrowClicked(false), 250); // Reset after animation
         }
     };
 
     const scrollRight = () => {
         if (scrollContainerRef.current && centeredReviewIndex !== null && centeredReviewIndex < reviews.length - 1) {
             setRightArrowClicked(true);
-            const scrollAmount = reviewWidth + gap;
-            scrollContainerRef.current.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-            setTimeout(() => setRightArrowClicked(false), 250); // Resetta dopo l'animazione
+            const container = scrollContainerRef.current;
+            const reviewElements = Array.from(container.querySelectorAll('[data-is-review="true"]'));
+
+            if (reviewElements[centeredReviewIndex + 1]) {
+                const targetElement = reviewElements[centeredReviewIndex + 1] as HTMLElement;
+                const targetPosition = targetElement.offsetLeft - (container.clientWidth / 2) + (targetElement.offsetWidth / 2);
+
+                container.scrollTo({
+                    left: targetPosition,
+                    behavior: 'smooth',
+                });
+            }
+
+            setTimeout(() => setRightArrowClicked(false), 250); // Reset after animation
         }
     };
 
     useEffect(() => {
         const container = scrollContainerRef.current;
-        const initialReviewNumber = Math.ceil(reviews.length / 2); // Numero della recensione iniziale (recensione centrale)
-        const initialReviewIndex = initialReviewNumber - 1; // Convertiamo il numero in indice
+        const initialReviewIndex = Math.floor(reviews.length / 2); // Indice della recensione iniziale (centrale)
         if (container) {
-            const initialScrollPosition = (reviewWidth + gap) * initialReviewIndex;
+            const initialScrollPosition = (reviewWidth + gap) * initialReviewIndex - (container.clientWidth / 2) + (reviewWidth / 2);
             container.scrollTo({
                 left: initialScrollPosition,
                 behavior: 'auto',
@@ -123,63 +143,50 @@ const ReviewCarousel = () => {
 
     return (
         <div className="relative w-full">
-            <div
-                ref={scrollContainerRef}
-                className="w-full overflow-x-scroll no-scrollbar snap-x snap-mandatory">
-                <div className="flex gap-x-10">
-                    {paddedReviews.map((item, index) => (
+            <div ref={scrollContainerRef} className="w-full overflow-x-scroll no-scrollbar snap-x snap-mandatory pl-5 sm:pl-10 md:pl-15 lg:pl-20">
+                <div className="flex gap-x-5 sm:gap-x-10 md:gap-x-15 lg:gap-x-20">
+                    {reviews.map((review, index) => (
                         <div
-                            key={item.id}
-                            style={{ width: item.width }}
-                            className={`flex-shrink-0 ${item.isSpacer ? '' : 'p-10 bg-stone-900 text-stone-100 rounded-4xl snap-center'}`}
-                            data-is-review={!item.isSpacer}
-                            data-index={!item.isSpacer ? index - 1 : undefined}>
-                            {!item.isSpacer && (
-                                <div className='flex flex-col gap-10'>
-                                    <div>
-                                        <div className="flex items-center mb-2">
-                                            {[...Array(5)].map((_, index) => (
-                                                <FontAwesomeIcon
-                                                    key={index}
-                                                    icon={index < 4 ? faStar : faStarHalf}
-                                                    className="text-yellow-400 mr-1" />
-                                            ))}
-                                        </div>
-                                        <p className="text-lg italic mb-4">"{item.text}"</p>
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <h3 className="text-xl font-bold">- {item.name}</h3>
-                                    </div>
+                            key={`review-${index}`}
+                            style={{ width: `${reviewWidth}px` }}
+                            className="sm:flex-shrink-0 p-5 sm:p-10 md:p-12 lg:p-16 bg-stone-900 text-stone-100 rounded-2xl sm:rounded-3xl lg:rounded-4xl snap-center"
+                            data-is-review="true">
+                            <div className='flex flex-col gap-3 sm:gap-5 md:gap-8 lg:gap-10'>
+                                <div>
+                                    {renderStars(review.rating)}
+                                    <p className="text-xs sm:text-sm md:text-base lg:text-lg italic mb-2 sm:mb-4 md:mb-6">"{review.text}"</p>
                                 </div>
-                            )}
+                                <div className="flex justify-end">
+                                    <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold">- {review.name}</h3>
+                                </div>
+                            </div>
                         </div>
                     ))}
+                    <div className="shrink-0 w-[0.1px]"></div>
                 </div>
             </div>
 
-            <div className="flex justify-center mt-5 gap-x-10">
+            <div className="flex justify-center mt-3 sm:mt-5 md:mt-7 gap-x-5 sm:gap-x-10 md:gap-x-12">
                 <button
                     onClick={scrollLeft}
                     disabled={isAtStart}
-                    className={`p-8 text-2xl rounded-full aspect-square size-10 flex items-center justify-center transition-all duration-200 group ${isAtStart
+                    className={`p-4 sm:p-6 md:p-8 text-lg sm:text-xl md:text-2xl rounded-full aspect-square flex items-center justify-center transition-all duration-200 group ${isAtStart
                         ? 'text-stone-500 cursor-not-allowed'
                         : 'text-stone-800 hover:bg-stone-900 hover:text-stone-100'
                         }`}>
                     <FontAwesomeIcon
-                        className={`transition-transform duration-250 ${leftArrowClicked ? '-translate-x-2' : ''
-                            }`}
+                        className={`transition-transform duration-250 ${leftArrowClicked ? '-translate-x-1 sm:-translate-x-2' : ''}`}
                         icon={faArrowLeftLong} />
                 </button>
                 <button
                     onClick={scrollRight}
                     disabled={isAtEnd}
-                    className={`p-8 text-2xl rounded-full aspect-square size-10 flex items-center justify-center transition-all duration-200 group ${isAtEnd
+                    className={`p-4 sm:p-6 md:p-8 text-lg sm:text-xl md:text-2xl rounded-full aspect-square flex items-center justify-center transition-all duration-200 group ${isAtEnd
                         ? 'text-stone-500 cursor-not-allowed'
                         : 'text-stone-800 hover:bg-stone-900 hover:text-stone-100'
                         }`}>
                     <FontAwesomeIcon
-                        className={`transition-transform duration-250 ${rightArrowClicked ? 'translate-x-2' : ''
-                            }`}
+                        className={`transition-transform duration-250 ${rightArrowClicked ? 'translate-x-1 sm:translate-x-2' : ''}`}
                         icon={faArrowRightLong} />
                 </button>
             </div>

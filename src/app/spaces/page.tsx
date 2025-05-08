@@ -12,7 +12,7 @@ const Spaces = () => {
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [loading, setLoading] = useState(true); // Stato di caricamento
   const [selectedTypology, setSelectedTypology] = useState<string>('All Spaces');
-  const [maxPrice, setMaxPrice] = useState<number>(500);
+  const [maxPrice, setMaxPrice] = useState<number>(300);
 
   interface Space {
     id: string;
@@ -83,7 +83,7 @@ const Spaces = () => {
           </div>
 
           {/* Filter by price range (espandibile) */}
-          <div className={`bg-stone-300 p-2 hover:gap-2 focus-within:gap-2 rounded-3xl items-center flex transition-all duration-250 group`}>
+          <div className={`bg-stone-300 p-2 gap-0 hover:gap-2 focus-within:gap-2 rounded-3xl items-center flex transition-all duration-250 group`}>
             <div className="w-22 flex justify-center items-center bg-stone-100 text-stone-900 font-medium whitespace-nowrap rounded-2xl px-3 h-12">
               &#8804; {maxPrice}€
             </div>
@@ -92,8 +92,8 @@ const Spaces = () => {
                 type="range"
                 id="price-range"
                 min={spaces.length > 0 ? Math.min(...spaces.map(space => space.price)) : 0}
-                max="500"
-                step="50"
+                max="300"
+                step="20"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="w-0 group-hover:w-48 group-focus-within:w-48 transition-all duration-250"

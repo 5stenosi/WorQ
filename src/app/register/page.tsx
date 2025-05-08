@@ -12,7 +12,7 @@ export default function RegisterPage() {
   return (
     <div id="register" className="px-10">
       <section className="w-full h-screen flex justify-center items-center pt-24 pb-3">
-        <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-10 flex flex-col gap-5">
+        <div className="bg-stone-100 rounded-xl shadow-sm max-w-4xl w-full p-10 flex flex-col gap-5">
           {/* Titolo */}
           <h2 className="text-center text-2xl font-bold mb-5">Sign up for an account</h2>
 
@@ -42,7 +42,23 @@ export default function RegisterPage() {
                 className="flex justify-center items-center absolute size-10 bg-stone-100 hover:bg-stone-900 border-1 border-stone-900/10 rounded-md shadow-sm text-stone-900 hover:text-stone-100 text-xl transition">
                 <FontAwesomeIcon icon={faArrowLeft} />
               </button>
-              {role === "CLIENT" ? <ClientForm /> : <AgencyForm />}
+              {role === "CLIENT" ? (
+                <ClientForm requiredFields={{
+                  name: true,
+                  surname: true,
+                  email: true,
+                  password: true,
+                  cellphone: true,
+                }} />
+              ) : (
+                <AgencyForm requiredFields={{
+                  name: true,
+                  vatNumber: true,
+                  email: true,
+                  password: true,
+                  telephone: true,
+                }} />
+              )}
             </>
           )}
         </div>

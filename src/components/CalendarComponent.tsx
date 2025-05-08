@@ -20,6 +20,11 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
     const days = Array.from({ length: daysInMonth(currentMonth, currentYear) }, (_, i) => i + 1);
 
+    const getLeadingEmptyDays = (month: number, year: number) => {
+        const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday, 1 = Monday, ...
+        return (firstDay + 6) % 7; // Shift to make Monday = 0
+    };
+
     const toggleDateSelection = (date: string) => {
         setSelectedDates((prev) => {
             const newDates = new Set(prev);
@@ -44,7 +49,6 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                 const response = await fetch(`/api/spaces/${spaceId}/availability?year=${currentYear}&month=${currentMonth + 1}`);
                 const data = await response.json();
                 console.log('Fetched availability:', data);
-                // Handle the fetched availability data as needed
             } catch (error) {
                 console.error('Error fetching availability:', error);
             }
@@ -79,13 +83,13 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
     const updateArrowSequence = (direction: string) => {
         setArrowSequence((prevSequence) => {
-            const newSequence = [...prevSequence, direction].slice(-10); // Keep only the last 10 inputs
-            logArrowSequence(newSequence); // Log the last 10 inputs
+            const newSequence = [...prevSequence, direction].slice(-10);
+            logArrowSequence(newSequence);
             if (newSequence.join(',') === 'left,right,right,left,left,left,right,right,right,right') {
                 setSnake(true);
                 console.log('%cEaster egg activated: snake mode!', 'color: green;');
             } else {
-                setSnake(false); // Reset snake mode if the sequence doesn't match
+                setSnake(false);
             }
             return newSequence;
         });
@@ -94,21 +98,20 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
     const triggerSnakeEffect = () => {
         if (snakeRef.current) {
             const snakeSpeed = 250;
-            const snakeLength = 750; // Length of the snake
+            const snakeLength = 750;
 
             const buttons = Array.from(snakeRef.current.querySelectorAll('.snake-day'));
-            const columns = 7; // Days in a week
+            const columns = 7;
             const selectedIndices = buttons
                 .map((button, index) => (button.classList.contains('bg-west-side-500') ? index : -1))
                 .filter((index) => index !== -1);
 
             if (selectedIndices.length > 0) {
-                // Random starting point
                 const startIndex = Math.floor(Math.random() * buttons.length);
                 const visited = new Set<number>();
 
                 const animateRandomSnake = (currentIndex: number) => {
-                    if (visited.size === selectedIndices.length) return; // Stop when all selected days are visited
+                    if (visited.size === selectedIndices.length) return;
 
                     const button = buttons[currentIndex];
                     button.classList.add('snake-hover');
@@ -124,16 +127,16 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                                     newDates.delete(date);
                                     return newDates;
                                 });
-                            }, snakeLength); // Delay the deselection by snakeLength
+                            }, snakeLength);
                         }
                     }
 
                     setTimeout(() => {
                         const neighbors = [
-                            currentIndex % columns !== 0 ? currentIndex - 1 : -1, // Left
-                            (currentIndex + 1) % columns !== 0 ? currentIndex + 1 : -1, // Right
-                            currentIndex - columns, // Up
-                            currentIndex + columns, // Down
+                            currentIndex % columns !== 0 ? currentIndex - 1 : -1,
+                            (currentIndex + 1) % columns !== 0 ? currentIndex + 1 : -1,
+                            currentIndex - columns,
+                            currentIndex + columns,
                         ].filter(
                             (index) =>
                                 index >= 0 &&
@@ -146,7 +149,6 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                             const nextIndex = neighbors[Math.floor(Math.random() * neighbors.length)];
                             animateRandomSnake(nextIndex);
                         } else {
-                            // If no valid neighbors, pick a random unvisited selected day
                             const unvisited = selectedIndices.filter((index) => !visited.has(index));
                             if (unvisited.length > 0) {
                                 const nextIndex = unvisited[Math.floor(Math.random() * unvisited.length)];
@@ -156,9 +158,8 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     }, snakeSpeed);
                 };
 
-                animateRandomSnake(startIndex); // Start from a random button
+                animateRandomSnake(startIndex);
             } else {
-                // Default snake movement
                 let direction = 'right';
                 let row = -1;
 
@@ -198,7 +199,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     }, snakeSpeed);
                 };
 
-                animateSnake(0); // Start animation from the first button
+                animateSnake(0);
             }
         }
     };
@@ -215,22 +216,30 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
 
-                {snake
-                    ? <button onClick={triggerSnakeEffect} className="text-lg text-center px-2 font-bold rounded-lg bg-green-500 text-stone-100
-                                        hover:scale-110 active:scale-90 transition-all duration-150 ease-out">SNAKE</button>
-                    : <div className="text-lg font-bold">{monthNames[currentMonth]} {currentYear}</div>
-                }
+                {snake ? (
+                    <button onClick={triggerSnakeEffect} className="text-lg text-center px-2 font-bold rounded-lg bg-green-500 text-stone-100 hover:scale-110 active:scale-90 transition-all duration-150 ease-out">
+                        SNAKE
+                    </button>
+                ) : (
+                    <div className="text-lg font-bold">{monthNames[currentMonth]} {currentYear}</div>
+                )}
 
                 <button onClick={handleNextMonth} className="aspect-square size-8 text-sm border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
+
             <div ref={snakeRef} className="grid grid-cols-7">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName, index) => (
                     <div key={index} className="text-center text-sm font-bold py-2">
                         {dayName}
                     </div>
                 ))}
+
+                {Array(getLeadingEmptyDays(currentMonth, currentYear)).fill(null).map((_, index) => (
+                    <div key={`empty-${index}`} className="h-10 w-10" />
+                ))}
+
                 {days.map((day) => {
                     const date = `${currentYear}-${currentMonth + 1}-${day}`;
                     const isSelected = selectedDates.has(date);
@@ -238,10 +247,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     return (
                         <button key={date} onClick={() => toggleDateSelection(date)}
                             className={`snake-day flex items-center justify-center h-10 w-10 transition duration-500 hover:duration-150 delay-250 hover:delay-0
-                                ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'hover:bg-west-side-200 hover:text-west-side-900'}
-                                ${[1].includes(day) ? 'rounded-tl-md' : ''}
-                                ${[7].includes(day) ? 'rounded-tr-md' : ''}
-                                ${[29].includes(day) ? 'rounded-bl-md' : ''}`}
+                                ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'hover:bg-west-side-200 hover:text-west-side-900'}`}
                             data-date={date}>
                             {day}
                         </button>

@@ -5,14 +5,7 @@ import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebookSquare,
-  faXTwitter,
-  faInstagram,
-  faTiktok,
-  faLinkedin,
-  faYoutube,
-} from "@fortawesome/free-brands-svg-icons";
+import { faFacebookSquare, faXTwitter, faInstagram, faTiktok, faLinkedin, faYoutube, } from "@fortawesome/free-brands-svg-icons";
 import { SessionProvider } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";

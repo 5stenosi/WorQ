@@ -251,7 +251,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                                 </ul>
                                             </div>
                                             <button
-                                                className="h-10 px-4 bg-west-side-500 hover:bg-west-side-600 text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-transform duration-150 ease-out">
+                                                className="h-10 px-4 border-2 border-west-side-500 hover:bg-west-side-500 text-west-side-500 hover:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-transform duration-150 ease-out">
                                                 Book now
                                             </button>
                                         </div>

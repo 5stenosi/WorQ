@@ -31,11 +31,18 @@ export default function CompleteProfile() {
   useEffect(() => {
     if (email) {
       const checkProfile = async () => {
-        const isComplete = await isUserProfileComplete(email);
-        if (isComplete) {
-          router.replace("/");
+        const res = await fetch("/api/check-profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+
+        if (data.complete) {
+          router.replace("/"); // replace invece di push, così non torna più indietro
         }
       };
+
       checkProfile();
     }
   }, [email, router]);

@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { updateSpaceAvgRating } from '@/lib/reviewUtils';
 
-// Handles GET requests to /api/reviews
+// Handles GET requests to /api/reviews?spaceId
 // Returns all reviews for a space
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

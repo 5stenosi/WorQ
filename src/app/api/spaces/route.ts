@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { set } from 'date-fns';
 import { NextResponse, NextRequest } from 'next/server';
 
 // Handles GET requests to /api/spaces
@@ -106,13 +107,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
+        const setFullSpaceBooking = body.typology === 'MEETING_ROOMS' ? true : false;
         const newSpace = await prisma.space.create({
             data: {
                 name: body.name,
                 agencyId: body.agencyId,
                 description: body.description,
                 seats: body.seats,
-                isFullSpaceBooking: body.isFullSpaceBooking,
+                isFullSpaceBooking: setFullSpaceBooking,
                 typology: body.typology,
                 price: body.price,
                 avgRating: body.avgRating,

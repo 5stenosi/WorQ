@@ -2,7 +2,7 @@ import { auth } from "@/auth"
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
-// Handles GET requests to /api/user
+// Handles GET requests to /api/profile
 // Fetch user data
 export async function GET() {
   try {

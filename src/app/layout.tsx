@@ -49,7 +49,10 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="en">
-      <title>WorQ</title>
+      <head>
+        <meta name="description" content="WorQ - Your ultimate workspace solution. Explore spaces, connect, and collaborate effortlessly." />
+        <title>WorQ</title>
+      </head>
       <body className="bg-stone-200 text-stone-900 select-none">
         <nav className="z-1000 w-full p-5 md:px-10 h-24 fixed flex justify-center items-center gap-5">
           <div className="bg-stone-100/75 border-1 border-stone-100 px-4 backdrop-blur-xs rounded-3xl grid items-center transition duration-250 grid-cols-1 lg:grid-cols-[1fr_auto_1fr] w-full lg:w-2/3">
@@ -101,8 +104,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <footer className="w-full bg-stone-900 text-stone-100 p-5 lg:p-20 mt-10">
           <div
             className="flex gap-10 lg:gap-5 justify-between
-                          flex-col lg:flex-row items-start lg:items-center"
-          >
+                          flex-col lg:flex-row items-start lg:items-center">
             {/* Main Info */}
             <div className="flex flex-col gap-5">
               <h1 className="text-4xl font-bold">
@@ -158,12 +160,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
             {/* Newsletter */}
             <div className="flex flex-col justify-center w-full lg:w-auto gap-5 lg:gap-10">
-              <h1
-                className="font-bold
-                             text-lg lg:text-3xl"
-              >
-                Subscribe and stay up to date.
-              </h1>
+              <h2 className="font-bold text-lg lg:text-3xl">Subscribe and stay up to date.</h2>
               <input
                 type="text"
                 placeholder="Enter your email..."

@@ -18,7 +18,7 @@ export default function Profile() {
                     <div className={`p-8 h-full overflow-y-auto flex flex-col gap-3 rounded-2xl border-1 border-stone-900/10 shadow-sm transition-all duration-1000 w-1/5`}>
                         {/* Profile Information */}
                         <div className='aspect-square w-full rounded-xl border-8 border-stone-300 flex items-center justify-center'>
-                            <FontAwesomeIcon icon={faUser} className='text-stone-500 text-[10rem]' />
+                            <FontAwesomeIcon icon={faUser} className='text-stone-600 text-[10rem]' />
                         </div>
                         <h1 className="text-3xl font-bold text-stone-800">Luca Tesei</h1>
                         <p className="text-lg text-stone-600">email@example.com</p>
@@ -46,7 +46,7 @@ export default function Profile() {
                                     className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5">
                                     <div>
                                         <h2 className="text-xl font-semibold text-stone-800">Oxford Artisan</h2>
-                                        <p className="text-sm text-stone-500">Location, Country</p>
+                                        <p className="text-sm text-stone-600">Location, Country</p>
                                     </div>
                                     <div className="flex justify-between gap-4">
                                         <div className='aspect-square w-full h-10 flex justify-center items-center rounded-lg font-bold text-lg text-center overflow-hidden bg-west-side-200 border-1 border-west-side-300 text-west-side-900'>28/12/2025</div>

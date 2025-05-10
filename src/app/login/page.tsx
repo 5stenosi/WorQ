@@ -137,11 +137,11 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 aspect-square h-full flex items-center text-stone-500 hover:text-stone-700 focus:outline-none"
+                    className="absolute inset-y-0 right-0 aspect-square h-full flex items-center text-stone-600 hover:text-stone-700 focus:outline-none"
                   >
                     <FontAwesomeIcon
                       icon={faEye}
-                      className="fa-stack-1x text-stone-500"
+                      className="fa-stack-1x text-stone-600"
                     />
                     {showPassword ? (
                       <FontAwesomeIcon

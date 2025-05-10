@@ -164,7 +164,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                                 accept=".jpg,.jpeg,.png"
                                                 onChange={handleImageUpload}
                                                 className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                                            <FontAwesomeIcon icon={faImages} className="text-stone-500 transition text-6xl group-hover:scale-125" />
+                                            <FontAwesomeIcon icon={faImages} className="text-stone-600 transition text-6xl group-hover:scale-125" />
                                         </>
                                     )}
                                     {uploadedImages.length === 1 && (
@@ -198,7 +198,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                         className={`flex items-center gap-2 px-3 py-1 text-sm rounded-full border-1 cursor-pointer transition duration-500 hover:duration-150 delay-250 hover:delay-0
                                             ${selectedServices.includes(service.id)
                                                 ? 'bg-west-side-200 border-west-side-900 text-west-side-900'
-                                                : 'hover:bg-west-side-100 hover:border-west-side-300 hover:text-west-side-900 border-stone-300 text-stone-500 bg-stone-50'
+                                                : 'hover:bg-west-side-100 hover:border-west-side-300 hover:text-west-side-900 border-stone-300 text-stone-600 bg-stone-50'
                                             }`}>
                                         <input
                                             type="checkbox"

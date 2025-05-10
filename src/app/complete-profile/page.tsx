@@ -6,7 +6,7 @@ import { isUserProfileComplete } from "@/lib/checkUserCompletation";
 import ClientForm from "@/components/ClientForm";
 import AgencyForm from "@/components/AgencyForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faUser, faUserTie } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faSpinner, faUser, faUserTie } from "@fortawesome/free-solid-svg-icons";
 
 export default function CompleteProfile() {
   const { data: session, status } = useSession();
@@ -47,8 +47,12 @@ export default function CompleteProfile() {
     }
   }, [email, router]);
 
-  if (status === "loading") return <p>Loading...</p>;
-  if (!email) return <p>Verifying your session...</p>;
+  if (status === "loading") return (
+    <div className="h-screen text-6xl flex justify-center items-center text-stone-600">
+      <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+    </div>
+  );;
+  if (!email) return <p className="h-screen flex justify-center items-center text-stone-600">Verifying your session...</p>;
 
   return (
     <div id="complete-profile" className="px-10">

@@ -157,7 +157,7 @@ const ReviewCarousel = () => {
                                     <p className="text-xs sm:text-sm md:text-base lg:text-lg italic mb-2 sm:mb-4 md:mb-6">"{review.text}"</p>
                                 </div>
                                 <div className="flex justify-end">
-                                    <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold">- {review.name}</h3>
+                                    <h2 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold">- {review.name}</h2>
                                 </div>
                             </div>
                         </div>
@@ -170,8 +170,9 @@ const ReviewCarousel = () => {
                 <button
                     onClick={scrollLeft}
                     disabled={isAtStart}
+                    aria-label="Scroll left"
                     className={`p-4 sm:p-6 md:p-8 text-lg sm:text-xl md:text-2xl rounded-full aspect-square flex items-center justify-center transition-all duration-200 group ${isAtStart
-                        ? 'text-stone-500 cursor-not-allowed'
+                        ? 'text-stone-600 cursor-not-allowed'
                         : 'text-stone-800 hover:bg-stone-900 hover:text-stone-100'
                         }`}>
                     <FontAwesomeIcon
@@ -181,8 +182,9 @@ const ReviewCarousel = () => {
                 <button
                     onClick={scrollRight}
                     disabled={isAtEnd}
+                    aria-label="Scroll right"
                     className={`p-4 sm:p-6 md:p-8 text-lg sm:text-xl md:text-2xl rounded-full aspect-square flex items-center justify-center transition-all duration-200 group ${isAtEnd
-                        ? 'text-stone-500 cursor-not-allowed'
+                        ? 'text-stone-600 cursor-not-allowed'
                         : 'text-stone-800 hover:bg-stone-900 hover:text-stone-100'
                         }`}>
                     <FontAwesomeIcon

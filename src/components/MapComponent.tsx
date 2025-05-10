@@ -100,7 +100,7 @@ const MapComponent: React.FC = () => {
                 map = null;
             }
         };
-    }, []); // Removed `zoom` from the dependency array to keep the zoom level unchanged.
+    }, []);
 
     return (
         <div className="flex w-full h-full">

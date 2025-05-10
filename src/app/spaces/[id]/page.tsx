@@ -96,10 +96,10 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     };
 
-    if (loading) return (<div className="h-screen text-6xl flex justify-center items-center text-stone-500">
+    if (loading) return (<div className="h-screen text-6xl flex justify-center items-center text-stone-600">
         <FontAwesomeIcon icon={faSpinner} className='animate-spin' />
     </div>);
-    if (!space) return (<p className="h-screen text-2xl flex justify-center items-center text-stone-500">
+    if (!space) return (<p className="h-screen text-2xl flex justify-center items-center text-stone-600">
         Space not found. Please check the ID or try again later.
     </p>);
 
@@ -142,7 +142,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                             </div>
                                         ))
                                     ) : (
-                                        <p className='text-sm text-stone-500'>No reviews available.</p>
+                                        <p className='text-sm text-stone-600'>No reviews available.</p>
                                     )}
                                 </div>
                             </div>
@@ -163,7 +163,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                             className='cursor-pointer transition-transform duration-150 ease-out active:scale-90 hover:scale-110'>
                                             <FontAwesomeIcon
                                                 icon={star <= (hoverRating || selectedRating) ? faStar : faHollowStar}
-                                                className={star <= (selectedRating) ? 'text-yellow-400' : 'text-stone-500'} />
+                                                className={star <= (selectedRating) ? 'text-yellow-400' : 'text-stone-600'} />
                                         </span>
                                     ))}
                                 </div>
@@ -185,7 +185,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                     {/* Title and Location */}
                                     <div className="flex flex-col gap-2">
                                         <h1 className='font-bold text-4xl'>{space.name}</h1>
-                                        <p className='text-lg text-stone-500'>{space.address?.street}, {space.address?.number} - {space.address?.city}, {space.address?.country}</p>
+                                        <p className='text-lg text-stone-600'>{space.address?.street}, {space.address?.number} - {space.address?.city}, {space.address?.country}</p>
                                     </div>
                                     {/* Media delle Reviews */}
                                     <div className='flex text-2xl text-yellow-400'>

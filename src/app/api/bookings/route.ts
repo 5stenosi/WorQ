@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 import { isDateAvailable } from "@/lib/spaceAvailability";
 
-// Handles POST request to /api/bookings/multiple
+// Handles POST request to /api/bookings
 // Creates new bookings for a space for multiple dates
 export async function POST(request: NextRequest) {
     try {

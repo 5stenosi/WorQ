@@ -1,65 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark } from '@fortawesome/free-solid-svg-icons';
 import Carousel from '@/components/Carousel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faKitchenSet, IconName } from '@fortawesome/free-solid-svg-icons';
+
 
 const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
+    const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
     const [formData, setFormData] = useState<{
+        agencyId?: number;
         name: string;
         address: string;
+        fullAddress?: string;
         seats: number;
-        pricePerDay: number;
-        spaceType: string;
+        price: number;
+        typology: string;
         description: string;
-        images: string[];
+        services?: string[];
+        images?: string[];
+        files?: File[];
     }>({
+        agencyId: 1, // TODO: Change this to the actual agency ID (session)
         name: '',
         address: '',
         seats: 1,
-        pricePerDay: 1,
-        spaceType: 'meetingRoom',
+        price: 1,
+        typology: 'MEETING_ROOMS',
         description: '',
-        images: [],
+        services: [],
     });
 
     const [errors, setErrors] = useState<{
+        agencyId?: number;
         name?: string;
         address?: string;
         seats?: string;
-        pricePerDay?: string;
-        spaceType?: string;
+        price?: string;
+        typology?: string;
         description?: string;
+        services?: string;
         images?: string;
+        files?: File;
     }>({});
 
     const [isClosing, setIsClosing] = useState(false);
 
-    // Stato per i servizi selezionati
+    // State for selected services
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
-    // Array dei servizi
+    // Array of services
     const services = [
-        { id: 'wifi', name: 'WiFi', icon: faWifi },
-        { id: 'desktop', name: 'Desktop', icon: faDesktop },
-        { id: 'stationery', name: 'Stationery', icon: faPen },
-        { id: 'disabilityAccess', name: 'Disability Access', icon: faWheelchair },
-        { id: 'printer', name: 'Printer', icon: faPrint },
-        { id: 'projector', name: 'Projector', icon: faVideo },
-        { id: 'catering', name: 'Catering', icon: faUtensils },
-        { id: 'childFriendly', name: 'Child-Friendly', icon: faChild },
-        { id: 'petFriendly', name: 'Pet-Friendly', icon: faDog },
-        { id: 'whiteBoard', name: 'White Board', icon: faChalkboard },
-        { id: 'videoConference', name: 'Video Conference', icon: faVideoCamera },
-        { id: 'scanner', name: 'Scanner', icon: faPrint },
-        { id: 'airConditioning', name: 'Air Conditioning', icon: faSnowflake },
-        { id: 'quietZones', name: 'Quiet Zones', icon: faVolumeXmark },
-        { id: 'vendingMachines', name: 'Vending Machines', icon: faCoffee },
-        { id: 'kitchenette', name: 'Kitchenette', icon: faUtensils },
-        { id: 'parking', name: 'Parking', icon: faParking },
-        { id: 'lockers', name: 'Lockers', icon: faLock },
-        { id: 'chargingStations', name: 'Charging Stations', icon: faBolt },
+        { id: '1', name: 'Free Wi-Fi', icon: faWifi },
+        { id: '2', name: 'Stationery', icon: faPen },
+        { id: '3', name: 'Printer', icon: faPrint },
+        { id: '4', name: 'Scanner', icon: faPrint },
+        { id: '5', name: 'Whiteboard', icon: faChalkboard },
+        { id: '6', name: 'Desktop', icon: faDesktop },
+        { id: '7', name: 'Projector', icon: faVideo },
+        { id: '8', name: 'Disability Access', icon: faWheelchair },
+        { id: '9', name: 'Air Conditioning', icon: faSnowflake },
+        { id: '10', name: 'Quiet Zones', icon: faVolumeXmark },
+        { id: '11', name: 'Vending Machines', icon: faCoffee },
+        { id: '12', name: 'Catering', icon: faUtensils },
+        { id: '13', name: 'Video Conference', icon: faVideoCamera },
+        { id: '14', name: 'Kitchenette', icon: faKitchenSet },
+        { id: '15', name: 'Child-friendly', icon: faChild },
+        { id: '16', name: 'Pet-friendly', icon: faDog },
+        { id: '17', name: 'Parking', icon: faParking },
+        { id: '18', name: 'Lockers', icon: faLock },
+        { id: '19', name: 'Charging Stations', icon: faBolt },
     ];
 
     useEffect(() => {
@@ -77,8 +88,8 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
         if (formData.name.trim() === '') newErrors.name = 'Name is required';
         if (formData.address.trim() === '') newErrors.address = 'Address is required';
         if (formData.seats <= 0) newErrors.seats = 'Seats must be greater than 0';
-        if (formData.pricePerDay <= 0) newErrors.pricePerDay = 'Price must be greater than 0';
-        if (formData.spaceType.trim() === '') newErrors.spaceType = 'Space type is required';
+        if (formData.price <= 0) newErrors.price = 'Price must be greater than 0';
+        if (formData.typology.trim() === '') newErrors.typology = 'Space type is required';
         if (formData.description.trim() === '') newErrors.description = 'Description is required';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -87,16 +98,26 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
-            const imageUrls = Array.from(files).map((file) => URL.createObjectURL(file));
+            const validFiles = Array.from(files).filter((file) => file.type.startsWith("image/"));
+            const imageUrls = validFiles.map((file) => URL.createObjectURL(file));
+            const fileNames = validFiles.map((file) => file.name);
             setUploadedImages(imageUrls);
-            setFormData({ ...formData, images: imageUrls });
+            setUploadedFiles(validFiles);
             setErrors({ ...errors, images: undefined }); // Clear image error if any
+            setErrors({ ...errors, files: undefined }); // Clear files error if any
         }
     };
 
+    const fetchSuggestions = async (value: string) => {
+        if (!value) return;
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${value}&format=json&limit=3&addressdetails=1`);
+        const data = await res.json();
+        setSuggestions(data);
+    }
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
-        setFormData({ ...formData, [id]: id === 'seats' || id === 'pricePerDay' ? parseInt(value) : value });
+        setFormData({ ...formData, [id]: id === 'seats' || id === 'price' ? parseInt(value) : value });
         setErrors({ ...errors, [id]: undefined }); // Clear error for the field
     };
 
@@ -105,30 +126,56 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
             name: '',
             address: '',
             seats: 1,
-            pricePerDay: 1,
-            spaceType: 'meetingRoom',
+            price: 1,
+            typology: 'MEETING_ROOMS',
             description: '',
-            images: [],
         });
-        setUploadedImages([]);
-        setErrors({});
+        setUploadedImages([]); // Clear uploaded images
+        setUploadedFiles([]); // Clear uploaded files
         setSelectedServices([]); // Clear selected services
+        setErrors({}); // Clear all errors
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (validateForm()) {
-            console.log('Form submitted successfully:', { ...formData, selectedServices });
-            onClose();
+    // Handles form submission
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault(); // Prevents the default form submission behavior
+        if (!validateForm()) { // Validates the form before proceeding
+            console.error('Form validation failed:', errors);
+            return;
+        }
+
+        try {
+            const formDataToSend = new FormData(); // Creates a FormData object to send data
+            formDataToSend.append('metadata', JSON.stringify(formData)); // Appends form metadata as JSON
+            uploadedFiles.forEach((file) => {
+                formDataToSend.append('files', file); // Appends each uploaded file
+            });
+
+            // Sends the form data to the server
+            const response = await fetch('/api/spaces', {
+                method: 'POST',
+                body: formDataToSend,
+            });
+
+            const result = await response.json(); // Parses the server response
+
+            handleClearFields(); // Clears the form fields after successful submission
+            onClose(); // Closes the modal
+        }
+        catch (error) {
+            console.error('Error creating space:', error); // Logs any errors during submission
         }
     };
 
+    // Toggles the selection of a service
     const handleServiceToggle = (serviceId: string) => {
-        setSelectedServices((prev) =>
-            prev.includes(serviceId)
-                ? prev.filter((id) => id !== serviceId)
-                : [...prev, serviceId]
-        );
+        setSelectedServices((prev) => {
+            const updatedServices = prev.includes(serviceId)
+                ? prev.filter((id) => id !== serviceId) // Removes the service if already selected
+                : [...prev, serviceId]; // Adds the service if not selected
+            setFormData({ ...formData, services: updatedServices }); // Updates the form data with selected services
+            return updatedServices;
+        });
     };
 
     if (!isOpen && !isClosing) return null;
@@ -171,7 +218,10 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                         <Image
                                             src={uploadedImages[0]}
                                             alt="Uploaded"
-                                            className="absolute inset-0 object-cover w-full h-full rounded-lg" />
+                                            className="absolute inset-0 object-cover w-full h-full rounded-lg"
+                                            width={100}
+                                            height={100}
+                                        />
                                     )}
                                     {uploadedImages.length > 1 && (
                                         <Carousel
@@ -183,7 +233,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                             chevronSize="text-xs"
                                             onClearImages={() => {
                                                 setUploadedImages([]);
-                                                setFormData({ ...formData, images: [] });
+                                                setUploadedFiles([]);
                                             }}
                                         />
                                     )}
@@ -206,7 +256,11 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                             checked={selectedServices.includes(service.id)}
                                             onChange={() => handleServiceToggle(service.id)}
                                             className="hidden" />
-                                        <FontAwesomeIcon icon={service.icon} />
+                                        {service.icon ? (
+                                            <FontAwesomeIcon icon={service.icon} />
+                                        ) : (
+                                            <FontAwesomeIcon icon={faPlus} />
+                                        )}
                                         {service.name}
                                     </label>
                                 ))}
@@ -230,7 +284,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                         className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                                         placeholder="Enter space name" />
                                 </div>
-                                <div className="w-full flex flex-col">
+                                <div className="w-full flex flex-col relative">
                                     <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                                         Address
                                         {errors.address && <p className="text-red-500">{errors.address}</p>}
@@ -240,8 +294,28 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                         id="address"
                                         value={formData.address}
                                         onChange={handleInputChange}
+                                        onBlur={(e) => fetchSuggestions(e.currentTarget.value)}
                                         className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
-                                        placeholder="Enter space address" />
+                                        placeholder="Enter space address"
+                                    />
+
+                                    {suggestions.length > 0 && (
+                                        <ul className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-stone-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                            {suggestions.map((s, i) => (
+                                                <li
+                                                    key={i}
+                                                    onClick={() => {
+                                                        setFormData(prev => ({ ...prev, address: s.display_name, fullAddress: s }));
+                                                        // Clear suggestions after selection
+                                                        setSuggestions([]);
+                                                    }}
+                                                    className="p-2 hover:bg-stone-100 cursor-pointer border-b border-stone-100 last:border-b-0"
+                                                >
+                                                    {s.display_name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                             {/* Seats + Price */}
@@ -263,13 +337,13 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                 <div className="w-full flex flex-col">
                                     <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                                         Price per day
-                                        {errors.pricePerDay && <p className="text-red-500">{errors.pricePerDay}</p>}
+                                        {errors.price && <p className="text-red-500">{errors.price}</p>}
                                     </label>
                                     <div className="flex gap-3">
                                         <input
                                             type="number"
-                                            id="pricePerDay"
-                                            value={formData.pricePerDay}
+                                            id="price"
+                                            value={formData.price}
                                             onChange={handleInputChange}
                                             className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                                             placeholder="Enter price per day"
@@ -282,17 +356,17 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                             <div className="flex flex-col">
                                 <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                                     Space type
-                                    {errors.spaceType && <p className="text-red-500">{errors.spaceType}</p>}
+                                    {errors.typology && <p className="text-red-500">{errors.typology}</p>}
                                 </label>
                                 <select
-                                    id="spaceType"
-                                    value={formData.spaceType}
+                                    id="typology"
+                                    value={formData.typology}
                                     onChange={handleInputChange}
                                     className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50">
-                                    <option value="meetingRoom">Meeting Room</option>
-                                    <option value="privateOffice">Private Office</option>
-                                    <option value="commonArea">Common Area</option>
-                                    <option value="outdoorSpace">Outdoor Space</option>
+                                    <option value="MEETING_ROOMS">Meeting Room</option>
+                                    <option value="PRIVATE_OFFICES">Private Office</option>
+                                    <option value="COMMON_AREAS">Common Area</option>
+                                    <option value="OUTDOOR_SPACES">Outdoor Space</option>
                                 </select>
                             </div>
                             {/* Description */}

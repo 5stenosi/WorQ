@@ -34,7 +34,7 @@ model Space {
 model Address {
   id        Int    @id @default(autoincrement())
   street    String
-  number    String
+  number    String?
   city      String
   zip       String
   country   String

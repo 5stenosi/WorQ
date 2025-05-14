@@ -2,7 +2,7 @@ import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+//import { signIn } from "next-auth/react";
 import { agencyRegisterSchema, agencyRegisterSchemaOAuth } from "@/lib/zod";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,8 +14,10 @@ import {
   faSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
+import { handleFormSubmit } from "@/lib/handleFormSubmit";
 
 type AgencyFormValues = z.infer<typeof agencyRegisterSchema>;
+type AgencyOAuthFormValues = z.infer<typeof agencyRegisterSchemaOAuth>;
 
 type AgencyFormProps = {
   email?: string; // email precompilata se l'utente è già loggato
@@ -59,79 +61,34 @@ AgencyFormProps) {
   } = useForm<AgencyFormValues>({
     resolver: zodResolver(
       useOAuth ? agencyRegisterSchemaOAuth : agencyRegisterSchema
-    ) as unknown as Resolver<AgencyFormValues>,
+    ) as unknown as Resolver<
+      typeof useOAuth extends true ? AgencyOAuthFormValues : AgencyFormValues
+    >,
   });
 
   const router = useRouter();
 
-  const onSubmit = async (data: AgencyFormValues) => {
-    const email = userEmail ?? data.email;
-    // Verifica che l'email sia disponibile
-    if (!email) {
-      console.error("Email not found.");
-      alert("Email is required to complete registration.");
-      return;
+  const [provider, setProvider] = useState<"google" | "github" | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    const savedProvider = localStorage.getItem("oauth_provider");
+    if (savedProvider === "google" || savedProvider === "github") {
+      setProvider(savedProvider);
     }
+  }, []);
 
-    try {
-      // Flusso OAuth (completamento profilo)
-      if (useOAuth) {
-        const res = await fetch("/api/complete-registration", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...data,
-            email: email,
-            role: "AGENCY",
-          }),
-        });
-
-        if (res.ok) {
-          // Forza un nuovo login OAuth per aggiornare il JWT
-          await signIn("google", {
-            redirect: true,
-            callbackUrl: "/",
-          });
-          return;
-        } else {
-          const error = await res.json();
-          throw new Error(error.message || "Registration failed");
-        }
-      }
-
-      // Flusso Credenziali (registrazione tradizionale)
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, role: "AGENCY" }),
-      });
-
-      if (res.status === 409) {
-        setError("email", {
-          type: "manual",
-          message: "Email already registered.",
-        });
-        return;
-      }
-
-      if (res.ok) {
-        // Login automatico dopo registrazione
-        await signIn("credentials", {
-          email: data.email,
-          password: data.password,
-          redirect: false, // !
-        });
-        router.replace("/");
-        // return;
-      } else {
-        const error = await res.json();
-        throw new Error(error.message || "Registration failed");
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert("An error occurred");
-    }
-  };
+  const onSubmit = (data: AgencyFormValues) =>
+    handleFormSubmit({
+      data,
+      role: "AGENCY",
+      useOAuth,
+      provider: provider,
+      setError,
+      router,
+      emailFromProps: userEmail,
+    });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-5`}>

@@ -14,7 +14,7 @@ import {
 export default function CompleteProfile() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState<string | null>(null);
+  const [, setEmail] = useState<string | null>(null);
   const [role, setRole] = useState<"CLIENT" | "AGENCY" | "">("");
   const router = useRouter();
 

@@ -58,17 +58,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-
-        // Recupera il ruolo dal DB se mancante
-        if (!user.role && user.email) {
-          const dbUser = await prisma.user.findUnique({
-            where: { email: user.email },
-          });
-          token.role = user.role ?? (dbUser?.role || null);
-        }
-
         token.provider = account?.provider || "credentials";
         token.providerAccountId = account?.providerAccountId;
+      }
+
+      // Sempre: aggiorna ruolo (anche dopo reload o signIn() automatico)
+      // Recupera il ruolo dal DB (puoi fare anche if token.email && !token.role, ma meglio aggiornarlo sempre)
+      if (token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+          // include le relazioni client e agency (carica i dati correlati)
+          include: { agency: true, client: true },
+        });
+        token.role = dbUser?.role;
+        // token.clientId = dbUser?.client?.id || null;
+        // token.agencyId = dbUser?.agency?.id || null;
       }
 
       return token;
@@ -80,7 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: token.id as string,
           name: token.name as string,
           email: token.email as string,
-          role: (token.role as string) || "CLIENT",
+          role: token.role as string,
           emailVerified: null, // Aggiunto per compatibilità con AdapterUser
         };
       }
@@ -125,26 +129,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return true;
     },
-
-    /*
-    // Mentre signIn decide SE l'utente può accedere, redirect decide DOVE mandarlo dopo le operazioni.
-    // È l'ultimo step prima che l'utente veda effettivamente una nuova pagina
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/complete-profile")) {
-        return `${baseUrl}${url}`;
-      }
-
-      // Se url è una URL assoluta, assicurati che sia del tuo dominio
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-
-      return baseUrl; // homepage
-    },
-
-    if (url === "/logout") {
-  return `${baseUrl}/goodbye`; // Pagina personalizzata
-}
-    */
   },
 });

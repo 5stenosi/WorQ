@@ -98,7 +98,10 @@ export default function LoginPage() {
                      ? "border-yellow-500 hover:bg-yellow-500 text-yellow-500"
                      : ""
                  }`}
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => {
+                localStorage.setItem("oauth_provider", "google");
+                signIn("google", { callbackUrl: "/" });
+              }}
             >
               <FontAwesomeIcon icon={faGoogle} className="mr-2 text-2xl" />
               Login with Google
@@ -109,7 +112,10 @@ export default function LoginPage() {
               className="w-full flex justify-center items-center py-4 border-2 border-github hover:bg-github text-github hover:text-stone-100 font-medium rounded-lg
                                 motion-preset-expand motion-delay-150
                                 transition-all duration-150 ease-out active:scale-90 hover:scale-105"
-              onClick={() => signIn("github", { callbackUrl: "/" })}
+              onClick={() => {
+                localStorage.setItem("oauth_provider", "github");
+                signIn("github", { callbackUrl: "/" });
+              }}
             >
               <FontAwesomeIcon icon={faGithub} className="mr-2 text-2xl" />
               Login with GitHub

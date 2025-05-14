@@ -62,6 +62,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Importante per aggiornare il ruolo dell'utente
+    await prisma.user.update({
+      where: { email },
+      data: { role },
+    });
+
     return NextResponse.json({
       success: true,
       role,

@@ -2,7 +2,7 @@ import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+//import { signIn } from "next-auth/react";
 import { clientRegisterSchema, clientRegisterSchemaOAuth } from "@/lib/zod";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,9 +14,10 @@ import {
   faSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
+import { handleFormSubmit } from "@/lib/handleFormSubmit";
 
 type ClientFormValues = z.infer<typeof clientRegisterSchema>;
-//type ClientOAuthFormValues = z.infer<typeof clientRegisterSchemaOAuth>;
+type ClientOAuthFormValues = z.infer<typeof clientRegisterSchemaOAuth>;
 
 type ClientFormProps = {
   email?: string; // email precompilata (per il flusso OAuth)
@@ -60,85 +61,34 @@ ClientFormProps) {
   } = useForm<ClientFormValues>({
     resolver: zodResolver(
       useOAuth ? clientRegisterSchemaOAuth : clientRegisterSchema
-    ) as unknown as Resolver<ClientFormValues>,
+    ) as unknown as Resolver<
+      typeof useOAuth extends true ? ClientOAuthFormValues : ClientFormValues
+    >,
   });
-
-  console.log("🧪 current form errors", errors);
 
   const router = useRouter();
 
-  const onSubmit = async (data: ClientFormValues) => {
-    console.log("Form submitted successfully with data:", data);
+  const [provider, setProvider] = useState<"google" | "github" | undefined>(
+    undefined
+  );
 
-    const email = userEmail ?? data.email;
-    // Verifica che l'email sia disponibile
-    if (!email) {
-      console.error("Email not found.");
-      alert("Email is required to complete registration.");
-      return;
+  useEffect(() => {
+    const savedProvider = localStorage.getItem("oauth_provider");
+    if (savedProvider === "google" || savedProvider === "github") {
+      setProvider(savedProvider);
     }
+  }, []);
 
-    try {
-      console.log("📦 requiredFields", requiredFields);
-      // Flusso OAuth (completamento profilo)
-      if (useOAuth) {
-        const res = await fetch("/api/complete-registration", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...data,
-            email: email,
-            role: "CLIENT",
-          }),
-        });
-
-        if (res.ok) {
-          console.log("🎉 Profilo completato. Re-autenticazione in corso...");
-          // Forza un nuovo login OAuth per aggiornare il JWT
-          await signIn("google", {
-            redirect: true,
-            callbackUrl: "/",
-          });
-          return;
-        } else {
-          const error = await res.json();
-          throw new Error(error.message || "Registration failed");
-        }
-      }
-
-      // Flusso Credenziali (registrazione tradizionale)
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, role: "CLIENT" }),
-      });
-
-      if (res.status === 409) {
-        setError("email", {
-          type: "manual",
-          message: "Email already registered.",
-        });
-        return;
-      }
-
-      if (res.ok) {
-        // Login automatico dopo registrazione
-        await signIn("credentials", {
-          email: data.email,
-          password: data.password,
-          redirect: false, // !
-        });
-        router.replace("/");
-        // return;
-      } else {
-        const error = await res.json();
-        throw new Error(error.message || "Registration failed");
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert("An error occurred");
-    }
-  };
+  const onSubmit = (data: ClientFormValues) =>
+    handleFormSubmit({
+      data,
+      role: "CLIENT",
+      useOAuth,
+      provider: provider,
+      setError,
+      router,
+      emailFromProps: userEmail,
+    });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-5`}>

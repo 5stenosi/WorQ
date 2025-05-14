@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthErrorMessage } from "@/lib/useAuthErrorMessage";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faGithub } from "@fortawesome/free-brands-svg-icons";
 import {
@@ -12,11 +12,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [randomNumber, setRandomNumber] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const errorMessage = useAuthErrorMessage();
+  const { status } = useSession();
+  const router = useRouter();
 
   const credentialsAction = (formData: FormData) => {
     signIn("credentials", {
@@ -25,6 +28,13 @@ export default function LoginPage() {
       callbackUrl: "/",
     });
   };
+
+  // Se l'utente è già loggato, viene reindirizzato alla home
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
 
   useEffect(() => {
     const number = Math.floor(Math.random() * 4) + 1;

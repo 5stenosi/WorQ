@@ -62,7 +62,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      role,
+      redirectTo: "/",
+    });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Error while saving." }, { status: 500 });

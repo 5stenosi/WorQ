@@ -4,7 +4,7 @@ import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
-import { isUserProfileComplete } from "./lib/checkUserCompletation";
+import { isUserProfileComplete } from "./lib/checkUserCompletion";
 import { getUserFromDb } from "./lib/password";
 import { createUserAndAccount } from "./lib/createUserAndAccount";
 
@@ -20,6 +20,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+      // The authorize function handles the custom login logic and determines whether the credentials provided are valid.
+      // It receives the input values defined in credentials, and you must return either a user object or null.
+      // If null is returned, the login fails.
       authorize: async (credentials) => {
         try {
           const email = credentials?.email as string;
@@ -28,7 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const user = await getUserFromDb(email, password);
 
           if (!user) {
-            return null; // NextAuth si aspetta null per credenziali invalide
+            return null; // no user found
           }
 
           return user;
@@ -61,9 +64,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const dbUser = await prisma.user.findUnique({
             where: { email: user.email },
           });
-          token.role = dbUser?.role || null;
-        } else {
-          token.role = user.role;
+          token.role = user.role ?? (dbUser?.role || null);
         }
 
         token.provider = account?.provider || "credentials";
@@ -106,8 +107,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
         });
-        return true; // L'utente è stato creato con successo
-        //return `/complete-profile?email=${encodeURIComponent(user.email)}`;
+        //return true; // L'utente è stato creato con successo
+        return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
       // Se esiste ma il provider è diverso
@@ -125,6 +126,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
 
+    /*
+    // Mentre signIn decide SE l'utente può accedere, redirect decide DOVE mandarlo dopo le operazioni.
+    // È l'ultimo step prima che l'utente veda effettivamente una nuova pagina
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/complete-profile")) {
         return `${baseUrl}${url}`;
@@ -135,7 +139,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return url;
       }
 
-      return baseUrl;
+      return baseUrl; // homepage
     },
+
+    if (url === "/logout") {
+  return `${baseUrl}/goodbye`; // Pagina personalizzata
+}
+    */
   },
 });

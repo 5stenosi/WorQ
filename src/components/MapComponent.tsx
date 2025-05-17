@@ -1,44 +1,28 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import ReactDOMServer from 'react-dom/server';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
 
 const MapComponent: React.FC = () => {
-    const [zoom, setZoom] = useState(13);
-
     useEffect(() => {
-        const updateZoom = () => {
-            const width = window.innerWidth;
-            if (width < 640) {
-                setZoom(15); // Mobile
-            } else if (width < 768) {
-                setZoom(14); // Small screens
-            } else if (width < 1024) {
-                setZoom(13); // Medium screens
-            } else {
-                setZoom(12); // Large screens
-            }
-        };
+        let map: any = null; // Declare map variable
 
-        updateZoom(); // Set initial zoom
-        window.addEventListener('resize', updateZoom);
+        const initializeMap = async () => {
+            if (typeof window !== 'undefined') {
+                const L = (await import('leaflet')).default;
 
-        return () => {
-            window.removeEventListener('resize', updateZoom);
-        };
-    }, []);
-
-    useEffect(() => {
-        let map: L.Map | null = null; // Declare map variable
-
-        if (typeof window !== 'undefined') {
-            import('leaflet').then((L) => {
-                // Fix for marker icons not appearing
-                L.Icon.Default.mergeOptions({
-                    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-                    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-                    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+                // Configura l'icona personalizzata
+                const customIcon = L.Icon.extend({
+                    options: {
+                        iconUrl: "/location-dot-solid-turquoise-blue-50.svg",
+                        iconSize: [32, 32], // Dimensioni dell'icona
+                        iconAnchor: [16, 32], // Punto di ancoraggio
+                        popupAnchor: [0, -32], // Posizione del popup rispetto all'icona
+                    },
                 });
 
                 // Check if map already exists and remove it
@@ -49,23 +33,49 @@ const MapComponent: React.FC = () => {
 
                 // Initialize the map
                 map = L.map('map', {
-                    zoomControl: true, // Enable zoom controls by default
-                    dragging: false, // Disable dragging initially
-                    scrollWheelZoom: false, // Disable scroll wheel zoom initially
-                }).setView([43.1381, 13.0684], zoom);
+                    zoomControl: true,
+                    dragging: false,
+                    scrollWheelZoom: false,
+                }).setView([43.1381, 13.0684], 6);
 
                 // Add the Stadia.AlidadeSmoothDark layer
                 L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-                    minZoom: 0,
-                    maxZoom: 20,
+                    minZoom: 3,
+                    maxZoom: 17,
                     attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                 }).addTo(map);
 
-                // Add the default marker to the map
-                L.marker([43.1381, 13.0684])
-                    .addTo(map)
-                    .bindPopup('Camerino, MC')
-                    .openPopup();
+                // Fetch and add markers
+                const fetchSpaces = async () => {
+                    try {
+                        const response = await fetch('/api/map');
+                        const spaces = await response.json();
+
+                        spaces.forEach((space: any) => {
+                            const { latitude, longitude } = space.address;
+                            if (latitude && longitude) {
+                                const popupContent = `
+                                    <div class="flex gap-3">
+                                        <a id="space-link" href="/spaces/${space.id}" target="_blank" class="flex justify-center items-center aspect-square size-12 bg-stone-100 hover:bg-stone-900 shadow-sm border-1 border-stone-900/10 rounded-md transition">
+                                            ${ReactDOMServer.renderToString(<FontAwesomeIcon icon={faArrowUpRightFromSquare} />)}
+                                        </a>
+                                        <div class="flex flex-col">
+                                            <h2 class="font-bold text-lg m-0">${space.name}</h2>
+                                            <p style="margin: 0" class="text-stone-600">${space.address.street} ${space.address.number}, ${space.address.city}</p>
+                                        </div>
+                                    </div>
+                                `;
+                                L.marker([latitude, longitude], { icon: new customIcon() })
+                                    .addTo(map)
+                                    .bindPopup(popupContent);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Failed to fetch spaces:', error);
+                    }
+                };
+
+                fetchSpaces();
 
                 // Enable controls on map click
                 const enableControls = () => {
@@ -90,8 +100,10 @@ const MapComponent: React.FC = () => {
                     enableControls();
                     document.addEventListener('click', handleClickOutside);
                 });
-            });
-        }
+            }
+        };
+
+        initializeMap();
 
         // Clean up the map when the component is unmounted
         return () => {

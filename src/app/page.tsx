@@ -38,9 +38,8 @@ const HomePage = () => {
           <div className="absolute flex flex-col gap-5 text-stone-100
                           justify-end items-start sm:text-start inset-5 sm:inset-10 md:inset-15 lg:inset-20 mb-5 sm:mb-0">
             {/* Titolo */}
-            <h1 className='font-medium
-                         text-4xl md:text-7xl w-full md:w-1/2 text-center sm:text-start
-                         md:motion-preset-slide-right md:motion-duration-300'>Locate A Cozy Workspace</h1>
+            <h1 className='font-medium text-balance
+                         text-4xl md:text-6xl w-full md:w-1/2 text-center sm:text-start'>Locate A Cozy Workspace</h1>
             {/* Sottotitolo */}
             <p className='text-balance text-base sm:text-lg md:text-xl w-full md:w-4/5 text-center sm:text-start
                         md:motion-preset-slide-right md:motion-duration-300 md:motion-delay-300'>From cost savings to increased collaboration opportunities, coworking spaces can make for idea offices, especially for small and growing businesses.</p>
@@ -344,7 +343,7 @@ const HomePage = () => {
           </div>
 
           {/* Griglia Space Types */}
-          <div className='w-full h-screen text-stone-100 *:rounded-3xl *:transition-all *:shadow-sm *:hover:shadow-lg *:hover:scale-105
+          <div className='w-full h-[45rem] text-stone-100 *:rounded-3xl *:transition-all *:shadow-sm *:hover:shadow-lg *:hover:scale-105
                           lg:grid lg:grid-cols-11 lg:grid-rows-2 lg:gap-10 flex flex-col gap-5'>
             {/* Meeting Rooms */}
             <div className='w-full h-full sm:col-span-6 sm:row-span-1 overflow-hidden relative group
@@ -440,8 +439,8 @@ const HomePage = () => {
 
         {/* Map */}
         <section id='map-section' className="w-full flex flex-col
-                     h-screen lg:h-[65rem]
-                     mt-5 p-5 sm:p-10 md:p-15 lg:p-20 gap-5 sm:gap-10 md:gap-15 lg:gap-20">
+                     h-[45rem] lg:h-[65rem]
+                     mt-5 p-5 sm:p-10 md:p-15 lg:p-20 pb-5 sm:pb-5 md:pb-5 lg:pb-5 gap-5 sm:gap-10 md:gap-15 lg:gap-20">
           <div className='flex flex-col gap-5 md:gap-20 overflow-clip'>
             <h3 className='text-center sm:text-start text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-bold
                            md:intersect-once md:intersect:motion-preset-slide-right-lg md:motion-duration-300'>

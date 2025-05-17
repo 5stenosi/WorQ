@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStarHalf, faArrowLeftLong, faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
+import { faStar } from '@fortawesome/free-solid-svg-icons/faStar';
+import { faStarHalf } from '@fortawesome/free-solid-svg-icons/faStarHalf';
+import { faArrowLeftLong } from '@fortawesome/free-solid-svg-icons/faArrowLeftLong';
+import { faArrowRightLong } from '@fortawesome/free-solid-svg-icons/faArrowRightLong';
 
 // Definiamo i tipi
 type Review = {

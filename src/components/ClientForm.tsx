@@ -65,9 +65,9 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-5`}>
-            <div className="flex gap-5">
+            <div className="flex flex-col sm:flex-row gap-5">
                 {requiredFields?.name && (
-                    <div className="w-full flex flex-col">
+                    <div className="w-full flex flex-col text-sm sm:text-base">
                         <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                             Name
                         </label>
@@ -83,7 +83,7 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
                     </div>
                 )}
                 {requiredFields?.surname && (
-                    <div className="w-full flex flex-col">
+                    <div className="w-full flex flex-col text-sm sm:text-base">
                         <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                             Surname
                         </label>
@@ -99,9 +99,9 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
                     </div>
                 )}
             </div>
-            <div className={`flex gap-5 ${layout === "col" ? "hidden" : ""}`}>
+            <div className={`flex flex-col sm:flex-row gap-5 ${layout === "col" ? "hidden" : ""}`}>
                 {requiredFields?.email && (
-                    <div className="w-full flex flex-col">
+                    <div className="w-full flex flex-col text-sm sm:text-base">
                         <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                             Email
                             {errors.email && (<p className="text-red-500">{errors.email.message}</p>)}
@@ -118,7 +118,7 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
                     </div>
                 )}
                 {requiredFields?.password && (
-                    <div className="w-full flex flex-col">
+                    <div className="w-full flex flex-col text-sm sm:text-base">
                         <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                             Password
                             {errors.password && (<p className="text-red-500">{errors.password.message}</p>)}
@@ -147,7 +147,7 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
                 )}
             </div>
             {requiredFields?.cellphone && (
-                <div className="w-full flex flex-col">
+                <div className="w-full flex flex-col text-sm sm:text-base">
                     <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
                         Cellphone
                         {errors.cellphone && (<p className="text-red-500">{errors.cellphone.message}</p>)}
@@ -164,17 +164,21 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
                     />
                 </div>
             )}
-            <div className="flex gap-5 mt-5">
+            <div className="flex gap-5 sm:mt-5">
                 {buttons === "register" && (
                     <>
-                        <Link href={"/login"} className="w-full font-medium h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-stone-100
-                                                    transition-all duration-150 ease-out active:scale-90 hover:scale-105 group">
+                        <Link href={"/login"} className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900
+                                                        hover:bg-stone-900 hover:text-stone-100
+                                                        active:bg-stone-900 active:text-stone-100
+                                                        transition-all duration-150 ease-out active:scale-90 hover:scale-105 group">
                             <FontAwesomeIcon icon={faArrowLeft} className="text-lg group-hover:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-150 group-hover:duration-500" />
                             Login
                             <FontAwesomeIcon icon={faArrowLeft} className="text-lg opacity-0" />
                         </Link>
-                        <button type="submit" className="w-full font-medium h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500 hover:bg-west-side-500 hover:text-stone-100
-                                                 transition-all duration-150 ease-out active:scale-90 hover:scale-105 group">
+                        <button type="submit" className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500
+                                                        hover:bg-west-side-500 hover:text-stone-100
+                                                        active:bg-west-side-500 active:text-stone-100
+                                                        transition-all duration-150 ease-out active:scale-90 hover:scale-105 group">
                             <FontAwesomeIcon icon={faArrowRight} className="text-lg opacity-0" />
                             Signup
                             <FontAwesomeIcon icon={faArrowRight} className="text-lg group-hover:translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-150 group-hover:duration-500" />
@@ -183,9 +187,10 @@ export default function ClientForm({ requiredFields, layout = "row", buttons = "
                 )}
                 {buttons === "confirm" && (
                     <button
-                        className="w-full font-medium h-12 flex justify-center items-center rounded-lg border-2 border-stone-900 text-stone-900
-                                                hover:border-west-side-500 hover:bg-west-side-500 hover:text-stone-100
-                                                transition-all duration-150 ease-out active:scale-90 hover:scale-105 overflow-hidden group">
+                        className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-lg border-2 border-west-side-500 text-west-side-500
+                                                                    hover:bg-west-side-500 hover:text-stone-100
+                                                                    active:bg-west-side-500 active:text-stone-100
+                                                                    transition-all duration-150 ease-out active:scale-90 hover:scale-105 overflow-hidden group">
                         <FontAwesomeIcon icon={faCheck} className="text-lg mr-2 opacity-0" />
                         Confirm
                         <FontAwesomeIcon icon={faCheck} className="text-stone-100 text-lg ml-2 translate-y-[200%] group-hover:translate-y-0 transition duration-150 group-hover:duration-500" />

@@ -5,10 +5,12 @@ import "./globals.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebookSquare, faXTwitter, faInstagram, faTiktok, faLinkedin, faYoutube, } from "@fortawesome/free-brands-svg-icons";
+import { faFacebookSquare, faXTwitter, faInstagram, faTiktok, faLinkedin, faYoutube } from "@fortawesome/free-brands-svg-icons";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { SessionProvider } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import React, { useState } from "react";
 config.autoAddCss = false;
 
 export default function RootLayout({
@@ -25,6 +27,7 @@ export default function RootLayout({
 
 function InnerLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleScrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {
@@ -54,42 +57,114 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <title>WorQ</title>
       </head>
       <body className="bg-stone-200 text-stone-900 select-none">
-        <nav className="z-1000 w-full p-5 md:px-10 h-24 fixed flex justify-center items-center gap-5">
-          <div className="bg-stone-100/75 border-1 border-stone-100 px-4 backdrop-blur-xs rounded-3xl grid items-center transition duration-250 grid-cols-1 lg:grid-cols-[1fr_auto_1fr] w-full lg:w-2/3">
-            <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden sm:flex">
-              <Link href="/spaces" className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
-                Spaces
-              </Link>
-              <button onClick={handleScrollToMap} className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
+        <nav className="z-1000 w-full p-5 md:px-10 fixed flex justify-center items-center gap-5">
+          <div className="bg-stone-100/75 border-1 border-stone-100 px-4 backdrop-blur-xs shadow-sm rounded-3xl flex flex-col md:grid items-center transition duration-250 grid-cols-1 md:grid-cols-[1fr_auto_1fr] w-full lg:w-3/4 xl:w-2/3">
+            <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
+              <button onClick={handleScrollToMap} className="rounded-xl transition duration-250 w-full py-3
+                                                            hover:bg-stone-900 hover:text-stone-100
+                                                            active:bg-stone-900 active:text-stone-100">
                 Map
               </button>
+              <Link href="/spaces" className="rounded-xl transition duration-250 w-full py-3
+                                            hover:bg-stone-900 hover:text-stone-100
+                                            active:bg-stone-900 active:text-stone-100">
+                Spaces
+              </Link>
             </div>
 
-            <div className="flex justify-center items-center text-center">
+            <div className="w-full md:w-auto flex flex-col justify-start md:justify-center items-center text-center">
               <Link
                 href="/"
                 onClick={handleScrollToTop}
-                className="text-5xl font-bold px-6 pt-2 pb-4 rounded-2xl text-stone-900">
+                className="w-full md:w-auto text-3xl md:text-5xl font-bold px-6 pt-2 md:pb-4 rounded-2xl text-stone-900">
                 Wor<span className="text-west-side-500">Q</span>
               </Link>
+              {/* Mobile Menu */}
+              <div className={`w-full flex md:hidden flex-col gap-2 overflow-hidden transition-all ${menuOpen ? "max-h-64 mt-2" : "max-h-0"}`}>
+                <div className="flex justify-evenly items-center text-stone-900 font-medium text-lg gap-2 text-center">
+                  {/* Primo blocco */}
+                  <button
+                    onClick={e => { handleScrollToMap(); setMenuOpen(false); }}
+                    className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                    Map
+                  </button>
+                  <Link
+                    href="/spaces"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                    Spaces
+                  </Link>
+                </div>
+                {/* Secondo blocco */}
+                <div className="flex justify-evenly items-center text-stone-900 font-medium text-lg gap-2 text-center">
+                  {session ? (
+                    <>
+                      <Link
+                        href="/api/auth/signout"
+                        onClick={() => setMenuOpen(false)}
+                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                        Logout
+                      </Link>
+                      <Link
+                        href="/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100 active:bg-west-side-500 active:text-stone-100">
+                        Profile
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/register"
+                        onClick={() => setMenuOpen(false)}
+                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                        Signup
+                      </Link>
+                      <Link
+                        href="/login"
+                        onClick={() => setMenuOpen(false)}
+                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100 active:bg-west-side-500 active:text-stone-100">
+                        Login
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="md:hidden w-full">
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className={`w-full pt-1 pb-2 transition-transform duration-200 cursor-pointer ${menuOpen ? "-scale-y-100" : ""}`}
+                  onClick={() => setMenuOpen((open) => !open)}
+                />
+              </div>
             </div>
 
-            <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden sm:flex">
+
+
+            <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
               {session ? (
                 <>
-                  <Link href="/api/auth/signout" className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
+                  <Link href="/api/auth/signout" className="rounded-xl transition duration-250 w-full py-3 
+                                                          hover:bg-stone-900 hover:text-stone-100
+                                                          active:bg-stone-900 active:text-stone-100">
                     Logout
                   </Link>
-                  <Link href="/profile" className="rounded-xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100">
+                  <Link href="/profile" className="rounded-xl transition duration-250 w-full py-3 
+                                                  hover:bg-west-side-500 hover:text-stone-100
+                                                  active:bg-west-side-500 active:text-stone-100">
                     Profile
                   </Link>
                 </>
               ) : (
                 <>
-                  <Link href="/register" className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100">
+                  <Link href="/register" className="rounded-xl transition duration-250 w-full py-3 
+                                                    hover:bg-stone-900 hover:text-stone-100
+                                                    active:bg-stone-900 active:text-stone-100">
                     Signup
                   </Link>
-                  <Link href="/login" className="rounded-xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100">
+                  <Link href="/login" className="rounded-xl transition duration-250 w-full py-3 
+                                                 hover:bg-west-side-500 hover:text-stone-100
+                                                 active:bg-west-side-500 active:text-stone-100">
                     Login
                   </Link>
                 </>
@@ -115,7 +190,9 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                 Call us{" "}
                 <a
                   href="tel:800515516"
-                  className="underline decoration-2 hover:decoration-turquoise-blue-400 cursor-pointer transition"
+                  className="underline decoration-2 cursor-pointer transition
+                            hover:decoration-turquoise-blue-400
+                            active:decoration-turquoise-blue-400"
                 >
                   800 515 516
                 </a>
@@ -124,7 +201,9 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                 Send us an email at{" "}
                 <a
                   href="mailto:info@worq.com"
-                  className="underline decoration-2 hover:decoration-turquoise-blue-400 cursor-pointer transition"
+                  className="underline decoration-2 cursor-pointer transition
+                            hover:decoration-turquoise-blue-400
+                            active:decoration-turquoise-blue-400"
                 >
                   info@worq.com
                 </a>
@@ -133,27 +212,45 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               <div className="flex gap-2">
                 <FontAwesomeIcon
                   icon={faXTwitter}
-                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg hover:bg-turquoise-blue-400 hover:text-stone-900 transition"
+                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-turquoise-blue-400 hover:text-stone-900
+                            active:bg-turquoise-blue-400 active:text-stone-900"
                 />
                 <FontAwesomeIcon
                   icon={faFacebookSquare}
-                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg hover:bg-turquoise-blue-400 hover:text-stone-900 transition"
+                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-turquoise-blue-400 hover:text-stone-900
+                            active:bg-turquoise-blue-400 active:text-stone-900"
                 />
                 <FontAwesomeIcon
                   icon={faLinkedin}
-                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg hover:bg-turquoise-blue-400 hover:text-stone-900 transition"
+                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-turquoise-blue-400 hover:text-stone-900
+                            active:bg-turquoise-blue-400 active:text-stone-900"
                 />
                 <FontAwesomeIcon
                   icon={faYoutube}
-                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg hover:bg-turquoise-blue-400 hover:text-stone-900 transition"
+                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-turquoise-blue-400 hover:text-stone-900
+                            active:bg-turquoise-blue-400 active:text-stone-900"
                 />
                 <FontAwesomeIcon
                   icon={faInstagram}
-                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg hover:bg-turquoise-blue-400 hover:text-stone-900 transition"
+                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-turquoise-blue-400 hover:text-stone-900
+                            active:bg-turquoise-blue-400 active:text-stone-900"
                 />
                 <FontAwesomeIcon
                   icon={faTiktok}
-                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg hover:bg-turquoise-blue-400 hover:text-stone-900 transition"
+                  className="aspect-square p-2 text-2xl cursor-pointer rounded-lg
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-turquoise-blue-400 hover:text-stone-900
+                            active:bg-turquoise-blue-400 active:text-stone-900"
                 />
               </div>
             </div>
@@ -192,8 +289,11 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                       }
                     }
                   }}
-                  className="px-4 py-2 border-2 border-stone-100 rounded-2xl hover:bg-stone-100 hover:text-stone-900 transition"
-                >
+                  className="px-4 py-2 border-2 border-stone-100 rounded-2xl
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-110
+                            hover:bg-stone-100 hover:text-stone-900
+                            active:bg-stone-100 active:text-stone-900
+                            ">
                   Subscribe
                 </button>
                 <p
@@ -206,6 +306,6 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
           </div>
         </footer>
       </body>
-    </html>
+    </html >
   );
 }

@@ -9,8 +9,8 @@ export default function Profile() {
     const [isModalOpen, setModalOpen] = useState(false);
 
     return (
-        <div id='profile' className={`overflow-y-auto px-10`}>
-            <section className={`w-full h-screen pt-24 pb-3`}>
+        <div id='profile' className={`px-10`}>
+            <section className={`w-full h-screen pt-28 pb-3`}>
                 {/* Profile Wrapper */}
                 <div className={`w-full h-full p-5 flex bg-stone-100 rounded-4xl transition-all duration-1000 gap-5`}>
 
@@ -22,7 +22,7 @@ export default function Profile() {
                         </div>
                         <h1 className="text-3xl font-bold text-stone-800">Luca Tesei</h1>
                         <p className="text-lg text-stone-600">email@example.com</p>
-                        <p className="text-lg text-stone-600">238 451 1240</p>
+                        <p className="text-lg text-stone-600">238 451 5735</p>
 
                         {/* Publish Space Button */}
                         <button

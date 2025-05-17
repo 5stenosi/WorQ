@@ -93,7 +93,7 @@ const Spaces = () => {
 
   return (
     <div id='home' className="overflow-y-auto">
-      <section className="flex flex-col items-center pt-24 px-5 sm:px-10 md:px-15 lg:px-20">
+      <section className="flex flex-col items-center pt-28 px-5 sm:px-10 md:px-15 lg:px-20">
 
         {/* Mobile Space Type Filter */}
         <div className="bg-stone-300 w-fit p-2 rounded-3xl sm:hidden">
@@ -109,8 +109,8 @@ const Spaces = () => {
         </div>
 
         {/* All filters */}
-        <div className='sm:static sm:bottom-0 sm:justify-center sm:gap-5
-                        fixed bottom-2 flex items-center w-full gap-0 mt-5 justify-between'>
+        <div className='sm:static sm:bottom-0 sm:px-0 sm:justify-center sm:gap-5 z-20
+                        fixed bottom-2 px-2 flex items-center w-full gap-0 mt-5 justify-between'>
           {/* Filter by type + Searchbar */}
           <div className="bg-stone-300 w-fit p-2 rounded-3xl flex gap-3 order-last sm:order-first"
             onBlur={() => handleSearchToggle(false)}
@@ -192,12 +192,12 @@ const Spaces = () => {
         )}
 
         {/* Griglia Spazi */}
-        <div className={`w-full py-10
+        <div className={`w-full pt-5 sm:pt-10
                grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5
                ${spaces.length === 0 ? 'h-screen' : ''}`}>
 
           {!loading && spaces.length === 0 && (
-            <p className="text-center text-stone-600 col-span-4">
+            <p className="text-center text-balance text-stone-600 col-span-4">
               No spaces available. Please try adjusting your search or typology filter.
             </p>)}
 

@@ -3,13 +3,12 @@
 import { useAuthErrorMessage } from "@/lib/useAuthErrorMessage";
 import { signIn } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faGithub } from "@fortawesome/free-brands-svg-icons";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faEye,
-  faSlash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons/faGoogle";
+import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons/faArrowLeft";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons/faArrowRight";
+import { faEye } from "@fortawesome/free-solid-svg-icons/faEye";
+import { faSlash } from "@fortawesome/free-solid-svg-icons/faSlash";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -54,55 +53,53 @@ export default function LoginPage() {
 
   return (
     <div id="login" className="px-10">
-      <section className="w-full h-screen flex justify-center items-center pt-24 pb-3">
-        <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-10 flex flex-col gap-10">
+      <section className="w-full min-h-screen flex justify-center items-center pt-28">
+        <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-5 sm:p-10 flex flex-col gap-5 sm:gap-10">
           {/* Titolo */}
-          <h2 className="text-center text-2xl font-bold">
+          <h2 className="text-center text-xl sm:text-2xl text-balance font-bold">
             Log into your account
           </h2>
           {/* Auth */}
-          <div className="flex gap-5">
+          <div className="flex flex-col sm:flex-row gap-5">
             {/* Google */}
             <button
               id="google"
-              className={`w-full flex justify-center items-center py-4 border-2 hover:text-stone-100 font-medium rounded-lg
-                                motion-preset-expand motion-delay-150
-                                transition-all duration-150 ease-out active:scale-90 hover:scale-105
-                 ${
-                   randomNumber === 1
-                     ? "border-google-blue hover:bg-google-blue text-google-blue"
-                     : ""
-                 }
-                 ${
-                   randomNumber === 2
-                     ? "border-red-500 hover:bg-red-500 text-red-500"
-                     : ""
-                 }
-                 ${
-                   randomNumber === 3
-                     ? "border-green-500 hover:bg-green-500 text-green-500"
-                     : ""
-                 }
-                 ${
-                   randomNumber === 4
-                     ? "border-yellow-500 hover:bg-yellow-500 text-yellow-500"
-                     : ""
-                 }`}
+              className={`w-full flex justify-center items-center py-2 sm:py-4 border-2 hover:text-stone-100 active:text-stone-100 font-medium rounded-lg
+                          motion-preset-expand motion-delay-150
+                          transition-all duration-150 ease-out active:scale-90 hover:scale-105
+               ${randomNumber === 1
+                  ? "border-google-blue hover:bg-google-blue active:bg-google-blue text-google-blue"
+                  : ""
+                }
+               ${randomNumber === 2
+                  ? "border-google-red hover:bg-google-red active:bg-google-red text-google-red"
+                  : ""
+                }
+               ${randomNumber === 3
+                  ? "border-google-green hover:bg-google-green active:bg-google-green text-google-green"
+                  : ""
+                }
+               ${randomNumber === 4
+                  ? "border-google-yellow hover:bg-google-yellow active:bg-google-yellow text-google-yellow"
+                  : ""
+                }`}
               onClick={() => signIn("google", { callbackUrl: "/" })}
             >
               <FontAwesomeIcon icon={faGoogle} className="mr-2 text-2xl" />
-              Login with Google
+              <span className="sm:hidden">Login</span>
+              <span className="hidden sm:inline">Login with Google</span>
             </button>
             {/* Github */}
             <button
               id="github"
-              className="w-full flex justify-center items-center py-4 border-2 border-github hover:bg-github text-github hover:text-stone-100 font-medium rounded-lg
+              className="w-full flex justify-center items-center py-2 sm:py-4 border-2 border-github hover:bg-github active:bg-github text-github hover:text-stone-100 active:text-stone-100 font-medium rounded-lg
                                 motion-preset-expand motion-delay-150
                                 transition-all duration-150 ease-out active:scale-90 hover:scale-105"
               onClick={() => signIn("github", { callbackUrl: "/" })}
             >
               <FontAwesomeIcon icon={faGithub} className="mr-2 text-2xl" />
-              Login with GitHub
+              <span className="sm:hidden">Login</span>
+              <span className="hidden sm:inline">Login with GitHub</span>
             </button>
           </div>
           {/* Form */}
@@ -138,6 +135,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 aspect-square h-full flex items-center text-stone-600 hover:text-stone-700 focus:outline-none"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     <FontAwesomeIcon
                       icon={faEye}
@@ -167,8 +165,10 @@ export default function LoginPage() {
               {/* Signup Button */}
               <Link
                 href={"/register"}
-                className="w-full font-medium h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900 hover:bg-stone-900 hover:text-stone-100
-                                                  transition-all duration-150 ease-out active:scale-90 hover:scale-105 group"
+                className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900
+                          hover:bg-stone-900 hover:text-stone-100
+                          active:bg-stone-900 active:text-stone-100
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-105 group"
               >
                 <FontAwesomeIcon
                   icon={faArrowLeft}
@@ -183,14 +183,17 @@ export default function LoginPage() {
               {/* Login Button */}
               <button
                 type="submit"
-                className="w-full font-medium h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500 hover:bg-west-side-500 hover:text-stone-100
-                                                transition-all duration-150 ease-out active:scale-90 hover:scale-105 group"
+                className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500
+                          hover:bg-west-side-500 hover:text-stone-100
+                          active:bg-west-side-500 active:text-stone-100
+                            transition-all duration-150 ease-out active:scale-90 hover:scale-105 group"
               >
                 <FontAwesomeIcon
                   icon={faArrowRight}
                   className="text-lg opacity-0"
                 />
-                Login with credentials
+                <span className="sm:hidden">Login</span>
+                <span className="hidden sm:inline">Login with Credentials</span>
                 <FontAwesomeIcon
                   icon={faArrowRight}
                   className="text-lg group-hover:translate-x-1/2 opacity-0 group-hover:opacity-100 transition duration-150 group-hover:duration-500"

@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { error } from 'console';
 import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Handles GET requests to /api/spaces/[id]
 // Returns a single space
@@ -121,6 +123,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         const deletedSpace = await prisma.space.delete({
             where: { id: spaceId },
         });
+
+        const folderPath = path.join(process.cwd(), 'public', 'uploads', `space${id}`);
+
+        try {
+            await fs.rm(folderPath, { recursive: true, force: true });
+        } catch (fsError) {
+            console.error('Failed to delete folder:', fsError);
+        }
 
         return NextResponse.json(deletedSpace);
     } catch (error) {

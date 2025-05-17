@@ -4,25 +4,25 @@ const prisma = new PrismaClient();
 async function main() {
     // Ensure all services have a valid iconName during seeding
     const services = await Promise.all([
-        prisma.service.create({ data: { detail: 'Free Wi-Fi', iconName: 'wifi' } }),
-        prisma.service.create({ data: { detail: 'Stationery', iconName: 'pen' } }),
-        prisma.service.create({ data: { detail: 'Printer', iconName: 'print' } }),
-        prisma.service.create({ data: { detail: 'Scanner', iconName: 'print' } }),
-        prisma.service.create({ data: { detail: 'Whiteboard', iconName: 'chalkboard' } }),
-        prisma.service.create({ data: { detail: 'Desktop', iconName: 'desktop' } }),
-        prisma.service.create({ data: { detail: 'Projector', iconName: 'video' } }),
-        prisma.service.create({ data: { detail: 'Disability Access', iconName: 'wheelchair' } }),
-        prisma.service.create({ data: { detail: 'Air Conditioning', iconName: 'snowflake' } }),
-        prisma.service.create({ data: { detail: 'Quiet Zones', iconName: 'volume-xmark' } }),
-        prisma.service.create({ data: { detail: 'Vending Machines', iconName: 'coffee' } }),
-        prisma.service.create({ data: { detail: 'Catering', iconName: 'utensils' } }),
-        prisma.service.create({ data: { detail: 'Video Conference', iconName: 'videocamera' } }),
-        prisma.service.create({ data: { detail: 'Kitchenette', iconName: 'kitchenset' } }),
-        prisma.service.create({ data: { detail: 'Child-friendly', iconName: 'child' } }),
-        prisma.service.create({ data: { detail: 'Pet-friendly', iconName: 'dog' } }),
-        prisma.service.create({ data: { detail: 'Parking', iconName: 'parking' } }),
-        prisma.service.create({ data: { detail: 'Lockers', iconName: 'lock' } }),
-        prisma.service.create({ data: { detail: 'Charging Stations', iconName: 'bolt' } }),
+        prisma.service.create({ data: { id: 1, detail: 'Free Wi-Fi', iconName: 'wifi' } }),
+        prisma.service.create({ data: { id: 2, detail: 'Stationery', iconName: 'pen' } }),
+        prisma.service.create({ data: { id: 3, detail: 'Printer', iconName: 'print' } }),
+        prisma.service.create({ data: { id: 4, detail: 'Scanner', iconName: 'print' } }),
+        prisma.service.create({ data: { id: 5, detail: 'Whiteboard', iconName: 'chalkboard' } }),
+        prisma.service.create({ data: { id: 6, detail: 'Desktop', iconName: 'desktop' } }),
+        prisma.service.create({ data: { id: 7, detail: 'Projector', iconName: 'video' } }),
+        prisma.service.create({ data: { id: 8, detail: 'Disability Access', iconName: 'wheelchair' } }),
+        prisma.service.create({ data: { id: 9, detail: 'Air Conditioning', iconName: 'snowflake' } }),
+        prisma.service.create({ data: { id: 10, detail: 'Quiet Zones', iconName: 'volume-xmark' } }),
+        prisma.service.create({ data: { id: 11, detail: 'Vending Machines', iconName: 'coffee' } }),
+        prisma.service.create({ data: { id: 12, detail: 'Catering', iconName: 'utensils' } }),
+        prisma.service.create({ data: { id: 13, detail: 'Video Conference', iconName: 'videocamera' } }),
+        prisma.service.create({ data: { id: 14, detail: 'Kitchenette', iconName: 'kitchenset' } }),
+        prisma.service.create({ data: { id: 15, detail: 'Child-friendly', iconName: 'child' } }),
+        prisma.service.create({ data: { id: 16, detail: 'Pet-friendly', iconName: 'dog' } }),
+        prisma.service.create({ data: { id: 17, detail: 'Parking', iconName: 'parking' } }),
+        prisma.service.create({ data: { id: 18, detail: 'Lockers', iconName: 'lock' } }),
+        prisma.service.create({ data: { id: 19, detail: 'Charging Stations', iconName: 'bolt' } }),
     ]);
 
     // Creation of an agency
@@ -89,6 +89,7 @@ async function main() {
     const spaces = await Promise.all([
         prisma.space.create({
             data: {
+                id : 1,
                 name: 'Milano Meetings',
                 agencyId: agencyUser.agency!.id,
                 description: 'A beautiful coworking space',
@@ -122,6 +123,7 @@ async function main() {
         }),
         prisma.space.create({
             data: {
+                id : 2,
                 name: 'RomOffice',
                 agencyId: agencyUser.agency!.id,
                 description: 'Another coworking space',
@@ -152,6 +154,7 @@ async function main() {
         }),
         prisma.space.create({
             data: {
+                id : 3,
                 name: 'Naples Outdoor',
                 agencyId: agencyUser.agency!.id,
                 description: 'A modern and well-equipped space',

@@ -44,6 +44,20 @@ export async function POST(req: Request) {
       },
     });
 
+    if (role === "CLIENT" && (!name || !surname || !cellphone)) {
+      return NextResponse.json(
+        { error: "Missing Client data" },
+        { status: 400 }
+      );
+    }
+
+    if (role === "AGENCY" && (!name || !vatNumber || !telephone)) {
+      return NextResponse.json(
+        { error: "Missing Agency data" },
+        { status: 400 }
+      );
+    }
+
     // crea client o agency associato
     if (role === "CLIENT") {
       await prisma.client.create({

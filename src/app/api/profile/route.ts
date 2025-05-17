@@ -6,41 +6,48 @@ import { NextResponse } from 'next/server'
 // Fetch user data
 export async function GET() {
   try {
-    // const session = await auth()
+    // Check if the user is authenticated
+    const session = await auth();
 
-    // Use Prisma's findFirst method to fetch the first record if needed
-    const user = await prisma.user.findFirst();
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
 
-    // TODO: Check if the user is authenticated
+    // Fetch the authenticated user's data
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    });
 
-    if (user?.role == "CLIENT") {
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (user.role === "CLIENT") {
       const client = await prisma.client.findUnique({
         where: { userEmail: user.email },
         include: {
-          bookings: {},
-          user: {}
+          bookings: true,
+          user: true
         }
-      })
-      return NextResponse.json(client)
-    }
-    else if (user?.role == "AGENCY") {
+      });
+      return NextResponse.json(client);
+    } else if (user.role === "AGENCY") {
       const agency = await prisma.agency.findUnique({
         where: { userEmail: user.email },
         include: {
-          spaces: {},
-          user: {}
+          spaces: true,
+          user: true
         }
-      })
-      return NextResponse.json(agency)
-    }
-    else {
-      return NextResponse.json({ error: "Utente non trovato" }, { status: 404 })
+      });
+      return NextResponse.json(agency);
+    } else {
+      return NextResponse.json({ error: "Invalid user role" }, { status: 400 });
     }
 
   } catch (error) {
     return NextResponse.json(
-      { error: "Errore del server" },
+      { error: "Server error" },
       { status: 500 }
-    )
+    );
   }
 }

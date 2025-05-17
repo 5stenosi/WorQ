@@ -1,6 +1,15 @@
 import { prisma } from '@/lib/prisma';
-import { set } from 'date-fns';
 import { NextResponse, NextRequest } from 'next/server';
+import fs from 'fs/promises';
+import path from 'path';
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
+const uploadPath = path.join(process.cwd(), 'public', 'uploads');
 
 // Handles GET requests to /api/spaces
 // Returns all spaces
@@ -21,17 +30,6 @@ export async function GET(request: NextRequest) {
         if (typology) {
             where.typology = typology;
         }
-
-        // Filter by services (must have ALL specified services, otherwise use SOME instead of EVERY)
-        // if (services.length > 0) {
-        //     where.services = {
-        //         every: {
-        //             id: {
-        //                 in: services.map(serviceId => parseInt(serviceId))
-        //             }
-        //         }
-        //     };
-        // }
 
         // Filter by price
         if (maxPrice) {
@@ -106,36 +104,77 @@ export async function GET(request: NextRequest) {
 // Creates a new space
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const setFullSpaceBooking = body.typology === 'MEETING_ROOMS' ? true : false;
+        const formData = await request.formData();
+
+        // Handle images
+        const metadata = JSON.parse(formData.get('metadata') as string);
+        const files = formData.getAll('files') as File[];
+        const savedImagePaths: string[] = [];
+
+        // Handle address
+        const nominatimAddress = metadata.fullAddress;
+
         const newSpace = await prisma.space.create({
             data: {
-                name: body.name,
-                agencyId: body.agencyId,
-                description: body.description,
-                seats: body.seats,
-                isFullSpaceBooking: setFullSpaceBooking,
-                typology: body.typology,
-                price: body.price,
-                avgRating: body.avgRating,
+                name: metadata.name,
+                description: metadata.description,
+                seats: parseInt(metadata.seats),
+                isFullSpaceBooking: metadata.typology === 'MEETING_ROOMS' ? true : false,
+                typology: metadata.typology,
+                price: parseFloat(metadata.price),
+                avgRating: null,
                 address: {
-                    create: body.address,
+                    create: {
+                        street: nominatimAddress.address.road,
+                        number: nominatimAddress.address.house_number ? nominatimAddress.address.house_number : '',
+                        city: nominatimAddress.address.city || nominatimAddress.address.town || nominatimAddress.address.village,
+                        zip: nominatimAddress.address.postcode,
+                        country: nominatimAddress.address.country,                        
+                        latitude: parseFloat(nominatimAddress.lat),
+                        longitude: parseFloat(nominatimAddress.lon),
+                    }
                 },
-                // Connect or create services
-                // services: {
-                //     connectOrCreate: body.services.map((service: { id: string, detail: string }) => ({
-                //         where: { id: service.id },
-                //         create: { detail: service.detail },
-                //     })),
-                // },
                 // Connect existing services by their IDs
                 services: {
-                    connect: body.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
+                    connect: metadata.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
+                },
+                agency: {
+                    connect: {
+                        id: parseInt(metadata.agencyId),
+                    }
                 },
                 // Images are optional
-                images: body.images ? body.images : undefined,
-            },
+                images: undefined,
+            }
         });
+
+        if (files && files.length > 0) {
+            const spaceFolder = `space${newSpace.id}`;
+            const spaceFolderPath = path.join(uploadPath, spaceFolder);
+
+            // Create the folder if it doesn't exist
+            await fs.mkdir(spaceFolderPath, { recursive: true });
+
+            // Save images
+            for (const [index, file] of files.entries()) {
+            const buffer = Buffer.from(await file.arrayBuffer());
+            const fileExtension = path.extname(file.name);
+            const fileName = `image${index + 1}${fileExtension}`;
+            const filePath = path.join(uploadPath, spaceFolder, fileName);
+
+            await fs.writeFile(filePath, buffer);
+            savedImagePaths.push(`/uploads/${spaceFolder}/${fileName}`);
+            }
+
+            // Update the space with the saved image paths
+            await prisma.space.update({
+            where: { id: newSpace.id },
+            data: {
+                images: savedImagePaths,
+            }
+            });
+        }
+
         return NextResponse.json(newSpace, { status: 201 });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to create space' + error }, { status: 500 });

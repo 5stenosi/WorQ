@@ -4,7 +4,7 @@ import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
-import { isUserProfileComplete } from "./lib/checkUserCompletation";
+import { isUserProfileComplete } from "./lib/checkUserCompletion";
 import { getUserFromDb } from "./lib/password";
 import { createUserAndAccount } from "./lib/createUserAndAccount";
 
@@ -20,6 +20,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+      // The authorize function handles the custom login logic and determines whether the credentials provided are valid.
+      // It receives the input values defined in credentials, and you must return either a user object or null.
+      // If null is returned, the login fails.
       authorize: async (credentials) => {
         try {
           const email = credentials?.email as string;
@@ -28,7 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const user = await getUserFromDb(email, password);
 
           if (!user) {
-            return null; // NextAuth si aspetta null per credenziali invalide
+            return null; // no user found
           }
 
           return user;
@@ -55,19 +58,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
-
-        // Recupera il ruolo dal DB se mancante
-        if (!user.role && user.email) {
-          const dbUser = await prisma.user.findUnique({
-            where: { email: user.email },
-          });
-          token.role = dbUser?.role || null;
-        } else {
-          token.role = user.role;
-        }
-
         token.provider = account?.provider || "credentials";
         token.providerAccountId = account?.providerAccountId;
+      }
+
+      // Sempre: aggiorna ruolo (anche dopo reload o signIn() automatico)
+      // Recupera il ruolo dal DB (puoi fare anche if token.email && !token.role, ma meglio aggiornarlo sempre)
+      if (token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+          // include le relazioni client e agency (carica i dati correlati)
+          include: { agency: true, client: true },
+        });
+        token.role = dbUser?.role;
+        // token.clientId = dbUser?.client?.id || null;
+        // token.agencyId = dbUser?.agency?.id || null;
       }
 
       return token;
@@ -79,7 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: token.id as string,
           name: token.name as string,
           email: token.email as string,
-          role: (token.role as string) || "CLIENT",
+          role: token.role as string,
           emailVerified: null, // Aggiunto per compatibilità con AdapterUser
         };
       }
@@ -106,8 +111,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
         });
-        return true; // L'utente è stato creato con successo
-        //return `/complete-profile?email=${encodeURIComponent(user.email)}`;
+        //return true; // L'utente è stato creato con successo
+        return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
       // Se esiste ma il provider è diverso
@@ -123,19 +128,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       return true;
-    },
-
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/complete-profile")) {
-        return `${baseUrl}${url}`;
-      }
-
-      // Se url è una URL assoluta, assicurati che sia del tuo dominio
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-
-      return baseUrl;
     },
   },
 });

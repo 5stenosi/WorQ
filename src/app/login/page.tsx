@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthErrorMessage } from "@/lib/useAuthErrorMessage";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons/faGoogle";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
@@ -11,11 +11,14 @@ import { faEye } from "@fortawesome/free-solid-svg-icons/faEye";
 import { faSlash } from "@fortawesome/free-solid-svg-icons/faSlash";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [randomNumber, setRandomNumber] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const errorMessage = useAuthErrorMessage();
+  const { status } = useSession();
+  const router = useRouter();
 
   const credentialsAction = (formData: FormData) => {
     signIn("credentials", {
@@ -24,6 +27,13 @@ export default function LoginPage() {
       callbackUrl: "/",
     });
   };
+
+  // Se l'utente è già loggato, viene reindirizzato alla home
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
 
   useEffect(() => {
     const number = Math.floor(Math.random() * 4) + 1;
@@ -83,7 +93,10 @@ export default function LoginPage() {
                   ? "border-google-yellow hover:bg-google-yellow active:bg-google-yellow text-google-yellow"
                   : ""
                 }`}
-              onClick={() => signIn("google", { callbackUrl: "/" })}
+              onClick={() => {
+                localStorage.setItem("oauth_provider", "google");
+                signIn("google", { callbackUrl: "/" });
+              }}
             >
               <FontAwesomeIcon icon={faGoogle} className="mr-2 text-2xl" />
               <span className="sm:hidden">Login</span>
@@ -95,7 +108,10 @@ export default function LoginPage() {
               className="w-full flex justify-center items-center py-2 sm:py-4 border-2 border-github hover:bg-github active:bg-github text-github hover:text-stone-100 active:text-stone-100 font-medium rounded-lg
                                 motion-preset-expand motion-delay-150
                                 transition-all duration-150 ease-out active:scale-90 hover:scale-105"
-              onClick={() => signIn("github", { callbackUrl: "/" })}
+              onClick={() => {
+                localStorage.setItem("oauth_provider", "github");
+                signIn("github", { callbackUrl: "/" });
+              }}
             >
               <FontAwesomeIcon icon={faGithub} className="mr-2 text-2xl" />
               <span className="sm:hidden">Login</span>

@@ -62,7 +62,17 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true });
+    // Importante per aggiornare il ruolo dell'utente
+    await prisma.user.update({
+      where: { email },
+      data: { role },
+    });
+
+    return NextResponse.json({
+      success: true,
+      role,
+      redirectTo: "/",
+    });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Error while saving." }, { status: 500 });

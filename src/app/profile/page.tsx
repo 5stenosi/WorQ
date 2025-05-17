@@ -9,7 +9,7 @@ export default function Profile() {
     const [isModalOpen, setModalOpen] = useState(false);
 
     return (
-        <div id='profile' className={`px-10`}>
+        <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
             <section className={`w-full h-screen pt-28 pb-3`}>
                 {/* Profile Wrapper */}
                 <div className={`w-full h-full p-5 flex bg-stone-100 rounded-4xl transition-all duration-1000 gap-5`}>

@@ -104,7 +104,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
     </p>);
 
     return (
-        <div id='spazioNelDettaglio' className={`overflow-y-auto px-10`}>
+        <div id='spazioNelDettaglio' className={`overflow-y-auto px-5 sm:px-10 md:px-15 lg:px-20`}>
             <section className={`w-full h-screen pt-28 pb-3`}>
                 {/* Space Wrapper */}
                 <div className={`w-full h-full p-5 flex bg-stone-100 rounded-4xl gap-5`}>

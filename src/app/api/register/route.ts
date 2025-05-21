@@ -19,13 +19,13 @@ export async function POST(req: Request) {
 
     // controlli di base
     if (!email || !password || !role) {
-      return NextResponse.json({ error: "Missing Data" }, { status: 400 });
+      return NextResponse.json({ message: "Missing Data" }, { status: 400 });
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json(
-        { error: "This user already exists" },
+        { message: "Email already registered." },
         { status: 409 }
       );
     }
@@ -46,14 +46,14 @@ export async function POST(req: Request) {
 
     if (role === "CLIENT" && (!name || !surname || !cellphone)) {
       return NextResponse.json(
-        { error: "Missing Client data" },
+        { message: "Missing Client data" },
         { status: 400 }
       );
     }
 
     if (role === "AGENCY" && (!name || !vatNumber || !telephone)) {
       return NextResponse.json(
-        { error: "Missing Agency data" },
+        { message: "Missing Agency data" },
         { status: 400 }
       );
     }
@@ -82,6 +82,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error during the registration", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

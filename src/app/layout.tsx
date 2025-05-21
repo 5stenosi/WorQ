@@ -7,7 +7,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebookSquare, faXTwitter, faInstagram, faTiktok, faLinkedin, faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -99,12 +99,11 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex justify-evenly items-center text-stone-900 font-medium text-lg gap-2 text-center">
                   {session ? (
                     <>
-                      <Link
-                        href="/api/auth/signout"
-                        onClick={() => setMenuOpen(false)}
+                      <button
+                        onClick={() => signOut({ callbackUrl: "/" })}
                         className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
                         Logout
-                      </Link>
+                      </button>
                       <Link
                         href="/profile"
                         onClick={() => setMenuOpen(false)}
@@ -144,11 +143,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
               {session ? (
                 <>
-                  <Link href="/api/auth/signout" className="rounded-xl transition duration-250 w-full py-3 
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="rounded-xl transition duration-250 w-full py-3 
                                                           hover:bg-stone-900 hover:text-stone-100
                                                           active:bg-stone-900 active:text-stone-100">
                     Logout
-                  </Link>
+                  </button>
                   <Link href="/profile" className="rounded-xl transition duration-250 w-full py-3 
                                                   hover:bg-west-side-500 hover:text-stone-100
                                                   active:bg-west-side-500 active:text-stone-100">

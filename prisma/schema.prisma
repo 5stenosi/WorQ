@@ -64,7 +64,7 @@ model User {
   role          Role
   password      String? // Hashed password for traditional authentication
   oauthProvider OAuthProvider
-  oauthId       String
+  oauthId       String?
   createdAt     DateTime      @default(now())
   client        Client?
   agency        Agency?

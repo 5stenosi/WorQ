@@ -27,7 +27,6 @@ export async function GET() {
         where: { userEmail: user.email },
         include: {
           bookings: true,
-          user: true
         }
       });
       return NextResponse.json(client);
@@ -36,7 +35,6 @@ export async function GET() {
         where: { userEmail: user.email },
         include: {
           spaces: true,
-          user: true
         }
       });
       return NextResponse.json(agency);

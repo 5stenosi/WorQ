@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Carousel from '@/components/Carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faKitchenSet, IconName } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faKitchenSet } from '@fortawesome/free-solid-svg-icons';
+import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
 
+library.add(
+    faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
+    faWheelchair, faSnowflake, faVolumeXmark, faCoffee, faUtensils,
+    faVideoCamera, faKitchenSet, faChild, faDog, faParking, faLock, faBolt
+);
 
-const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, agency: any }> = ({ isOpen, onClose, agency }) => {
     const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
     const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
@@ -22,7 +28,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
         images?: string[];
         files?: File[];
     }>({
-        agencyId: 1, // TODO: Change this to the actual agency ID (session)
+        agencyId: agency.id,
         name: '',
         address: '',
         seats: 1,
@@ -47,33 +53,33 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
 
     const [isClosing, setIsClosing] = useState(false);
 
+    // State for services
+    const [services, setServices] = useState<{
+        id: string;
+        detail: string;
+        iconName?: IconName;
+    }[]>([]);
+
     // State for selected services
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
-    // Array of services
-    const services = [
-        { id: '1', name: 'Free Wi-Fi', icon: faWifi },
-        { id: '2', name: 'Stationery', icon: faPen },
-        { id: '3', name: 'Printer', icon: faPrint },
-        { id: '4', name: 'Scanner', icon: faPrint },
-        { id: '5', name: 'Whiteboard', icon: faChalkboard },
-        { id: '6', name: 'Desktop', icon: faDesktop },
-        { id: '7', name: 'Projector', icon: faVideo },
-        { id: '8', name: 'Disability Access', icon: faWheelchair },
-        { id: '9', name: 'Air Conditioning', icon: faSnowflake },
-        { id: '10', name: 'Quiet Zones', icon: faVolumeXmark },
-        { id: '11', name: 'Vending Machines', icon: faCoffee },
-        { id: '12', name: 'Catering', icon: faUtensils },
-        { id: '13', name: 'Video Conference', icon: faVideoCamera },
-        { id: '14', name: 'Kitchenette', icon: faKitchenSet },
-        { id: '15', name: 'Child-friendly', icon: faChild },
-        { id: '16', name: 'Pet-friendly', icon: faDog },
-        { id: '17', name: 'Parking', icon: faParking },
-        { id: '18', name: 'Lockers', icon: faLock },
-        { id: '19', name: 'Charging Stations', icon: faBolt },
-    ];
+    // Fetch services from the server
+    const fetchServices = async () => {
+        try {
+            const response = await fetch('/api/services');
+            const data = await response.json();
+            setServices(data.map((service: { id: string; detail: string; iconName?: IconName }) => ({
+                id: service.id,
+                detail: service.detail,
+                iconName: service.iconName ? findIconDefinition({ prefix: 'fas', iconName: service.iconName }) : faVideoCamera,
+            })));
+        } catch (error) {
+            console.error('Error fetching services:', error);
+        }
+    }
 
     useEffect(() => {
+        fetchServices(); // Fetch services when the component mounts
         if (!isOpen) {
             setIsClosing(true);
             const timeout = setTimeout(() => {
@@ -256,12 +262,8 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                                             checked={selectedServices.includes(service.id)}
                                             onChange={() => handleServiceToggle(service.id)}
                                             className="hidden" />
-                                        {service.icon ? (
-                                            <FontAwesomeIcon icon={service.icon} />
-                                        ) : (
-                                            <FontAwesomeIcon icon={faPlus} />
-                                        )}
-                                        {service.name}
+                                        <FontAwesomeIcon icon={service.iconName || faVideoCamera} />
+                                        {service.detail}
                                     </label>
                                 ))}
                             </div>

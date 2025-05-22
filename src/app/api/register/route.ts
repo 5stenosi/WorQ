@@ -40,7 +40,7 @@ export async function POST(req: Request) {
         password: hashedPassword,
         role,
         oauthProvider: "APP",
-        oauthId: email, // per compatibilità con schema.prisma
+        oauthId: null, // per compatibilità con schema.prisma
       },
     });
 
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
           name,
           surname,
           cellphone,
-          userEmail: email,
+          userId: newUser.id,
         },
       });
     } else if (role === "AGENCY") {
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
           name,
           vatNumber,
           telephone,
-          userEmail: email,
+          userId: newUser.id,
         },
       });
     }

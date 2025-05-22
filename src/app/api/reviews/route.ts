@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 import { updateSpaceAvgRating } from '@/lib/reviewUtils';
 
@@ -26,6 +27,13 @@ export async function GET(request: Request) {
 // Creates a new review
 export async function POST(request: Request) {
     try {
+        // Check if user is authenticated
+        const session = await auth();
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+        }
+
         const body = await request.json();
         const { spaceId, clientId, rating, comment } = body;
 
@@ -36,7 +44,7 @@ export async function POST(request: Request) {
         const newReview = await prisma.review.create({
             data: {
                 spaceId: parseInt(spaceId),
-                clientId: parseInt(clientId),
+                clientId: clientId,
                 rating: parseInt(rating),
                 comment: comment || null,
             },

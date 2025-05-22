@@ -16,7 +16,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, agency:
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
     const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
     const [formData, setFormData] = useState<{
-        agencyId?: number;
+        userId?: string;
         name: string;
         address: string;
         fullAddress?: string;
@@ -28,7 +28,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, agency:
         images?: string[];
         files?: File[];
     }>({
-        agencyId: agency.id,
+        userId: agency.userId,
         name: '',
         address: '',
         seats: 1,
@@ -39,7 +39,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, agency:
     });
 
     const [errors, setErrors] = useState<{
-        agencyId?: number;
+        agencyId?: string;
         name?: string;
         address?: string;
         seats?: string;

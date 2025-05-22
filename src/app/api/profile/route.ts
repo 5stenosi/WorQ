@@ -24,7 +24,7 @@ export async function GET() {
 
     if (user.role === "CLIENT") {
       const client = await prisma.client.findUnique({
-        where: { userEmail: user.email },
+        where: { userId: user.id },
         include: {
           bookings: true,
         }
@@ -32,7 +32,7 @@ export async function GET() {
       return NextResponse.json(client);
     } else if (user.role === "AGENCY") {
       const agency = await prisma.agency.findUnique({
-        where: { userEmail: user.email },
+        where: { userId: user.id },
         include: {
           spaces: true,
         }

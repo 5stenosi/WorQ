@@ -10,7 +10,7 @@ export default function Profile() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [userData, setUserData] = useState({
-        id: '',
+        userId: '',
         name: 'Nome',
         surname: 'Cognome',
         userEmail: 'Email',
@@ -24,7 +24,6 @@ export default function Profile() {
         try {
             const response = await fetch('/api/profile');
             const data = await response.json();
-            console.log('User data:', data);
             setUserData(data);
         }
         catch (error) {

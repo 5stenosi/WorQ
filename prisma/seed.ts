@@ -91,7 +91,7 @@ async function main() {
             data: {
                 id : 1,
                 name: 'Milano Meetings',
-                agencyId: agencyUser.agency!.id,
+                agencyId: agencyUser.agency!.userId,
                 description: 'A beautiful coworking space',
                 seats: 10,
                 isFullSpaceBooking: true,
@@ -125,7 +125,7 @@ async function main() {
             data: {
                 id : 2,
                 name: 'RomOffice',
-                agencyId: agencyUser.agency!.id,
+                agencyId: agencyUser.agency!.userId,
                 description: 'Another coworking space',
                 seats: 15,
                 isFullSpaceBooking: false,
@@ -156,7 +156,7 @@ async function main() {
             data: {
                 id : 3,
                 name: 'Naples Outdoor',
-                agencyId: agencyUser.agency!.id,
+                agencyId: agencyUser.agency!.userId,
                 description: 'A modern and well-equipped space',
                 seats: 20,
                 isFullSpaceBooking: true,
@@ -188,7 +188,7 @@ async function main() {
     // Creation of a booking
     const booking = await prisma.booking.create({
         data: {
-            clientId: clientUser.client!.id,
+            clientId: clientUser.client!.userId,
             spaceId: spaces[0].id,
             bookingDate: new Date('2025-04-20T10:00:00Z'),
         },
@@ -197,7 +197,7 @@ async function main() {
     // Creation of a review
     const review = await prisma.review.create({
         data: {
-            clientId: clientUser.client!.id,
+            clientId: clientUser.client!.userId,
             spaceId: spaces[0].id,
             rating: 5,
             comment: 'Fantastic space!',

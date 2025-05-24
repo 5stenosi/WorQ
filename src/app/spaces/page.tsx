@@ -93,7 +93,7 @@ const Spaces = () => {
 
   return (
     <div id='home' className="overflow-y-auto">
-      <section className="flex flex-col items-center pt-28 px-5 sm:px-10 md:px-15 lg:px-20">
+      <section className="flex flex-col items-center pt-28 pb-3 px-5 sm:px-10 md:px-15 lg:px-20">
 
         {/* Mobile Space Type Filter */}
         <div className="bg-stone-300 w-fit p-2 rounded-3xl sm:hidden">
@@ -206,13 +206,15 @@ const Spaces = () => {
               className='w-full h-80 sm:h-100 bg-stone-100 col-span-1 md: overflow-hidden flex flex-col
                           rounded-4xl cursor-pointer shadow-sm hover:shadow-md 
                           hover:scale-105 active:scale-95 transition-all duration-150 ease-out'>
-              <div className='w-full h-1/2'>
+              <div className='w-full h-1/2 relative'>
                 <Image
-                  src={space.images[0]}
+                  src={space.images?.[0] || '/placeholder-image.jpg'}
                   alt={space.name}
-                  width={1000}
-                  height={1000}
-                  className="w-full h-full object-cover" />
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover rounded-t-4xl"
+                />
               </div>
 
               <div className='w-full h-1/2 flex flex-col justify-between p-5'>

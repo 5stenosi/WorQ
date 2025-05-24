@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faKitchenSet, IconName } from '@fortawesome/free-solid-svg-icons';
 
 
+
 const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
@@ -46,6 +47,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
     }>({});
 
     const [isClosing, setIsClosing] = useState(false);
+    const [isVisible, setIsVisible] = useState(false); // For entry transition
 
     // State for selected services
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -73,14 +75,26 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
         { id: '19', name: 'Charging Stations', icon: faBolt },
     ];
 
+
     useEffect(() => {
-        if (!isOpen) {
+        let openTimeout: NodeJS.Timeout | undefined;
+        let closeTimeout: NodeJS.Timeout | undefined;
+        if (isOpen) {
+            setIsVisible(false); // Reset
+            openTimeout = setTimeout(() => {
+                setIsVisible(true);
+            }, 10); // Wait a tick to trigger transition
+        } else {
             setIsClosing(true);
-            const timeout = setTimeout(() => {
+            setIsVisible(false);
+            closeTimeout = setTimeout(() => {
                 setIsClosing(false);
             }, 300); // Duration of the transition in milliseconds
-            return () => clearTimeout(timeout);
         }
+        return () => {
+            if (openTimeout) clearTimeout(openTimeout);
+            if (closeTimeout) clearTimeout(closeTimeout);
+        };
     }, [isOpen]);
 
     const validateForm = () => {
@@ -178,10 +192,11 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
         });
     };
 
+
     if (!isOpen && !isClosing) return null;
 
     return (
-        <div className={`fixed inset-0 flex items-center justify-center z-9999 transition-opacity duration-300 ${isOpen && !isClosing ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`fixed inset-0 flex items-center justify-center z-9999 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
             <div
                 className="w-screen h-screen bg-stone-900/75 absolute"
                 onClick={() => {
@@ -190,7 +205,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                 }}
             ></div>
             <div
-                className={`bg-stone-100 rounded-xl shadow-lg max-w-7xl w-full p-5 relative transition-transform duration-300 ${isOpen && !isClosing ? 'scale-100' : 'scale-90'}`}>
+                className={`bg-stone-100 rounded-xl shadow-lg max-w-7xl w-full p-5 relative transition-transform duration-300 ${isVisible ? 'scale-100' : 'scale-90'}`}>
                 <h2 className="text-2xl font-bold mb-5">Publish a New Space</h2>
                 <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                     <div className="flex gap-5">

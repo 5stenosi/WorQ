@@ -63,7 +63,7 @@ export default function LoginPage() {
 
   return (
     <div id="login" className="px-10">
-      <section className="w-full min-h-screen flex justify-center items-center pt-28">
+      <section className="w-full min-h-screen flex justify-center items-center pt-28 pb-3">
         <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-5 sm:p-10 flex flex-col gap-5 sm:gap-10">
           {/* Titolo */}
           <h2 className="text-center text-xl sm:text-2xl text-balance font-bold">

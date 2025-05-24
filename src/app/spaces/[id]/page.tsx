@@ -228,7 +228,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                 </div>
 
                                 {/* Recap */}
-                                <div className='w-full h-fit mt-auto p-4 rounded-lg flex gap-5 border-1 border-stone-900/10 bg-stone-100 shadow-sm transition duration-500'>
+                                <div className='w-full h-fit mt-auto p-4 rounded-lg flex gap-5 transition duration-500'>
                                     <div className='min-w-fit w-2/5'>
                                         <CalendarComponent
                                             onDateSelection={handleDateSelection}

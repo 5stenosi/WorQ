@@ -16,8 +16,8 @@ datasource db {
 model Space {
   id                 Int       @id @default(autoincrement())
   name               String
-  agencyId           Int
-  agency             Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agencyId           String
+  agency             Agency    @relation(fields: [agencyId], references: [userId], onDelete: Cascade)
   address            Address?
   description        String
   seats              Int
@@ -32,7 +32,7 @@ model Space {
 }
 
 model Address {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   street    String
   number    String?
   city      String
@@ -40,8 +40,8 @@ model Address {
   country   String
   latitude  Float
   longitude Float
-  spaceId   Int    @unique
-  space     Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId   Int     @unique
+  space     Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
 }
 
 model Service {
@@ -64,7 +64,7 @@ model User {
   role          Role
   password      String? // Hashed password for traditional authentication
   oauthProvider OAuthProvider
-  oauthId       String
+  oauthId       String?
   createdAt     DateTime      @default(now())
   client        Client?
   agency        Agency?
@@ -73,30 +73,28 @@ model User {
 }
 
 model Client {
-  id        Int       @id @default(autoincrement())
+  userId    String    @id
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   surname   String
   cellphone String
   bookings  Booking[]
   reviews   Review[]
-  userEmail String    @unique
-  user      User      @relation(fields: [userEmail], references: [email])
 }
 
 model Agency {
-  id        Int     @id @default(autoincrement())
+  userId    String    @id
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   vatNumber String
   telephone String
   spaces    Space[]
-  userEmail String  @unique
-  user      User    @relation(fields: [userEmail], references: [email])
 }
 
 model Booking {
   id          Int      @id @default(autoincrement())
-  clientId    Int
-  client      Client   @relation(fields: [clientId], references: [id])
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [userId])
   spaceId     Int
   space       Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   bookingDate DateTime // Booking date
@@ -107,8 +105,8 @@ model Booking {
 
 model Review {
   id        Int      @id @default(autoincrement())
-  clientId  Int
-  client    Client   @relation(fields: [clientId], references: [id])
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [userId])
   spaceId   Int
   space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   rating    Int // 1-5

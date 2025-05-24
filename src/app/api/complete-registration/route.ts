@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     if (!email) {
       return NextResponse.json(
-        { error: "Email is required." },
+        { message: "Email is required." },
         { status: 400 }
       );
     }
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     // Se l'utente ha già un profilo, restituisci errore -- serve ??
     if (user.client || user.agency) {
       return NextResponse.json(
-        { error: "Profile already completed." },
+        { message: "Profile already completed." },
         { status: 400 }
       );
     }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (role === "CLIENT") {
       if (!rest.name || !rest.surname || !rest.cellphone) {
         return NextResponse.json(
-          { error: "Missing client fields." },
+          { message: "Missing client fields." },
           { status: 400 }
         );
       }
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     } else if (role === "AGENCY") {
       if (!rest.name || !rest.vatNumber || !rest.telephone) {
         return NextResponse.json(
-          { error: "Missing agency fields." },
+          { message: "Missing agency fields." },
           { status: 400 }
         );
       }
@@ -75,6 +75,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Error while saving." }, { status: 500 });
+    return NextResponse.json({ message: "Error while saving." }, { status: 500 });
   }
 }

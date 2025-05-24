@@ -16,7 +16,7 @@ async function main() {
         prisma.service.create({ data: { id: 10, detail: 'Quiet Zones', iconName: 'volume-xmark' } }),
         prisma.service.create({ data: { id: 11, detail: 'Vending Machines', iconName: 'coffee' } }),
         prisma.service.create({ data: { id: 12, detail: 'Catering', iconName: 'utensils' } }),
-        prisma.service.create({ data: { id: 13, detail: 'Video Conference', iconName: 'videocamera' } }),
+        prisma.service.create({ data: { id: 13, detail: 'Video Conference', iconName: 'video' } }),
         prisma.service.create({ data: { id: 14, detail: 'Kitchenette', iconName: 'kitchenset' } }),
         prisma.service.create({ data: { id: 15, detail: 'Child-friendly', iconName: 'child' } }),
         prisma.service.create({ data: { id: 16, detail: 'Pet-friendly', iconName: 'dog' } }),
@@ -91,7 +91,7 @@ async function main() {
             data: {
                 id : 1,
                 name: 'Milano Meetings',
-                agencyId: agencyUser.agency!.id,
+                agencyId: agencyUser.agency!.userId,
                 description: 'A beautiful coworking space',
                 seats: 10,
                 isFullSpaceBooking: true,
@@ -125,7 +125,7 @@ async function main() {
             data: {
                 id : 2,
                 name: 'RomOffice',
-                agencyId: agencyUser.agency!.id,
+                agencyId: agencyUser.agency!.userId,
                 description: 'Another coworking space',
                 seats: 15,
                 isFullSpaceBooking: false,
@@ -156,7 +156,7 @@ async function main() {
             data: {
                 id : 3,
                 name: 'Naples Outdoor',
-                agencyId: agencyUser.agency!.id,
+                agencyId: agencyUser.agency!.userId,
                 description: 'A modern and well-equipped space',
                 seats: 20,
                 isFullSpaceBooking: true,
@@ -188,7 +188,7 @@ async function main() {
     // Creation of a booking
     const booking = await prisma.booking.create({
         data: {
-            clientId: clientUser.client!.id,
+            clientId: clientUser.client!.userId,
             spaceId: spaces[0].id,
             bookingDate: new Date('2025-04-20T10:00:00Z'),
         },
@@ -197,7 +197,7 @@ async function main() {
     // Creation of a review
     const review = await prisma.review.create({
         data: {
-            clientId: clientUser.client!.id,
+            clientId: clientUser.client!.userId,
             spaceId: spaces[0].id,
             rating: 5,
             comment: 'Fantastic space!',

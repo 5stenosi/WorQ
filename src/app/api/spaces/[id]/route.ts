@@ -108,6 +108,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 // Deletes a single space
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
+        // TODO: Check if the user is authorized to delete this space
+        
         const { id } = params;
 
         // Convert the ID to a number

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
+import { useSession } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
 import { faStar, faStarHalfStroke, faPaperPlane, faBuilding, faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo, faWheelchair, faSnowflake, faCoffee, faUtensils, faVideoCamera, faKitchenSet, faChild, faDog, faParking, faLock, faBolt, faVolumeXmark, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -40,6 +41,7 @@ type Space = {
 
 export default function SpaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
+    const { data: session } = useSession();
 
     const [space, setSpace] = useState<Space | null>(null);
     const [loading, setLoading] = useState(true);
@@ -81,6 +83,44 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
 
         fetchSpace();
     }, [id]);
+
+    const handleReviewSubmit = async () => {
+        if (selectedRating === 0) {
+            alert("Please fill in all fields.");
+            return;
+        }
+        try {
+            const res = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    spaceId: space?.id,
+                    clientId: session?.user.id,
+                    rating: selectedRating,
+                    comment: reviewText,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to submit review');
+            }
+
+            const newReview = await res.json();
+            setSpace((prevSpace) => {
+                if (!prevSpace) return prevSpace;
+                return {
+                    ...prevSpace,
+                    reviews: [...(prevSpace.reviews || []), newReview],
+                };
+            });
+            setReviewText('');
+            setSelectedRating(0);
+        } catch (error) {
+            console.error("Errore nella fetch POST:", error);
+        }
+    }
 
     const handleDateSelection = (dates: Set<string>) => {
         const formattedDates = new Set(
@@ -148,30 +188,34 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                             </div>
 
                             {/* Write Review */}
-                            <div className='flex justify-between gap-2 p-2'>
-                                <input type="text" id='write-comment' placeholder="Write a review..." onChange={(e) => setReviewText(e.target.value)}
-                                    className={`w-full p-2 rounded-xl hover:ring-west-side-500 focus:ring-west-side-500 shadow-sm outline-0 transition
-                                        ${reviewText ? 'ring-west-side-500 ring-2' : 'ring-1'}`} />
+                            {session?.user && session.user.role == "CLIENT" && (
+                                <div className='flex justify-between gap-2 p-2'>
+                                    <input type="text" id='write-comment' placeholder="Write a review..." onChange={(e) => setReviewText(e.target.value)}
+                                        className={`w-full p-2 rounded-xl hover:ring-west-side-500 focus:ring-west-side-500 shadow-sm outline-0 transition
+                                            ${reviewText ? 'ring-west-side-500 ring-2' : 'ring-1'}`} />
 
-                                <div className='flex items-center h-10 text-xl rounded-xl bg-stone-100 ring-1 ring-stone-900/10 shadow-sm px-2'>
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <span
-                                            key={star}
-                                            onMouseEnter={() => setHoverRating(star)}
-                                            onMouseLeave={() => setHoverRating(0)}
-                                            onClick={() => setSelectedRating(star)}
-                                            className='cursor-pointer transition-transform duration-150 ease-out active:scale-90 hover:scale-110'>
-                                            <FontAwesomeIcon
-                                                icon={star <= (hoverRating || selectedRating) ? faStar : faHollowStar}
-                                                className={star <= (selectedRating) ? 'text-yellow-400' : 'text-stone-600'} />
-                                        </span>
-                                    ))}
+                                    <div className='flex items-center h-10 text-xl rounded-xl bg-stone-100 ring-1 ring-stone-900/10 shadow-sm px-2'>
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <span
+                                                key={star}
+                                                onMouseEnter={() => setHoverRating(star)}
+                                                onMouseLeave={() => setHoverRating(0)}
+                                                onClick={() => setSelectedRating(star)}
+                                                className='cursor-pointer transition-transform duration-150 ease-out active:scale-90 hover:scale-110'>
+                                                <FontAwesomeIcon
+                                                    icon={star <= (hoverRating || selectedRating) ? faStar : faHollowStar}
+                                                    className={star <= (selectedRating) ? 'text-yellow-400' : 'text-stone-600'} />
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    <button className='aspect-square size-10 rounded-xl bg-stone-900 text-stone-100 hover:bg-west-side-500 hover:text-stone-100 hover:scale-110 active:scale-90 transition-transform duration-150 ease-out'
+                                        onClick={handleReviewSubmit}>
+                                        <FontAwesomeIcon icon={faPaperPlane} />
+                                    </button>
                                 </div>
+                            )}
 
-                                <button className='aspect-square size-10 rounded-xl bg-stone-900 text-stone-100 hover:bg-west-side-500 hover:text-stone-100 hover:scale-110 active:scale-90 transition-transform duration-150 ease-out'>
-                                    <FontAwesomeIcon icon={faPaperPlane} />
-                                </button>
-                            </div>
                         </div>
                     </div>
 

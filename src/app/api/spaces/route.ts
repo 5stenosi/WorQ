@@ -104,6 +104,7 @@ export async function GET(request: NextRequest) {
 // Creates a new space
 export async function POST(request: Request) {
     try {
+
         const formData = await request.formData();
 
         // Handle images
@@ -125,13 +126,13 @@ export async function POST(request: Request) {
                 avgRating: null,
                 address: {
                     create: {
-                        street: nominatimAddress.address.road,
+                        street: nominatimAddress.address.road || '',
                         number: nominatimAddress.address.house_number ? nominatimAddress.address.house_number : '',
-                        city: nominatimAddress.address.city || nominatimAddress.address.town || nominatimAddress.address.village,
-                        zip: nominatimAddress.address.postcode,
-                        country: nominatimAddress.address.country,                        
-                        latitude: parseFloat(nominatimAddress.lat),
-                        longitude: parseFloat(nominatimAddress.lon),
+                        city: nominatimAddress.address.city || nominatimAddress.address.town || nominatimAddress.address.village || '',
+                        zip: nominatimAddress.address.postcode || '',
+                        country: nominatimAddress.address.country || '',                        
+                        latitude: parseFloat(nominatimAddress.lat) || 0,
+                        longitude: parseFloat(nominatimAddress.lon) || 0,
                     }
                 },
                 // Connect existing services by their IDs
@@ -140,7 +141,7 @@ export async function POST(request: Request) {
                 },
                 agency: {
                     connect: {
-                        id: parseInt(metadata.agencyId),
+                        userId: metadata.userId,
                     }
                 },
                 // Images are optional

@@ -29,7 +29,7 @@ export async function handleFormSubmit<
   }
 
   try {
-    const payload = { ...data, email, role };
+  const payload = { ...data, email, role };
 
     if (useOAuth) {
       const res = await fetch("/api/complete-registration", {
@@ -39,9 +39,6 @@ export async function handleFormSubmit<
       });
 
       if (res.ok) {
-        // Forza logout + login per rigenerare JWT aggiornato
-        // await signOut({ redirect: false });
-
         await signIn(provider, {
           redirect: true,
           callbackUrl: "/",
@@ -72,6 +69,16 @@ export async function handleFormSubmit<
     }
   } catch (error) {
     console.error("Registration error:", error);
-    alert("An error occurred");
+    if (error instanceof Error) {
+      if (error.message.includes("Email already registered.")) {
+        alert("Email already registered. Please try another one.");
+      } else if (error.message.includes("Missing")) {
+        alert("Please fill in all required fields.");
+      } else {
+        alert("An error occurred during registration. Please try again.");
+      }
+    } else {
+      alert("An unknown error occurred. Please try again.");
+    }
   }
 }

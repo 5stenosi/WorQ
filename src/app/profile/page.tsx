@@ -1,12 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
 import CreateSpaceModal from '@/components/CreateSpaceModal';
+import { set } from 'date-fns';
 
 export default function Profile() {
     const [isModalOpen, setModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [userData, setUserData] = useState({
+        userId: '',
+        name: 'Nome',
+        surname: 'Cognome',
+        userEmail: 'Email',
+        cellphone: 'Phone',
+        // bookings: [],
+        // spaces: [],
+    });
+
+    // Fetch user data from the API
+    const fetchUserData = async () => {
+        try {
+            const response = await fetch('/api/profile');
+            const data = await response.json();
+            setUserData(data);
+        }
+        catch (error) {
+            console.error('Error fetching user data:', error);
+            return null;
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
+    if (isLoading) return null;
 
     return (
         <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
@@ -20,9 +53,9 @@ export default function Profile() {
                         <div className='aspect-square w-full rounded-xl border-8 border-stone-300 flex items-center justify-center'>
                             <FontAwesomeIcon icon={faUser} className='text-stone-600 text-[10rem]' />
                         </div>
-                        <h1 className="text-3xl font-bold text-stone-800">Luca Tesei</h1>
-                        <p className="text-lg text-stone-600">email@example.com</p>
-                        <p className="text-lg text-stone-600">238 451 5735</p>
+                        <h1 className="text-3xl font-bold text-stone-800"> {userData?.name} {userData?.surname} </h1>
+                        <p className="text-lg text-stone-600">{userData?.userEmail}</p>
+                        <p className="text-lg text-stone-600">{userData?.cellphone}</p>
 
                         {/* Publish Space Button */}
                         <button
@@ -70,7 +103,9 @@ export default function Profile() {
             {/* Modal */}
             <CreateSpaceModal
                 isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)} />
+                onClose={() => setModalOpen(false)} 
+                agency={userData}
+            />
 
         </div >
     );

@@ -1,7 +1,5 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import ClientForm from "@/components/ClientForm";
 import AgencyForm from "@/components/AgencyForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,26 +9,15 @@ import {
   faUser,
   faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 export default function CompleteProfile() {
   const { data: session, status } = useSession();
-  const searchParams = useSearchParams();
-  const [, setEmail] = useState<string | null>(null);
+  //const searchParams = useSearchParams();
+  //const [, setEmail] = useState<string | null>(null);
   const [role, setRole] = useState<"CLIENT" | "AGENCY" | "">("");
-  const router = useRouter();
+  //const router = useRouter();
 
-  // da rivedere questo useEffect
-  useEffect(() => {
-    const urlEmail = searchParams.get("email");
-
-    if (urlEmail) {
-      setEmail(urlEmail);
-    } else {
-      router.push("/");
-    }
-  }, [status, session, searchParams, router]);
-
-  // da rivedere se serve spinner
   if (status === "loading")
     return (
       <div className="h-screen text-6xl flex justify-center items-center text-stone-600">

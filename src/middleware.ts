@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   // Pagine accessibili solo se autenticati
   if (
     !isAuth &&
-    (pathname === "/complete-profile" || pathname === "/profile")
+    (pathname === "/profile")
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
@@ -28,5 +28,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/complete-profile", "/profile"],
+  matcher: ["/login", "/register", "/profile"],
 };

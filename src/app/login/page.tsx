@@ -89,7 +89,7 @@ export default function LoginPage() {
                }`}
               onClick={() => {
                 localStorage.setItem("oauth_provider", "google");
-                signIn("google", { callbackUrl: "/" });
+                signIn("google");
               }}
             >
               <FontAwesomeIcon icon={faGoogle} className="mr-2 text-2xl" />
@@ -104,7 +104,7 @@ export default function LoginPage() {
                                 transition-all duration-150 ease-out active:scale-90 hover:scale-105"
               onClick={() => {
                 localStorage.setItem("oauth_provider", "github");
-                signIn("github", { callbackUrl: "/" });
+                signIn("github");
               }}
             >
               <FontAwesomeIcon icon={faGithub} className="mr-2 text-2xl" />

@@ -4,11 +4,8 @@ import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
-import { isUserProfileComplete } from "./lib/checkUserCompletion";
 import { getUserFromDb } from "./lib/password";
 import { createUserAndAccount } from "./lib/createUserAndAccount";
-
-//const prisma = new PrismaClient();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -54,10 +51,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async jwt({ token, user, account }) {
+      console.log("jwt callback: token =", token);
+      // Primo login: aggiunge info base dal provider
       if (user) {
         token.id = user.id;
         token.name = user.name;
-        token.email = user.email;
+        token.email = user.email ?? "";
         token.provider = account?.provider || "credentials";
         token.providerAccountId = account?.providerAccountId;
       }
@@ -70,7 +69,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // include le relazioni client e agency (carica i dati correlati)
           include: { agency: true, client: true },
         });
-        token.role = dbUser?.role;
+        token.role = dbUser?.role ?? "defaultRole";
         // token.clientId = dbUser?.client?.id || null;
         // token.agencyId = dbUser?.agency?.id || null;
       }
@@ -79,6 +78,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async session({ session, token }) {
+      console.log("session callback: session =", session);
       if (token) {
         session.user = {
           id: token.id as string,
@@ -92,6 +92,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async signIn({ user, account }) {
+      console.log("signIn callback: user =", user);
+      console.log("account =", account);
+      // per login credenziali procedi sempre
       if (account?.provider === "credentials") {
         return true;
       }
@@ -111,7 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
         });
-        //return true; // L'utente è stato creato con successo
+        // return true; // L'utente è stato creato con successo
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
@@ -120,11 +123,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         throw new Error(
           `Account already exists with ${existingUser.oauthProvider} provider. Please sign in with that method.`
         );
-      }
-
-      const isComplete = await isUserProfileComplete(user.email);
-      if (!isComplete) {
-        return `/complete-profile?email=${encodeURIComponent(user.email)}`;
       }
 
       return true;

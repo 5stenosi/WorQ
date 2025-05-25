@@ -127,7 +127,7 @@ export async function POST(request: Request) {
                 address: {
                     create: {
                         street: nominatimAddress.address.road || '',
-                        number: nominatimAddress.address.house_number ? nominatimAddress.address.house_number : '',
+                        number: nominatimAddress.address.house_number ? nominatimAddress.address.house_number : null,
                         city: nominatimAddress.address.city || nominatimAddress.address.town || nominatimAddress.address.village || '',
                         zip: nominatimAddress.address.postcode || '',
                         country: nominatimAddress.address.country || '',                        

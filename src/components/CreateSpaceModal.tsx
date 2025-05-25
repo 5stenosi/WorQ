@@ -11,7 +11,7 @@ library.add(
     faVideoCamera, faKitchenSet, faChild, faDog, faParking, faLock, faBolt
 );
 
-const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, agency: any }> = ({ isOpen, onClose, agency }) => {
+const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string }> = ({ isOpen, onClose, userId }) => {
     const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
     const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
@@ -28,7 +28,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, agency:
         images?: string[];
         files?: File[];
     }>({
-        userId: agency.userId,
+        userId: userId,
         name: '',
         address: '',
         seats: 1,

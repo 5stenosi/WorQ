@@ -13,31 +13,65 @@ export async function GET() {
       return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
     }
 
-    // Fetch the authenticated user's data
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role === "CLIENT") {
-      const client = await prisma.client.findUnique({
-        where: { userId: user.id },
-        include: {
-          bookings: true,
+    if (session.user.role === "CLIENT") {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          email: true,
+          role: true,
+          client: {
+            select: {
+              name: true,
+              surname: true,
+              cellphone: true,
+              bookings: {
+                where: {
+                  bookingDate: {
+                    gt: new Date(), // Only bookings after the current day
+                  },
+                },
+                select: {
+                  id: true,
+                  bookingDate: true,
+                  space: {
+                    select: {
+                      id: true,
+                      name: true,
+                      address: true,
+                    }
+                  },
+                }
+              },
+            }
+          }
         }
       });
-      return NextResponse.json(client);
-    } else if (user.role === "AGENCY") {
-      const agency = await prisma.agency.findUnique({
-        where: { userId: user.id },
-        include: {
-          spaces: true,
+      return NextResponse.json(user);
+    } else if (session.user.role === "AGENCY") {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          agency: {
+            select: {
+              userId: true,
+              name: true,
+              vatNumber: true,
+              telephone: true,
+              spaces: {
+                select: {
+                  id: true,
+                  name: true,
+                  address: true,
+                }
+              },
+            }
+          }
         }
       });
-      return NextResponse.json(agency);
+      return NextResponse.json(user);
     } else {
       return NextResponse.json({ error: "Invalid user role" }, { status: 400 });
     }

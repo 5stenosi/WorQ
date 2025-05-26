@@ -62,31 +62,32 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalizza ogni parola
     };
 
-    useEffect(() => {
-        async function fetchSpace() {
-            try {
-                setLoading(true);
-                const res = await fetch(`/api/spaces/${id}`);
-                if (!res.ok) {
-                    setSpace(null);
-                    return;
-                }
-                const data = await res.json();
-                setSpace(data);
-            } catch (err) {
-                console.error("Errore nella fetch GET:", err);
+    async function fetchSpace() {
+        try {
+            setLoading(true);
+            const res = await fetch(`/api/spaces/${id}`);
+            if (!res.ok) {
                 setSpace(null);
-            } finally {
-                setLoading(false);
+                return;
             }
+            const data = await res.json();
+            setSpace(data);
+        } catch (err) {
+            console.error("Errore nella fetch GET:", err);
+            setSpace(null);
+        } finally {
+            setLoading(false);
         }
+    }
 
+    useEffect(() => {
         fetchSpace();
     }, [id]);
 
     const handleReviewSubmit = async () => {
         if (selectedRating === 0) {
-            alert("Please fill in all fields.");
+            // TODO: Show a message to the user?
+            console.log("Please select a rating before submitting.");
             return;
         }
         try {
@@ -107,16 +108,9 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                 throw new Error('Failed to submit review');
             }
 
-            const newReview = await res.json();
-            setSpace((prevSpace) => {
-                if (!prevSpace) return prevSpace;
-                return {
-                    ...prevSpace,
-                    reviews: [...(prevSpace.reviews || []), newReview],
-                };
-            });
             setReviewText('');
             setSelectedRating(0);
+            await fetchSpace(); // Refresh the space data to include the new review
         } catch (error) {
             console.error("Errore nella fetch POST:", error);
         }
@@ -190,7 +184,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                             {/* Write Review */}
                             {session?.user && session.user.role == "CLIENT" && (
                                 <div className='flex justify-between gap-2 p-2'>
-                                    <input type="text" id='write-comment' placeholder="Write a review..." onChange={(e) => setReviewText(e.target.value)}
+                                    <input type="text" id='write-comment' placeholder="Write a review..." value={reviewText} onChange={(e) => setReviewText(e.target.value)}
                                         className={`w-full p-2 rounded-xl hover:ring-west-side-500 focus:ring-west-side-500 shadow-sm outline-0 transition
                                             ${reviewText ? 'ring-west-side-500 ring-2' : 'ring-1'}`} />
 
@@ -276,7 +270,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                     <div className='min-w-fit w-2/5'>
                                         <CalendarComponent
                                             onDateSelection={handleDateSelection}
-                                            spaceId="2" // Pass the space ID dynamically if needed
+                                            spaceId={space.id}
                                         />
                                     </div>
 

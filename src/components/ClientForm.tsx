@@ -2,7 +2,6 @@ import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-//import { signIn } from "next-auth/react";
 import { clientRegisterSchema, clientRegisterSchemaOAuth } from "@/lib/zod";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -43,28 +42,22 @@ export default function ClientForm({
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams(); // Ottieni i parametri di ricerca dall'URL
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
-  const [userEmail, setUserEmail] = useState<string | undefined>(email);
+  const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
 
-  // verifica effettiva utilità
-  useEffect(() => {
-    const emailFromUrl = searchParams.get("email");
-    if (!email && emailFromUrl) {
-      setUserEmail(decodeURIComponent(emailFromUrl));
-    }
-  }, [searchParams, email]);
+  type FormValues = typeof useOAuth extends true
+  ? ClientOAuthFormValues
+  : ClientFormValues;
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<ClientFormValues>({
-    resolver: zodResolver(
-      useOAuth ? clientRegisterSchemaOAuth : clientRegisterSchema
-    ) as unknown as Resolver<
-      typeof useOAuth extends true ? ClientOAuthFormValues : ClientFormValues
-    >,
-  });
+const schema = useOAuth ? clientRegisterSchemaOAuth : clientRegisterSchema;
+
+const {
+  register,
+  handleSubmit,
+  setError,
+  formState: { errors },
+} = useForm<FormValues>({
+  resolver: zodResolver(schema) as Resolver<FormValues>,
+});
 
   const router = useRouter();
 

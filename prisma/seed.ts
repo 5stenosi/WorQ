@@ -1,4 +1,6 @@
+import { saltAndHashPassword } from '@/lib/password';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -24,6 +26,51 @@ async function main() {
         prisma.service.create({ data: { id: 18, detail: 'Lockers', iconName: 'lock' } }),
         prisma.service.create({ data: { id: 19, detail: 'Charging Stations', iconName: 'bolt' } }),
     ]);
+
+    // Creation of a test user (client and agency) with a hashed password
+    const testPassword = 'password123'; // Password in chiaro per i test
+    const hashedPassword = await saltAndHashPassword(testPassword);
+    
+    const testClientUser = await prisma.user.upsert({
+        where: { email: 'client@admin.com' },
+        update: {}, // No updates for now
+        
+        create: {
+            email: 'client@admin.com',
+            password: hashedPassword,
+            role: 'CLIENT',
+            oauthProvider: 'APP',
+            client: {
+                create: {
+                    name: 'Test',
+                    surname: 'Client',
+                    cellphone: '1234567890',
+                },
+            },
+        },
+        include: { client: true },
+    });  
+
+    const testAgencyUser = await prisma.user.upsert({
+        where: { email: 'agency@admin.com' },
+        update: {}, // No updates for now
+        
+        create: {
+            email: 'agency@admin.com',
+            password: hashedPassword,
+            role: 'AGENCY',
+            oauthProvider: 'APP',
+            agency: {
+                create: {
+                    name: 'Test Agency',
+                    vatNumber: '12345678901',
+                    telephone: '1234567890',
+                },
+            },
+        },
+        include: { client: true },
+    });  
+
 
     // Creation of an agency
     const agencyUser = await prisma.user.upsert({

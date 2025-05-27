@@ -33,7 +33,6 @@ export async function POST(req: Request) {
     const hashedPassword = await saltAndHashPassword(password);
 
     // crea user
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const newUser = await prisma.user.create({
       data: {
         email,
@@ -58,14 +57,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // crea client o agency associato
+    // crea client o agency associato usando connect
     if (role === "CLIENT") {
       await prisma.client.create({
         data: {
           name,
           surname,
           cellphone,
-          userId: newUser.id,
+          user: {
+            connect: { id: newUser.id }, 
+          },
         },
       });
     } else if (role === "AGENCY") {
@@ -74,7 +75,9 @@ export async function POST(req: Request) {
           name,
           vatNumber,
           telephone,
-          userId: newUser.id,
+          user: {
+            connect: { id: newUser.id },
+          },
         },
       });
     }

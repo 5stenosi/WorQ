@@ -61,7 +61,9 @@ const MapComponent: React.FC = () => {
                                         </a>
                                         <div class="flex flex-col">
                                             <h2 class="font-bold text-lg m-0">${space.name}</h2>
-                                            <p style="margin: 0" class="text-stone-600">${space.address.street} ${space.address.number}, ${space.address.city}</p>
+                                            <p style="margin: 0" class="text-stone-600">
+                                                ${space.address?.number != null ? `${space.address?.street} ${space.address.number}` : `${space.address?.street}`}, ${space.address?.city}
+                                            </p>
                                         </div>
                                     </div>
                                 `;

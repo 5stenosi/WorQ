@@ -135,10 +135,12 @@ export async function POST(request: Request) {
                         longitude: parseFloat(nominatimAddress.lon) || 0,
                     }
                 },
-                // Connect existing services by their IDs
-                services: {
-                    connect: metadata.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
-                },
+                // Connect existing services by their IDs, only if provided
+                services: metadata.services && metadata.services.length > 0
+                    ? {
+                        connect: metadata.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
+                    }
+                    : undefined,
                 agency: {
                     connect: {
                         userId: metadata.userId,
@@ -178,6 +180,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json(newSpace, { status: 201 });
     } catch (error) {
+        console.error('Error creating space:', error);
         return NextResponse.json({ error: 'Failed to create space' + error }, { status: 500 });
     }
 }

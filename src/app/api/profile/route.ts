@@ -42,6 +42,19 @@ export async function GET() {
                   },
                 }
               },
+              reviews: {
+                select: {
+                  id: true,
+                  rating: true,
+                  comment: true,
+                  space: {
+                    select: {
+                      id: true,
+                      name: true,
+                    }
+                  },
+                }
+              },
             }
           }
         }
@@ -75,6 +88,93 @@ export async function GET() {
     } else {
       return NextResponse.json({ error: "Invalid user role" }, { status: 400 });
     }
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// Handles PUT requests to /api/profile
+// Update user data
+export async function PUT(request: Request) {
+  try {
+    const session = await auth();
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
+
+    const userData = await request.json();
+
+    if (session.user.role === "CLIENT") {
+      const updatedUser = await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          client: {
+            update: {
+              name: userData.name,
+              surname: userData.surname,
+              cellphone: userData.cellphone,
+            }
+          }
+        },
+        select: {
+          email: true,
+          role: true,
+          client: true
+        }
+      });
+      return NextResponse.json(updatedUser);
+    } else if (session.user.role === "AGENCY") {
+      const updatedUser = await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          agency: {
+            update: {
+              name: userData.name,
+              vatNumber: userData.vatNumber,
+              telephone: userData.telephone,
+            }
+          }
+        },
+        select: {
+          email: true,
+          role: true,
+          agency: true
+        }
+      });
+      return NextResponse.json(updatedUser);
+    } else {
+      return NextResponse.json({ error: "Invalid user role" }, { status: 400 });
+    }
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// Handles DELETE requests to /api/profile
+// Delete user account
+export async function DELETE() {
+  try {
+    const session = await auth();
+
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
+
+    // Delete user account
+    await prisma.user.delete({
+      where: { id: session.user.id }
+    });
+
+    return NextResponse.json({ message: "User account deleted successfully" }, { status: 200 });
 
   } catch (error) {
     return NextResponse.json(

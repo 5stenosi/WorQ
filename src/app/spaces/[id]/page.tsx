@@ -8,6 +8,7 @@ import { faStar, faStarHalfStroke, faPaperPlane, faBuilding, faWifi, faPen, faPr
 import { faStar as faHollowStar } from '@fortawesome/free-regular-svg-icons';
 import CalendarComponent from '@/components/CalendarComponent';
 import Carousel from '@/components/Carousel';
+import { set } from 'date-fns';
 
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
@@ -47,6 +48,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
     const [loading, setLoading] = useState(true);
     const [reviewText, setReviewText] = useState('');
     const [hoverRating, setHoverRating] = useState(0);
+    const [hasReviewed, setHasReviewed] = useState(false);
     const [selectedRating, setSelectedRating] = useState(0);
     const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
 
@@ -62,6 +64,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalizza ogni parola
     };
 
+    // Funzione per recuperare i dettagli dello spazio
     async function fetchSpace() {
         try {
             setLoading(true);
@@ -80,8 +83,25 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
+    // Funzione per verificare se l'utente ha già recensito lo spazio
+    async function checkUserReview() {
+        if (!session?.user) return false;
+        try {
+            const res = await fetch(`/api/reviews/check?spaceId=${id}`);
+            if (!res.ok) {
+                throw new Error('Failed to check review');
+            }
+            const data = await res.json();
+            setHasReviewed(data.reviewed);
+        } catch (error) {
+            console.error("Errore nella fetch GET per controllare la recensione:", error);
+            return false;
+        }
+    }
+
     useEffect(() => {
         fetchSpace();
+        checkUserReview();
     }, [id]);
 
     const handleReviewSubmit = async () => {
@@ -182,7 +202,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                             </div>
 
                             {/* Write Review */}
-                            {session?.user && session.user.role == "CLIENT" && (
+                            {session?.user && session.user.role == "CLIENT" && !hasReviewed && (
                                 <div className='flex justify-between gap-2 p-2'>
                                     <input type="text" id='write-comment' placeholder="Write a review..." value={reviewText} onChange={(e) => setReviewText(e.target.value)}
                                         className={`w-full p-2 rounded-xl hover:ring-west-side-500 focus:ring-west-side-500 shadow-sm outline-0 transition
@@ -223,7 +243,10 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                     {/* Title and Location */}
                                     <div className="flex flex-col gap-2">
                                         <h1 className='font-bold text-4xl'>{space.name}</h1>
-                                        <p className='text-lg text-stone-600'>{space.address?.street}, {space.address?.number} - {space.address?.city}, {space.address?.country}</p>
+                                        <p className='text-lg text-stone-600'>
+                                            {space.address?.number != null ? `${space.address?.street}, ${space.address.number} - ` : `${space.address?.street} - `}
+                                            {space.address?.city}, {space.address?.country}
+                                        </p>
                                     </div>
                                     {/* Media delle Reviews */}
                                     <div className='flex text-2xl text-yellow-400'>

@@ -1,17 +1,15 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import CreateSpaceModal from '@/components/CreateSpaceModal';
-import { set } from 'date-fns';
 
 export default function Profile() {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [userEmail, setUserEmail] = useState("");
     const [userRole, setUserRole] = useState("");
-    const [userId, setUserId] = useState("");
     const [client, setClient] = useState({
         name: 'Name',
         surname: 'Surname',
@@ -34,24 +32,10 @@ export default function Profile() {
             setUserEmail(data.email);
             setUserRole(data.role);
             if (data.role === "CLIENT") {
-                console.log('Client data:', data.client);
                 setClient(data.client);
-                // setClient({
-                //     name: data.client.name,
-                //     surname: data.client.surname,
-                //     cellphone: data.client.cellphone,
-                //     bookings: data.client.bookings.map((booking: any) => ({
-                //         bookingDate: booking.bookingDate,
-                //         space: {
-                //             id: booking.space.id,
-                //             name: booking.space.name,
-                //         },
-                //     })),
-                // });
             }
             else if (data.role === 'AGENCY') {
                 setAgency(data.agency);
-                setUserId(data.id);
             }
         }
         catch (error) {
@@ -252,7 +236,13 @@ export default function Profile() {
                 <CreateSpaceModal
                     isOpen={isModalOpen}
                     onClose={() => setModalOpen(false)}
-                    userId={userId}
+                    onSubmitComplete={async (status) => {
+                        if (status === 201)
+                            console.log('Space created successfully!');
+                            await fetchUserData(); // Refresh spaces after successful submission
+                        setModalOpen(false);
+                    }}
+                    userId={agency.userId}
                 />
 
             </div >

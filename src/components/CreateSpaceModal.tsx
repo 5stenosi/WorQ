@@ -11,7 +11,7 @@ library.add(
     faVideoCamera, faKitchenSet, faChild, faDog, faParking, faLock, faBolt
 );
 
-const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string }> = ({ isOpen, onClose, userId }) => {
+const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string, onSubmitComplete: (status: number | null) => void}> = ({ isOpen, onClose, userId, onSubmitComplete }) => {
     const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
     const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
@@ -80,10 +80,10 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
     }
 
     useEffect(() => {
-        fetchServices(); // Fetch services when the component mounts
         let openTimeout: NodeJS.Timeout | undefined;
         let closeTimeout: NodeJS.Timeout | undefined;
         if (isOpen) {
+            fetchServices(); // Fetch services when the component mounts
             setIsVisible(false); // Reset
             openTimeout = setTimeout(() => {
                 setIsVisible(true);
@@ -178,6 +178,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
             const result = await response.json(); // Parses the server response
 
             handleClearFields(); // Clears the form fields after successful submission
+            onSubmitComplete(result.status || null); // Calls the callback with the status from the server
             onClose(); // Closes the modal
         }
         catch (error) {
@@ -308,7 +309,10 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                         type="text"
                                         id="address"
                                         value={formData.address}
-                                        onChange={handleInputChange}
+                                        onChange={(e) => {
+                                            handleInputChange(e);
+                                            //fetchSuggestions(e.currentTarget.value);
+                                        }}
                                         onBlur={(e) => fetchSuggestions(e.currentTarget.value)}
                                         className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                                         placeholder="Enter space address"
@@ -320,6 +324,11 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                                 <li
                                                     key={i}
                                                     onClick={() => {
+                                                        if(!s.address.road || !s.address.country || (!s.address.city && !s.address.town && !s.address.village)) {
+                                                            // TODO: Message to user
+                                                            alert('Please select a valid address with street information.');
+                                                            return;
+                                                        }
                                                         setFormData(prev => ({ ...prev, address: s.display_name, fullAddress: s }));
                                                         // Clear suggestions after selection
                                                         setSuggestions([]);

@@ -1,20 +1,27 @@
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
+import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // Handles GET requests to /api/reviews/check?spaceId
 // Checks if a user has already reviewed a space
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
     try {
         const url = new URL(request.url);
         const spaceId = parseInt(url.searchParams.get('spaceId') || '');
 
         if (isNaN(spaceId)) {
-            return new Response(JSON.stringify({ error: 'Invalid Space ID' }), { status: 400 });
+            return NextResponse.json({ error: 'Invalid Space ID' }, { status: 400 });
+        }
+        // Check if user is authenticated
+        const session = await auth();
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
         }
 
-        const session = await auth();
-        if (!session || !session.user) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+        if (session.user.role !== 'CLIENT') {
+            return NextResponse.json({ error: "User not authorized" }, { status: 403 });
         }
 
         const review = await prisma.review.findFirst({
@@ -25,11 +32,11 @@ export async function GET(request: Request) {
         });
 
         if (!review) {
-            return new Response(JSON.stringify({ reviewed: false }), { status: 200 });
+            return NextResponse.json({ reviewed: false }, { status: 200 });
         }
 
-        return new Response(JSON.stringify({ reviewed: true }), { status: 200 });
+        return NextResponse.json({ reviewed: true }, { status: 200 });
     } catch (error) {
-        return new Response(JSON.stringify({ error: 'Failed to check review' }), { status: 500 });
+        return NextResponse.json({ error: 'Failed to check review' }, { status: 500 });
     }
 }

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 import { NextResponse, NextRequest } from "next/server";
 import { isDateAvailable } from "@/lib/spaceAvailability";
 
@@ -6,6 +7,13 @@ import { isDateAvailable } from "@/lib/spaceAvailability";
 // Creates new bookings for a space for multiple dates
 export async function POST(request: NextRequest) {
     try {
+        // Check if the user is authenticated
+        const session = await auth();
+        
+        if (!session || !session.user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        
         const { bookingDates, spaceId, clientId } = await request.json();
 
         if (!Array.isArray(bookingDates) || bookingDates.length === 0) {

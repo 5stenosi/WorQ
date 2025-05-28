@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
 import { error } from 'console';
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
@@ -40,6 +41,17 @@ export async function GET(request: Request, { params }: { params: { id: string }
 // Updates a single space
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
     try {
+        // Check if user is authenticated
+        const session = await auth();
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+        }
+
+        if (session.user.role !== 'AGENCY') {
+            return NextResponse.json({ error: "User not authorized" }, { status: 403 });
+        }
+
         const { id } = params;
 
         // Convert the ID to a number
@@ -108,7 +120,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 // Deletes a single space
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
-        // TODO: Check if the user is authorized to delete this space
+        // Check if user is authenticated
+        const session = await auth();
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+        }
+
+        if (session.user.role !== 'AGENCY') {
+            return NextResponse.json({ error: "User not authorized" }, { status: 403 });
+        }
         
         const { id } = params;
 

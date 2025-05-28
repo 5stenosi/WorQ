@@ -9,6 +9,7 @@ import { faFacebookSquare, faXTwitter, faInstagram, faTiktok, faLinkedin, faYout
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { SessionProvider, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
+import { ToastContainer } from 'react-toastify';
 import Link from "next/link";
 import React, { useState } from "react";
 config.autoAddCss = false;
@@ -306,6 +307,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </footer>
+        <ToastContainer position="bottom-right"/>
       </body>
     </html >
   );

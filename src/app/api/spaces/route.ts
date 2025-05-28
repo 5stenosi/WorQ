@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
 import { NextResponse, NextRequest } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
@@ -104,6 +105,16 @@ export async function GET(request: NextRequest) {
 // Creates a new space
 export async function POST(request: Request) {
     try {
+        // Check if user is authenticated
+        const session = await auth();
+
+        if (!session || !session.user) {
+            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+        }
+
+        if (session.user.role !== 'AGENCY') {
+            return NextResponse.json({ error: "User not authorized" }, { status: 403 });
+        }
 
         const formData = await request.formData();
 

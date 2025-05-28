@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
 import { faStar, faStarHalfStroke, faPaperPlane, faBuilding, faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo, faWheelchair, faSnowflake, faCoffee, faUtensils, faVideoCamera, faKitchenSet, faChild, faDog, faParking, faLock, faBolt, faVolumeXmark, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faHollowStar } from '@fortawesome/free-regular-svg-icons';
+import { toast } from 'react-toastify';
 import CalendarComponent from '@/components/CalendarComponent';
 import Carousel from '@/components/Carousel';
-import { set } from 'date-fns';
 
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
@@ -51,6 +51,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
     const [hasReviewed, setHasReviewed] = useState(false);
     const [selectedRating, setSelectedRating] = useState(0);
     const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
+    const [bookingDates, setBookingDates] = useState<Set<string>>(new Set());
 
     const placeholderImages = [
         '/placeholder-image.jpg'
@@ -136,7 +137,44 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
+    const handleBooking = async () => {
+        toast.success("Booking in progress...");
+        if (selectedDates.size === 0) {
+            // TODO: Show a message to the user?
+            console.log("Please select at least one date before booking.");
+            return;
+        }
+        try {
+            const res = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    bookingDates: Array.from(bookingDates),
+                    spaceId: space?.id,
+                    clientId: session?.user.id,
+                }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to book space');
+            }
+
+            // Reset selected dates after booking
+            setSelectedDates(new Set());
+            // TODO: Show a success message to the user
+            console.log("Booking successful!");
+        }
+        catch (error) {
+            console.error("Errore nella fetch POST per la prenotazione:", error);
+        }
+    }
+
     const handleDateSelection = (dates: Set<string>) => {
+        // Saving the selected dates to state
+        setBookingDates(dates);
+        // Formatting the dates to DD/MM/YYYY
         const formattedDates = new Set(
             Array.from(dates).map((date) => {
                 const [year, month, day] = date.split('-'); // Assuming the date is in YYYY-MM-DD format
@@ -157,7 +195,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         Space not found. Please check the ID or try again later.
     </p>);
 
-    return (
+    return (       
         <div id='spazioNelDettaglio' className={`overflow-y-auto px-5 sm:px-10 md:px-15 lg:px-20`}>
             <section className={`w-full h-screen pt-28 pb-3`}>
                 {/* Space Wrapper */}
@@ -311,10 +349,13 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                                     ))}
                                                 </ul>
                                             </div>
+                                            {(session?.user.role === "CLIENT") && (
                                             <button
-                                                className="h-10 px-4 border-2 border-west-side-500 hover:bg-west-side-500 text-west-side-500 hover:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-transform duration-150 ease-out">
+                                                className="h-10 px-4 border-2 border-west-side-500 hover:bg-west-side-500 text-west-side-500 hover:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-transform duration-150 ease-out"
+                                                onClick={() => handleBooking()}>
                                                 Book now
                                             </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

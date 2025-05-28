@@ -34,6 +34,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
         }
 
+        if (session.user.role !== 'CLIENT') {
+            return NextResponse.json({ error: "User not authorized" }, { status: 403 });
+        }
+
         const body = await request.json();
         const { spaceId, clientId, rating, comment } = body;
 

@@ -42,21 +42,21 @@ export default function AgencyForm({
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams(); // Ottieni i parametri di ricerca dall'URL
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
+  //const [userEmail] = useState<string | undefined>(email);
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
+  console.log("Email ricevuta via props:", email);
 
-  type FormValues = typeof useOAuth extends true
-    ? AgencyOAuthFormValues
-    : AgencyFormValues;
-  
-  const schema = useOAuth ? agencyRegisterSchemaOAuth : agencyRegisterSchema;
-  
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema) as Resolver<FormValues>,
+  } = useForm<AgencyFormValues>({
+    resolver: zodResolver(
+      useOAuth ? agencyRegisterSchemaOAuth : agencyRegisterSchema
+    ) as unknown as Resolver<
+      typeof useOAuth extends true ? AgencyOAuthFormValues : AgencyFormValues
+    >,
   });
 
   const router = useRouter();

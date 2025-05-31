@@ -20,7 +20,10 @@ export async function handleFormSubmit<
   const { data, role, useOAuth, provider, router, emailFromProps } = params;
 
   // operatore nullish coalescing (??) per gestire il caso in cui emailFromProps sia undefined
-  const email = emailFromProps ?? data.email;
+  console.log("Dati del form:", data);
+  const email = useOAuth ? emailFromProps : data.email;
+  console.log("Email estratta:", email);
+  console.log("typeof data.email:", typeof data.email);
 
   if (!email) {
     console.error("Email not found.");
@@ -28,9 +31,10 @@ export async function handleFormSubmit<
     return;
   }
 
-  try {
   const payload = { ...data, email, role };
 
+  try {
+  
     if (useOAuth) {
       const res = await fetch("/api/complete-registration", {
         method: "POST",
@@ -40,13 +44,15 @@ export async function handleFormSubmit<
 
       if (res.ok) {
         await signIn(provider, {
+          //email,
           redirect: true,
           callbackUrl: "/",
+          prompt: "none",
         });
         return;
       } else {
         const error = await res.json();
-        throw new Error(error.message || "Registration failed");
+        throw new Error(error?.message ?? `(${res.status}) Registration failed`);
       }
     }
 

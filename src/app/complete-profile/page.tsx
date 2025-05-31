@@ -85,7 +85,7 @@ export default function CompleteProfile() {
               </button>
               {role === "CLIENT" ? (
                 <ClientForm
-                  email={session?.user.email} // da sessione OAuth
+                  email={session?.user?.email} // da sessione OAuth
                   requiredFields={{
                     name: true,
                     surname: true,
@@ -96,7 +96,7 @@ export default function CompleteProfile() {
                 />
               ) : (
                 <AgencyForm
-                  email={session?.user.email} // da sessione OAuth
+                  email={session?.user?.email} // da sessione OAuth
                   requiredFields={{
                     name: true,
                     vatNumber: true,

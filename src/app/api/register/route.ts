@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { saltAndHashPassword } from "@/lib/password";
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const hashedPassword = await saltAndHashPassword(password);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // crea user
     const newUser = await prisma.user.create({

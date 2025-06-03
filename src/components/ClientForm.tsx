@@ -42,22 +42,21 @@ export default function ClientForm({
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams(); // Ottieni i parametri di ricerca dall'URL
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
+  //const [userEmail] = useState<string | undefined>(email);
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
-
-  type FormValues = typeof useOAuth extends true
-  ? ClientOAuthFormValues
-  : ClientFormValues;
-
-const schema = useOAuth ? clientRegisterSchemaOAuth : clientRegisterSchema;
-
-const {
-  register,
-  handleSubmit,
-  setError,
-  formState: { errors },
-} = useForm<FormValues>({
-  resolver: zodResolver(schema) as Resolver<FormValues>,
-});
+  
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<ClientFormValues>({
+    resolver: zodResolver(
+      useOAuth ? clientRegisterSchemaOAuth : clientRegisterSchema
+    ) as unknown as Resolver<
+      typeof useOAuth extends true ? ClientOAuthFormValues : ClientFormValues
+    >,
+  });
 
   const router = useRouter();
 

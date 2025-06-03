@@ -4,7 +4,7 @@ import GitHub from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import Credentials from "next-auth/providers/credentials";
-import { getUserFromDb } from "./lib/password";
+import getUserFromDb from "./lib/password";
 import { createUserAndAccount } from "./lib/createUserAndAccount";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -56,7 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.name = user.name;
-        token.email = user.email ?? "";
+        token.email = user.email ?? token.email ?? "";
         token.provider = account?.provider || "credentials";
         token.providerAccountId = account?.providerAccountId;
       }
@@ -114,8 +114,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
         });
-        // return true; // L'utente è stato creato con successo
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
+        // return '/complete-profile';
       }
 
       // Se esiste ma il provider è diverso

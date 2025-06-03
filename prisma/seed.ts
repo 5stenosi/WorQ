@@ -1,4 +1,3 @@
-import { saltAndHashPassword } from '@/lib/password';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
@@ -29,7 +28,7 @@ async function main() {
 
     // Creation of a test user (client and agency) with a hashed password
     const testPassword = 'password123'; // Password in chiaro per i test
-    const hashedPassword = await saltAndHashPassword(testPassword);
+    const hashedPassword = await bcrypt.hash(testPassword, 10);
     
     const testClientUser = await prisma.user.upsert({
         where: { email: 'client@admin.com' },

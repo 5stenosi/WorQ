@@ -19,7 +19,7 @@ async function main() {
         prisma.service.create({ data: { id: 11, detail: 'Vending Machines', iconName: 'coffee' } }),
         prisma.service.create({ data: { id: 12, detail: 'Catering', iconName: 'utensils' } }),
         prisma.service.create({ data: { id: 13, detail: 'Video Conference', iconName: 'video' } }),
-        prisma.service.create({ data: { id: 14, detail: 'Kitchenette', iconName: 'kitchenset' } }),
+        prisma.service.create({ data: { id: 14, detail: 'Kitchenette', iconName: 'utensils' } }),
         prisma.service.create({ data: { id: 15, detail: 'Child-friendly', iconName: 'child' } }),
         prisma.service.create({ data: { id: 16, detail: 'Pet-friendly', iconName: 'dog' } }),
         prisma.service.create({ data: { id: 17, detail: 'Parking', iconName: 'parking' } }),

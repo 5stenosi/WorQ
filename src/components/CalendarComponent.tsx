@@ -76,12 +76,17 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowLeft') handlePreviousMonth();
-            else if (e.key === 'ArrowRight') handleNextMonth();
+            if (e.key === 'ArrowLeft') {
+                updateArrowSequence('left');
+                e.preventDefault();
+            } else if (e.key === 'ArrowRight') {
+                updateArrowSequence('right');
+                e.preventDefault();
+            }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentMonth, currentYear]);
+    }, []);
 
     const logArrowSequence = (sequence: string[]) => {
         console.log(`%cArrow sequence: ${sequence.join(',')}`, 'color: yellow;');

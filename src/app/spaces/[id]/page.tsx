@@ -195,14 +195,13 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         Space not found. Please check the ID or try again later.
     </p>);
 
-    return (       
-        <div id='spazioNelDettaglio' className={`overflow-y-auto px-5 sm:px-10 md:px-15 lg:px-20`}>
-            <section className={`w-full h-screen pt-28 pb-3`}>
+    return (
+        <div id='spazioNelDettaglio' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
+            <section className={`w-full h-screen pt-28 pb-5`}>
                 {/* Space Wrapper */}
-                <div className={`w-full h-full p-5 flex bg-stone-100 rounded-4xl gap-5`}>
-
+                <div className={`w-full h-full flex gap-5`}>
                     {/* Left Section */}
-                    <div className={`flex flex-col gap-5 h-full w-2/5`}>
+                    <div className={`flex flex-col gap-5 h-full w-1/2`}>
                         {/* Carosello */}
                         <div className={`w-full rounded-2xl overflow-hidden h-3/5 shadow-sm`}>
                             <Carousel images={space.images || placeholderImages} autoPlay={true} autoPlayInterval={10000} buttonSize="size-12" dotSize="size-3" chevronSize='text-xl' />
@@ -213,7 +212,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
 
                             <div className='w-full flex justify-between gap-2 overflow-hidden'>
                                 {/* Reviews */}
-                                <div className='w-full flex flex-col overflow-y-auto gap-2 pl-4 pt-4 h-full divide-y-1 divide-stone-900/10'>
+                                <div className='w-full flex flex-col overflow-y-auto gap-2 px-5 pt-5 h-full divide-y-1 divide-stone-900/10'>
                                     {space.reviews && space.reviews.length > 0 ? (
                                         space.reviews.map((review) => (
                                             <div key={review.id} className='w-full flex flex-col gap-2 pb-1'>
@@ -238,14 +237,12 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                     )}
                                 </div>
                             </div>
-
                             {/* Write Review */}
                             {session?.user && session.user.role == "CLIENT" && !hasReviewed && (
                                 <div className='flex justify-between gap-2 p-2'>
                                     <input type="text" id='write-comment' placeholder="Write a review..." value={reviewText} onChange={(e) => setReviewText(e.target.value)}
                                         className={`w-full p-2 rounded-xl hover:ring-west-side-500 focus:ring-west-side-500 shadow-sm outline-0 transition
                                             ${reviewText ? 'ring-west-side-500 ring-2' : 'ring-1'}`} />
-
                                     <div className='flex items-center h-10 text-xl rounded-xl bg-stone-100 ring-1 ring-stone-900/10 shadow-sm px-2'>
                                         {[1, 2, 3, 4, 5].map((star) => (
                                             <span
@@ -260,8 +257,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                             </span>
                                         ))}
                                     </div>
-
-                                    <button className='aspect-square size-10 rounded-xl bg-stone-900 text-stone-100 hover:bg-west-side-500 hover:text-stone-100 hover:scale-110 active:scale-90 transition-transform duration-150 ease-out'
+                                    <button className='aspect-square size-10 rounded-xl text-stone-900 hover:bg-west-side-500 hover:text-stone-100 ring-1 ring-stone-900/10 shadow-sm hover:scale-110 active:scale-90 transition-all duration-150 ease-out'
                                         onClick={handleReviewSubmit}>
                                         <FontAwesomeIcon icon={faPaperPlane} />
                                     </button>
@@ -272,91 +268,88 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                     </div>
 
                     {/* Right Section */}
-                    <div className={`flex flex-col h-full gap-5 w-3/5`}>
+                    <div className={`w-1/2 h-full flex flex-col gap-5 rounded-2xl bg-stone-100 border-stone-900/10 border-1 shadow-sm overflow-hidden`}>
+                        <div className="relative h-full flex flex-col p-5 gap-5 overflow-y-auto rounded-2xl">
+                            {/* Price */}
+                            <p className='absolute bottom-5 right-5 flex font-bold text-4xl'>{space.price}€<span className='text-xl align-super'>/day</span></p>
+                            {/* Title + Location + Media delle Reviews */}
+                            <div className="flex justify-between items-start">
+                                {/* Title and Location */}
+                                <div className="flex flex-col gap-2">
+                                    <h1 className='font-bold text-4xl'>{space.name}</h1>
+                                    <p className='text-lg text-stone-600'>
+                                        {space.address?.number != null ? `${space.address?.street}, ${space.address.number} - ` : `${space.address?.street} - `}
+                                        {space.address?.city}, {space.address?.country}
+                                    </p>
+                                </div>
+                                {/* Media delle Reviews */}
+                                <div className='flex text-2xl text-yellow-400'>
+                                    {Array.from({ length: 5 }).map((_, index) => {
+                                        const starValue = index + 1;
+                                        if (space.avgRating && space.avgRating >= starValue) {
+                                            return <FontAwesomeIcon key={index} icon={faStar} />;
+                                        } else if (space.avgRating && space.avgRating >= starValue - 0.5) {
+                                            return <FontAwesomeIcon key={index} icon={faStarHalfStroke} />;
+                                        } else {
+                                            return <FontAwesomeIcon key={index} icon={faHollowStar} />;
+                                        }
+                                    })}
+                                </div>
+                            </div>
 
-                        {/* Info & Reservation */}
-                        <div id="infoSection" className={`w-full flex flex-col rounded-2xl border-stone-900/10 h-full border-1 shadow-sm overflow-hidden`}>
-                            <div className="relative h-full flex flex-col p-4 gap-2 overflow-y-auto rounded-2xl">
-                                <div className="flex justify-between items-start">
-                                    {/* Title and Location */}
-                                    <div className="flex flex-col gap-2">
-                                        <h1 className='font-bold text-4xl'>{space.name}</h1>
-                                        <p className='text-lg text-stone-600'>
-                                            {space.address?.number != null ? `${space.address?.street}, ${space.address.number} - ` : `${space.address?.street} - `}
-                                            {space.address?.city}, {space.address?.country}
-                                        </p>
-                                    </div>
-                                    {/* Media delle Reviews */}
-                                    <div className='flex text-2xl text-yellow-400'>
-                                        {Array.from({ length: 5 }).map((_, index) => {
-                                            const starValue = index + 1;
-                                            if (space.avgRating && space.avgRating >= starValue) {
-                                                return <FontAwesomeIcon key={index} icon={faStar} />;
-                                            } else if (space.avgRating && space.avgRating >= starValue - 0.5) {
-                                                return <FontAwesomeIcon key={index} icon={faStarHalfStroke} />;
-                                            } else {
-                                                return <FontAwesomeIcon key={index} icon={faHollowStar} />;
-                                            }
-                                        })}
-                                    </div>
+                            {/* Services */}
+                            <div className="flex flex-wrap gap-2 overflow-y-auto">
+                                {/* SpaceType */}
+                                <div className='flex justify-center items-center px-3 py-1 max-h-10 text-sm font-medium rounded-md bg-west-side-200 border-1 border-west-side-300 hover:border-west-side-900 text-west-side-900 transition duration-500 hover:duration-150 delay-250 hover:delay-0'>
+                                    <FontAwesomeIcon icon={faBuilding} className="mr-2" />
+                                    {formatTypology(space.typology)}
+                                </div>
+                                {space.services?.map((service, index) => {
+                                    const iconDefinition = findIconDefinition({ iconName: service.iconName, prefix: 'fas' });
+                                    return (
+                                        <div
+                                            key={index}
+                                            className='h-fit flex items-center gap-1 px-2 py-1 max-h-10 text-sm rounded-full hover:bg-west-side-100 border-1 border-stone-900 hover:border-west-side-300 hover:text-west-side-900 transition duration-500 hover:duration-150 delay-250 hover:delay-0'>
+                                            <FontAwesomeIcon icon={iconDefinition} />
+                                            {service.detail}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Description */}
+                            <p>{space.description}</p>
+
+                            {/* Recap */}
+                            <div className=' w-full h-fit mt-auto p-5 rounded-lg flex gap-5 transition duration-500'>
+                                <div className='min-w-fit w-2/5'>
+                                    <CalendarComponent
+                                        onDateSelection={handleDateSelection}
+                                        spaceId={space.id}
+                                    />
                                 </div>
 
-                                <div className='w-full h-full flex gap-x-5 overflow-hidden'>
-                                    {/* Description */}
-                                    <p className="w-1/2 text-sm overflow-y-auto">{space.description}</p>
-
-                                    {/* Services */}
-                                    <div className="w-1/2 flex flex-wrap gap-2 overflow-y-auto">
-                                        {/* SpaceType */}
-                                        <button className='px-3 py-1 max-h-10 text-sm font-medium rounded-md bg-west-side-200 border-1 border-west-side-300 hover:border-west-side-900 text-west-side-900 transition duration-500 hover:duration-150 delay-250 hover:delay-0'>
-                                            <FontAwesomeIcon icon={faBuilding} className="mr-2" />
-                                            {formatTypology(space.typology)}
-                                        </button>
-                                        {space.services?.map((service, index) => {
-                                            const iconDefinition = findIconDefinition({ iconName: service.iconName, prefix: 'fas' });
-                                            return (
-                                                <button
-                                                    key={index}
-                                                    className='px-3 py-1 max-h-10 text-sm rounded-full hover:bg-west-side-100 border-1 border-stone-900 hover:border-west-side-300 hover:text-west-side-900 transition duration-500 hover:duration-150 delay-250 hover:delay-0'>
-                                                    <FontAwesomeIcon icon={iconDefinition} className="mr-1" />
-                                                    {service.detail}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* Recap */}
-                                <div className='w-full h-fit mt-auto p-4 rounded-lg flex gap-5 transition duration-500'>
-                                    <div className='min-w-fit w-2/5'>
-                                        <CalendarComponent
-                                            onDateSelection={handleDateSelection}
-                                            spaceId={space.id}
-                                        />
-                                    </div>
-
-                                    <div className='w-full flex flex-col gap-2 relative'>
-                                        <div className='flex justify-between'>
-                                            <div>
-                                                <p className="text-lg">
-                                                    <strong>Selected days</strong>
-                                                </p>
-                                                <ul className="list-disc pl-5 overflow-y-auto">
-                                                    {Array.from(selectedDates).map((date) => (
-                                                        <li key={date}>
-                                                            {date}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                            {(session?.user.role === "CLIENT") && (
+                                <div className='w-full flex flex-col gap-2 relative'>
+                                    <div className='flex justify-between'>
+                                        <div>
+                                            <p className="text-lg">
+                                                <strong>Selected days</strong>
+                                            </p>
+                                            <ul className="list-disc pl-5 overflow-y-auto">
+                                                {Array.from(selectedDates).map((date) => (
+                                                    <li key={date}>
+                                                        {date}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        {(session?.user.role === "CLIENT") && (
                                             <button
-                                                className="h-10 px-4 border-2 border-west-side-500 hover:bg-west-side-500 text-west-side-500 hover:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-transform duration-150 ease-out"
+                                                className="h-10 px-4 border-2 border-west-side-500 hover:bg-west-side-500 text-west-side-500 hover:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-all duration-150 ease-out"
                                                 onClick={() => handleBooking()}>
                                                 Book now
                                             </button>
-                                            )}
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

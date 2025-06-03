@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser, faSpinner, faUserPen } from '@fortawesome/free-solid-svg-icons';
 import CreateSpaceModal from '@/components/CreateSpaceModal';
 
 export default function Profile() {
@@ -87,166 +87,294 @@ export default function Profile() {
         </div>
     );
 
-    // Render different content based on user role
-    if (userRole === 'CLIENT' && client) {
-        return (
-            <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
-                <section className={`w-full min-h-screen  lg:h-screen pt-28 pb-3`}>
-                    {/* Profile Wrapper */}
-                    <div className={`w-full h-full p-5 flex flex-col lg:flex-row bg-stone-100 rounded-4xl gap-5`}>
-
-                        {/* Left Section */}
-                        <div className={`p-3 sm:p-5 xl:p-8 h-full flex flex-col sm:flex-row lg:flex-col gap-5 rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
-                                    w-full lg:w-1/5`}>
-                            {/* Profile Information */}
-                            <div className="w-full aspect-square max-w-[120px] lg:max-w-full rounded-lg border-8 border-stone-300 flex items-center justify-center lg:mx-auto">
-                                <FontAwesomeIcon icon={faUser} className="text-stone-600 w-2/3 h-2/3 text-[5rem] lg:text-[8rem]" />
-                            </div>
-                            <div className='flex flex-col gap-3'>
-                                <h1 className="text-3xl lg:text-2xl xl:text-3xl font-bold text-stone-800"> {client?.name} {client?.surname} </h1>
-                                <p className="text-lg lg:text-base xl:text-lg text-stone-600">{userEmail}</p>
-                                <p className="text-lg lg:text-base xl:text-lg text-stone-600">{client?.cellphone}</p>
-                            </div>
-                        </div>
-
-                        {/* Right Section */}
-                        <div className={`gap-5 h-full rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
-                                    w-full lg:w-4/5`}>
-                            <div className="grid gap-4 p-4 h-full lg:h-full lg:overflow-y-scroll
-                                        grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-
-                                {client.bookings && client.bookings.length > 0 ? (
-                                    client.bookings?.map((booking: any, index: number) => (
-                                        <div
-                                            key={index} // Add a unique key for each child
-                                            className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5 h-fit">
-                                            <div>
-                                                <h2 className="text-xl font-semibold text-stone-800">{booking.space.name}</h2>
-                                                <p className="text-sm text-stone-600">{booking?.space.address.city}, {booking?.space.address.country}</p>
-                                            </div>
-                                            <div className="flex justify-between gap-4">
-                                                <div className='aspect-square w-full h-8 flex justify-center items-center rounded-sm font-bold text-sm md:text-xs lg:text-sm text-center overflow-hidden bg-west-side-200 border-1 border-west-side-300 text-west-side-900'>
-                                                    {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
-                                                        day: '2-digit',
-                                                        month: '2-digit',
-                                                        year: 'numeric'
-                                                    })}
-                                                </div>
-
-                                                <div className='flex gap-2 items-end'>
-                                                    <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
-                                                                text-sm xl:text-base"
-                                                        onClick={() => handleBookingDelete(booking.id)}>
-                                                        <FontAwesomeIcon icon={faTrashCan} />
-                                                    </button>
-                                                    <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
-                                                                text-sm xl:text-base"
-                                                        onClick={() => window.open(`/spaces/${booking.space.id}`, '_blank')}>
-                                                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-stone-600">
-                                        <p className="text-xl">No bookings found.</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </section >
-            </div >
-        );
+    if (isModalOpen) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = 'auto';
     }
-    else if (userRole === 'AGENCY' && agency) {
-        return (
-            <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
-                <section className={`w-full min-h-screen  lg:h-screen pt-28 pb-3`}>
-                    {/* Profile Wrapper */}
-                    <div className={`w-full h-full p-5 flex flex-col lg:flex-row bg-stone-100 rounded-4xl gap-5`}>
 
-                        {/* Left Section */}
-                        <div className={`p-3 sm:p-5 xl:p-8 h-full flex flex-col sm:flex-row lg:flex-col gap-5 rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
-                                    w-full lg:w-1/5`}>
-                            {/* Profile Information */}
-                            <div className="w-full aspect-square max-w-[120px] lg:max-w-full rounded-lg border-8 border-stone-300 flex items-center justify-center lg:mx-auto">
-                                <FontAwesomeIcon icon={faUser} className="text-stone-600 w-2/3 h-2/3 text-[5rem] lg:text-[8rem]" />
+    return (
+        <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
+            <section className={`w-full min-h-screen pt-28`}>
+                {/* Profile Wrapper */}
+                <div className={`w-full h-full flex flex-col gap-5`}>
+                    {/* Top Section */}
+                    <div className="w-full h-full p-5 flex flex-col gap-5 rounded-2xl bg-stone-100 border-1 border-stone-900/10 shadow-sm overflow-hidden
+                                    md:grid md:grid-cols-7">
+                        {/* Colonna 1: Foto profilo, nome e cognome */}
+                        <div className="flex items-center col-span-2 md:col-span-3 lg:col-span-2 gap-3">
+                            <div className="aspect-square w-24 h-24 rounded-lg border-8 border-stone-300 flex items-center justify-center">
+                                <FontAwesomeIcon icon={faUser} className="text-stone-600 w-2/3 h-2/3 text-[5rem]" />
                             </div>
-                            <div className='flex flex-col gap-3'>
-                                <h1 className="text-3xl lg:text-2xl xl:text-3xl font-bold text-stone-800"> {agency?.name}</h1>
-                                <p className="text-lg lg:text-base xl:text-lg text-stone-600">{userEmail}</p>
-                                <p className="text-lg lg:text-base xl:text-lg text-stone-600">{agency?.vatNumber} {agency?.telephone}</p>
+                            <h1 className="text-2xl font-bold text-stone-800">
+                                {userRole === 'AGENCY' ? agency.name : `${client?.name} ${client?.surname}`}
+                            </h1>
+                        </div>
+                        {/* Colonne 2 e 3: Email e Cellulare (stacked on md and up) */}
+                        <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row col-span-4 md:col-span-3 lg:col-span-4 gap-3 sm:gap-10 md:gap-3 lg:gap-0 justify-center items-center">
+                            {/* Email */}
+                            <div className="flex flex-col justify-center items-center gap-1 w-full">
+                                <p className="text-sm font-bold w-full lg:w-auto">Email</p>
+                                <p className="text-stone-600 break-all w-full lg:w-auto">{userEmail}</p>
                             </div>
-
-                            {/* Publish Space Button */}
+                            {/* Cellulare */}
+                            <div className="flex flex-col justify-center items-center gap-1 w-full">
+                                <p className="text-sm font-bold w-full lg:w-auto">{userRole === 'AGENCY' ? "Telephone" : "Cellphone"}</p>
+                                <p className="text-stone-600 break-all w-full lg:w-auto">
+                                    {userRole === 'AGENCY' ? agency.telephone : client?.cellphone}
+                                </p>
+                            </div>
+                        </div>
+                        {/* Colonna 4: Vuota */}
+                        <div className={`flex md:flex-col items-end text-stone-100 ${userRole === 'AGENCY' ? 'justify-between' : 'justify-end'}`}>
+                            {/* //TODO: collegare il bottone per modificare le info dell'utente */}
                             <button
-                                onClick={() => setModalOpen(true)}
-                                className='mt-auto ml-auto flex justify-end items-center rounded-xl bg-west-side-500 text-stone-100 transition-all duration-150
-                                           w-12 hover:w-44 active:w-44 ease-out active:scale-90 hover:scale-110 origin-right delay-1000 hover:delay-0 active:delay-0'>
-                                <p className='whitespace-nowrap text-xl text-right w-full'>Publish space</p>
-                                <div className='aspect-square bg-west-side-500 size-12 text-2xl rounded-xl flex items-center justify-center'>
-                                    <FontAwesomeIcon icon={faPlus} />
+                                className='flex justify-start md:justify-end items-center rounded-lg ring-2 ring-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 text-stone-900 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
+                                           w-10 hover:w-37 active:w-37 ease-out active:scale-90 hover:scale-110 origin-left md:origin-right group'>
+                                <p className='order-2 md:order-1 whitespace-nowrap text-xl text-start md:text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100
+                                                duration-150'>Edit profile</p>
+                                <div className='order-1 md:order-2 aspect-square bg-stone-100 group-hover:bg-stone-900 group-active:bg-stone-900 size-10 text-xl rounded-lg flex items-center justify-center
+                                                duration-150'>
+                                    <FontAwesomeIcon icon={faUserPen} />
                                 </div>
                             </button>
+                            {userRole === 'AGENCY' && (
+                                <button onClick={() => setModalOpen(true)}
+                                    className='flex justify-end items-center rounded-lg ring-2 ring-west-side-500 bg-stone-100 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
+                                               w-10 hover:w-43 active:w-43 ease-out active:scale-90 hover:scale-110 origin-right group'>
+                                    <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100
+                                                    duration-150'>Publish space</p>
+                                    <div className='aspect-square bg-stone-100 group-hover:bg-west-side-500 group-active:bg-west-side-500 size-10 text-2xl rounded-lg flex items-center justify-center
+                                                    duration-150'>
+                                        <FontAwesomeIcon icon={faPlus} />
+                                    </div>
+                                </button>
+                            )}
                         </div>
+                    </div>
 
-                        {/* Right Section */}
-                        <div className={`gap-5 h-full rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
-                                    w-full lg:w-4/5`}>
-                            <div className="grid gap-4 p-4 h-full lg:h-full lg:overflow-y-scroll
-                                        grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                                {agency.spaces && agency.spaces.length > 0 ? (
-                                    agency.spaces?.map((space: any, index: number) => (
+                    {/* Bottom Section */}
+                    <div className={`w-full h-full gap-5 rounded-2xl bg-stone-100 border-1 border-stone-900/10 shadow-sm overflow-hidden`}>
+                        <div className="grid gap-4 p-5 h-full
+                                        grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+
+                            {/* TODO: RIVEDERE BENE I BOOKINGS DEL CLIENTE */}
+                            {client.bookings && client.bookings.length > 0 ? (
+                                [...client.bookings]
+                                    .sort((a: any, b: any) => new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime())
+                                    .map((booking: any, index: number) => (
                                         <div
-                                            key={index} // Add a unique key for each child
+                                            key={index}
                                             className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5 h-fit">
                                             <div>
-                                                <h2 className="text-xl font-semibold text-stone-800">{space.name}</h2>
-                                                <p className="text-sm text-stone-600">{space.address.city}, {space.address.country}</p>
+                                                <h2 className="text-xl font-semibold text-stone-800">Space {index + 1}</h2>
+                                                <p className="text-sm text-stone-600">City {index + 1}, Country</p>
                                             </div>
-                                            <div className="flex justify-between gap-4">
-                                                <div className='flex gap-2 items-end'>
-                                                    <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
-                                                                text-sm xl:text-base"
-                                                            onClick={() => handleSpaceDelete(space.id)}>
+                                            <div className={`flex gap-2 justify-between`}>
+                                                {userRole === 'CLIENT' && (
+                                                    <div className='px-2 h-8 flex justify-center items-center rounded-sm font-bold text-center overflow-hidden bg-west-side-200 border-1 border-west-side-300 text-west-side-900'>
+                                                        {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric'
+                                                        })}
+                                                    </div>
+                                                )}
+                                                <div className={`flex gap-2 items-end ${userRole === 'CLIENT' ? 'justify-end' : 'w-full justify-between'}`}>
+                                                    <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
+                                                        onClick={() => alert(`Delete space ${index + 1}`)}>
                                                         <FontAwesomeIcon icon={faTrashCan} />
                                                     </button>
-                                                    <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
-                                                                text-sm xl:text-base"
-                                                        onClick={() => window.open(`/spaces/${space.id}`, '_blank')}>
+                                                    <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
+                                                        onClick={() => window.open(`/spaces/${index + 1}`, '_blank')}>
                                                         <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
                                     ))
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-stone-600">
-                                        <p className="text-xl">No spaces found.</p>
-                                    </div>
-                                )}
-                            </div>
+                            ) : (
+                                <p className="text-center text-balance text-stone-600 col-span-full">
+                                    {userRole === 'CLIENT' ? 'No bookings found.' : 'No spaces found.'}
+                                </p>
+                            )}
                         </div>
                     </div>
-                </section >
+                </div>
+            </section >
+            {/* Modal */}
+            <CreateSpaceModal
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onSubmitComplete={async (status) => {
+                    if (status === 201)
+                        console.log('Space created successfully!');
+                    await fetchUserData(); // Refresh spaces after successful submission
+                    setModalOpen(false);
+                }}
+                userId={agency.userId}
+            />
+        </div >
+    );
+};
 
-                {/* Modal */}
-                <CreateSpaceModal
-                    isOpen={isModalOpen}
-                    onClose={() => setModalOpen(false)}
-                    onSubmitComplete={async (status) => {
-                        if (status === 201)
-                            console.log('Space created successfully!');
-                            await fetchUserData(); // Refresh spaces after successful submission
-                        setModalOpen(false);
-                    }}
-                    userId={agency.userId}
-                />
+// Render different content based on user role
+//     if (userRole === 'CLIENT' && client) {
+//         return (
+//             <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
+//                 <section className={`w-full min-h-screen  lg:h-screen pt-28 pb-3`}>
+//                     {/* Profile Wrapper */}
+//                     <div className={`w-full h-full p-5 flex flex-col lg:flex-row bg-stone-100 rounded-4xl gap-5`}>
 
-            </div >
-        );
-    }
+//                         {/* Left Section */}
+//                         <div className={`p-3 sm:p-5 xl:p-8 h-full flex flex-col sm:flex-row lg:flex-col gap-5 rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
+//                                     w-full lg:w-1/5`}>
+//                             {/* Profile Information */}
+//                             <div className="w-full aspect-square max-w-[120px] lg:max-w-full rounded-lg border-8 border-stone-300 flex items-center justify-center lg:mx-auto">
+//                                 <FontAwesomeIcon icon={faUser} className="text-stone-600 w-2/3 h-2/3 text-[5rem] lg:text-[8rem]" />
+//                             </div>
+//                             <div className='flex flex-col gap-3'>
+//                                 <h1 className="text-3xl lg:text-2xl xl:text-3xl font-bold text-stone-800"> {client?.name} {client?.surname} </h1>
+//                                 <p className="text-lg lg:text-base xl:text-lg text-stone-600">{userEmail}</p>
+//                                 <p className="text-lg lg:text-base xl:text-lg text-stone-600">{client?.cellphone}</p>
+//                             </div>
+//                         </div>
 
-}
+//                         {/* Right Section */}
+//                         <div className={`gap-5 h-full rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
+//                                     w-full lg:w-4/5`}>
+//                             <div className="grid gap-4 p-4 h-full lg:h-full lg:overflow-y-scroll
+//                                         grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+
+//                                 {client.bookings && client.bookings.length > 0 ? (
+//                                     client.bookings?.map((booking: any, index: number) => (
+//                                         <div
+//                                             key={index} // Add a unique key for each child
+//                                             className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5 h-fit">
+//                                             <div>
+//                                                 <h2 className="text-xl font-semibold text-stone-800">{booking.space.name}</h2>
+//                                                 <p className="text-sm text-stone-600">{booking?.space.address.city}, {booking?.space.address.country}</p>
+//                                             </div>
+//                                             <div className="flex justify-between gap-4">
+//                                                 <div className='aspect-square w-full h-8 flex justify-center items-center rounded-sm font-bold text-sm md:text-xs lg:text-sm text-center overflow-hidden bg-west-side-200 border-1 border-west-side-300 text-west-side-900'>
+//                                                     {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
+//                                                         day: '2-digit',
+//                                                         month: '2-digit',
+//                                                         year: 'numeric'
+//                                                     })}
+//                                                 </div>
+
+//                                                 <div className='flex gap-2 items-end'>
+//                                                     <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
+//                                                                 text-sm xl:text-base"
+//                                                         onClick={() => handleBookingDelete(booking.id)}>
+//                                                         <FontAwesomeIcon icon={faTrashCan} />
+//                                                     </button>
+//                                                     <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
+//                                                                 text-sm xl:text-base"
+//                                                         onClick={() => window.open(`/spaces/${booking.space.id}`, '_blank')}>
+//                                                         <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+//                                                     </button>
+//                                                 </div>
+//                                             </div>
+//                                         </div>
+//                                     ))
+//                                 ) : (
+//                                     <div className="w-full h-full flex items-center justify-center text-stone-600">
+//                                         <p className="text-xl">No bookings found.</p>
+//                                     </div>
+//                                 )}
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </section >
+//             </div >
+//         );
+//     }
+//     else if (userRole === 'AGENCY' && agency) {
+//         return (
+//             <div id='profile' className={`px-5 sm:px-10 md:px-15 lg:px-20`}>
+//                 <section className={`w-full min-h-screen  lg:h-screen pt-28 pb-3`}>
+//                     {/* Profile Wrapper */}
+//                     <div className={`w-full h-full p-5 flex flex-col bg-stone-100 rounded-4xl gap-5`}>
+
+//                         {/* Left Section */}
+//                         <div className={`p-3 sm:p-5 xl:p-8 h-full flex flex-col sm:flex-row lg:flex-col gap-5 rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
+//                                     w-full lg:w-1/5`}>
+//                             {/* Profile Information */}
+//                             <div className="w-full aspect-square max-w-[120px] lg:max-w-full rounded-lg border-8 border-stone-300 flex items-center justify-center lg:mx-auto">
+//                                 <FontAwesomeIcon icon={faUser} className="text-stone-600 w-2/3 h-2/3 text-[5rem] lg:text-[8rem]" />
+//                             </div>
+//                             <div className='flex flex-col gap-3'>
+//                                 <h1 className="text-3xl lg:text-2xl xl:text-3xl font-bold text-stone-800"> {agency?.name}</h1>
+//                                 <p className="text-lg lg:text-base xl:text-lg text-stone-600">{userEmail}</p>
+//                                 <p className="text-lg lg:text-base xl:text-lg text-stone-600">{agency?.vatNumber} {agency?.telephone}</p>
+//                             </div>
+
+//                             {/* Publish Space Button */}
+//                             <button
+//                                 onClick={() => setModalOpen(true)}
+//                                 className='mt-auto ml-auto flex justify-end items-center rounded-xl bg-west-side-500 text-stone-100 transition-all duration-150
+//                                            w-12 hover:w-44 active:w-44 ease-out active:scale-90 hover:scale-110 origin-right delay-1000 hover:delay-0 active:delay-0'>
+//                                 <p className='whitespace-nowrap text-xl text-right w-full'>Publish space</p>
+//                                 <div className='aspect-square bg-west-side-500 size-12 text-2xl rounded-xl flex items-center justify-center'>
+//                                     <FontAwesomeIcon icon={faPlus} />
+//                                 </div>
+//                             </button>
+//                         </div>
+
+//                         {/* Right Section */}
+//                         <div className={`gap-5 h-full rounded-2xl border-1 border-stone-900/10 shadow-sm overflow-hidden
+//                                     w-full lg:w-4/5`}>
+//                             <div className="grid gap-4 p-4 h-full lg:h-full lg:overflow-y-scroll
+//                                         grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+//                                 {agency.spaces && agency.spaces.length > 0 ? (
+//                                     agency.spaces?.map((space: any, index: number) => (
+//                                         <div
+//                                             key={index} // Add a unique key for each child
+//                                             className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5 h-fit">
+//                                             <div>
+//                                                 <h2 className="text-xl font-semibold text-stone-800">{space.name}</h2>
+//                                                 <p className="text-sm text-stone-600">{space.address.city}, {space.address.country}</p>
+//                                             </div>
+//                                             <div className="flex justify-between gap-4">
+//                                                 <div className='flex gap-2 items-end'>
+//                                                     <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
+//                                                                 text-sm xl:text-base"
+//                                                         onClick={() => handleSpaceDelete(space.id)}>
+//                                                         <FontAwesomeIcon icon={faTrashCan} />
+//                                                     </button>
+//                                                     <button className="aspect-square flex justify-center items-center size-8 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-lg shadow-sm
+//                                                                 text-sm xl:text-base"
+//                                                         onClick={() => window.open(`/spaces/${space.id}`, '_blank')}>
+//                                                         <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+//                                                     </button>
+//                                                 </div>
+//                                             </div>
+//                                         </div>
+//                                     ))
+//                                 ) : (
+//                                     <div className="w-full h-full flex items-center justify-center text-stone-600">
+//                                         <p className="text-xl">No spaces found.</p>
+//                                     </div>
+//                                 )}
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </section >
+
+//                 {/* Modal */}
+//                 <CreateSpaceModal
+//                     isOpen={isModalOpen}
+//                     onClose={() => setModalOpen(false)}
+//                     onSubmitComplete={async (status) => {
+//                         if (status === 201)
+//                             console.log('Space created successfully!');
+//                         await fetchUserData(); // Refresh spaces after successful submission
+//                         setModalOpen(false);
+//                     }}
+//                     userId={agency.userId}
+//                 />
+
+//             </div >
+//         );

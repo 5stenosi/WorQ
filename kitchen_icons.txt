@@ -1,0 +1,5 @@
+ Il volume nell'unità C è BRAIN
+ Numero di serie del volume: 1CA3-A320
+
+ Directory di C:\Users\david\Desktop\worq\node_modules\@fortawesome\free-solid-svg-icons
+

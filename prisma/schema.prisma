@@ -63,6 +63,8 @@ model User {
   email         String        @unique
   role          Role
   password      String? // Hashed password for traditional authentication
+  resetToken    String?
+  resetTokenExpiry DateTime?
   oauthProvider OAuthProvider
   oauthId       String?
   createdAt     DateTime      @default(now())

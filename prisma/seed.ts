@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import test from 'node:test';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -68,67 +69,6 @@ async function main() {
             },
         },
         include: { client: true },
-    });  
-
-
-    // Creation of an agency
-    const agencyUser = await prisma.user.upsert({
-        where: { email: 'agency@example.com' },
-        update: {}, // No updates for now
-        create: {
-            email: 'agency@example.com',
-            role: 'AGENCY',
-            oauthProvider: 'GOOGLE',
-            oauthId: 'oauth-agency-1',
-            agency: {
-                create: {
-                    name: 'Agency 1',
-                    vatNumber: '12345678901',
-                    telephone: '1234567890',
-                },
-            },
-        },
-        include: { agency: true },
-    });
-
-    // Creation of a client
-    const clientUser = await prisma.user.upsert({
-        where: { email: 'client@example.com' },
-        update: {}, // No updates for now
-        create: {
-            email: 'client@example.com',
-            role: 'CLIENT',
-            oauthProvider: 'GOOGLE',
-            oauthId: 'oauth-client-1',
-            client: {
-                create: {
-                    name: 'Mario',
-                    surname: 'Rossi',
-                    cellphone: '0987654321',
-                },
-            },
-        },
-        include: { client: true },
-    });
-
-    // Creation of another client
-    const clientUser2 = await prisma.user.upsert({
-        where: { email: 'client2@example.com' },
-        update: {}, // No updates for now
-        create: {
-            email: 'client2@example.com',
-            role: 'CLIENT',
-            oauthProvider: 'GOOGLE',
-            oauthId: 'oauth-client2-1',
-            client: {
-                create: {
-                    name: 'Luigi',
-                    surname: 'Verdi',
-                    cellphone: '3287654321',
-                },
-            },
-        },
-        include: { client: true },
     });
 
     // Creation of multiple spaces
@@ -137,7 +77,7 @@ async function main() {
             data: {
                 id : 1,
                 name: 'Milano Meetings',
-                agencyId: agencyUser.agency!.userId,
+                agencyId: testAgencyUser.id,
                 description: 'A beautiful coworking space',
                 seats: 10,
                 isFullSpaceBooking: true,
@@ -171,7 +111,7 @@ async function main() {
             data: {
                 id : 2,
                 name: 'RomOffice',
-                agencyId: agencyUser.agency!.userId,
+                agencyId: testAgencyUser.id,
                 description: 'Another coworking space',
                 seats: 15,
                 isFullSpaceBooking: false,
@@ -202,7 +142,7 @@ async function main() {
             data: {
                 id : 3,
                 name: 'Naples Outdoor',
-                agencyId: agencyUser.agency!.userId,
+                agencyId: testAgencyUser.id,
                 description: 'A modern and well-equipped space',
                 seats: 20,
                 isFullSpaceBooking: true,
@@ -234,16 +174,16 @@ async function main() {
     // Creation of a booking
     const booking = await prisma.booking.create({
         data: {
-            clientId: clientUser.client!.userId,
+            clientId: testClientUser.id,
             spaceId: spaces[0].id,
-            bookingDate: new Date('2025-04-20T10:00:00Z'),
+            bookingDate: new Date('2025-07-20T10:00:00Z'),
         },
     });
 
     // Creation of a review
     const review = await prisma.review.create({
         data: {
-            clientId: clientUser.client!.userId,
+            clientId: testClientUser.id,
             spaceId: spaces[0].id,
             rating: 5,
             comment: 'Fantastic space!',

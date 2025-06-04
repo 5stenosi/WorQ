@@ -76,6 +76,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             }
             const data = await res.json();
             setSpace(data);
+            await checkUserReview();
         } catch (err) {
             console.error("Errore nella fetch GET:", err);
             setSpace(null);
@@ -86,7 +87,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
 
     // Funzione per verificare se l'utente ha già recensito lo spazio
     async function checkUserReview() {
-        if (!session?.user) return false;
+        if (!session?.user || session.user.role === 'AGENCY') return false;
         try {
             const res = await fetch(`/api/reviews/check?spaceId=${id}`);
             if (!res.ok) {
@@ -102,13 +103,14 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
 
     useEffect(() => {
         fetchSpace();
-        checkUserReview();
     }, [id]);
 
     const handleReviewSubmit = async () => {
         if (selectedRating === 0) {
-            // TODO: Show a message to the user?
-            console.log("Please select a rating before submitting.");
+            toast.error("Please select a rating before submitting your review.");
+            return;
+        } else if (reviewText.trim() === '') {
+            toast.error("Please write a comment before submitting your review.");
             return;
         }
         try {
@@ -132,16 +134,17 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             setReviewText('');
             setSelectedRating(0);
             await fetchSpace(); // Refresh the space data to include the new review
+            setHasReviewed(true);
+            toast.success("Review submitted");
         } catch (error) {
             console.error("Errore nella fetch POST:", error);
+            toast.error("An error occurred while submitting your review. Please try again later.");
         }
     }
 
-    const handleBooking = async () => {
-        toast.success("Booking in progress...");
+    const handleBooking = async () => {        
         if (selectedDates.size === 0) {
-            // TODO: Show a message to the user?
-            console.log("Please select at least one date before booking.");
+            toast.error("Please select at least one date to book.");
             return;
         }
         try {
@@ -163,11 +166,11 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
 
             // Reset selected dates after booking
             setSelectedDates(new Set());
-            // TODO: Show a success message to the user
-            console.log("Booking successful!");
+            toast.success("Booking successful!");
         }
         catch (error) {
             console.error("Errore nella fetch POST per la prenotazione:", error);
+            toast.error("An error occurred while booking the space. Please try again later.");
         }
     }
 

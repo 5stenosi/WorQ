@@ -1,0 +1,23 @@
+{
+    "name": "WorQ - Coworking Spaces",
+    "short_name": "WorQ",
+    "description": "Your ultimate workspace solution. Explore spaces, connect, and collaborate effortlessly.",
+    "start_url": "/",
+    "background_color": "#2f3d58",
+    "theme_color": "#2f3d58",
+    "orientation": "portrait",
+    "lang": "en-us",
+    "display": "standalone",
+    "icons": [
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

@@ -9,7 +9,7 @@ WorQ è una piattaforma digitale che connette professionisti in cerca di spazi d
 ### Per Clienti
 - ✅ Registrazione/Login con diversi provider (Google/GitHub) o credenziali
 - 🔍 Esplorazione degli spazi di coworking disponibili
-- 📅 Prenotazione di postazioni negli orari desiderati
+- 📅 Prenotazione di postazioni nei giorni desiderati
 - ✍️ Lasciare recensioni sugli spazi utilizzati
 - 🗂 Gestione delle prenotazioni dal proprio profilo
 

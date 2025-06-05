@@ -19,11 +19,7 @@ export async function handleFormSubmit<
   // Destruttura i params ricevuti per renderli più comodi da usare (params.data -> data)
   const { data, role, useOAuth, provider, router, emailFromProps } = params;
 
-  // operatore nullish coalescing (??) per gestire il caso in cui emailFromProps sia undefined
-  console.log("Dati del form:", data);
   const email = useOAuth ? emailFromProps : data.email;
-  console.log("Email estratta:", email);
-  console.log("typeof data.email:", typeof data.email);
 
   if (!email) {
     console.error("Email not found.");

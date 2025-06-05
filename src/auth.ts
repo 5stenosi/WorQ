@@ -41,8 +41,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   pages: {
     signIn: "/login",
-    //signOut: "/logout",
-    //error: "/auth/error", // Error code passed in query string as ?error=
   },
   session: {
     strategy: "jwt", // importante per il provider Credentials
@@ -51,7 +49,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
   callbacks: {
     async jwt({ token, user, account }) {
-      console.log("jwt callback: token =", token);
       // Primo login: aggiunge info base dal provider
       if (user) {
         token.id = user.id;
@@ -70,15 +67,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           include: { agency: true, client: true },
         });
         token.role = dbUser?.role ?? "defaultRole";
-        // token.clientId = dbUser?.client?.id || null;
-        // token.agencyId = dbUser?.agency?.id || null;
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      console.log("session callback: session =", session);
       if (token) {
         session.user = {
           id: token.id as string,
@@ -92,8 +86,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async signIn({ user, account }) {
-      console.log("signIn callback: user =", user);
-      console.log("account =", account);
       // per login credenziali procedi sempre
       if (account?.provider === "credentials") {
         return true;
@@ -115,7 +107,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           providerAccountId: account.providerAccountId,
         });
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
-        // return '/complete-profile';
       }
 
       // Se esiste ma il provider è diverso

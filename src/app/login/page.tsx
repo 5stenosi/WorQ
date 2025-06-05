@@ -145,9 +145,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 aspect-square h-full flex items-center text-stone-600 hover:text-stone-700 focus:outline-none"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     <FontAwesomeIcon
                       icon={faEye}
@@ -163,6 +161,13 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
+                {/* Link Forgot Password */}
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-west-side-500 hover:underline mt-2"
+                >
+                  Forgot Password?
+                </Link>
               </div>
             </div>
 

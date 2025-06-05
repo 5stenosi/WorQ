@@ -4,6 +4,7 @@ import Carousel from '@/components/Carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faSpinner, faQuestion, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
+import { toast } from 'react-toastify';
 
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
@@ -203,9 +204,11 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
             handleClearFields(); // Clears the form fields after successful submission
             onSubmitComplete(result.status || null); // Calls the callback with the status from the server
             onClose(); // Closes the modal
+            toast.success('Space created successfully!'); // Displays a success message
         }
         catch (error) {
             console.error('Error creating space:', error); // Logs any errors during submission
+            toast.error('Failed to create space. Please try again.'); // Displays an error message
         }
     };
 

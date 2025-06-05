@@ -44,7 +44,6 @@ export default function AgencyForm({
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
   //const [userEmail] = useState<string | undefined>(email);
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
-  console.log("Email ricevuta via props:", email);
 
   const {
     register,

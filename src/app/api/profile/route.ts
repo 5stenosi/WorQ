@@ -42,19 +42,6 @@ export async function GET() {
                   },
                 }
               },
-              reviews: {
-                select: {
-                  id: true,
-                  rating: true,
-                  comment: true,
-                  space: {
-                    select: {
-                      id: true,
-                      name: true,
-                    }
-                  },
-                }
-              },
             }
           }
         }

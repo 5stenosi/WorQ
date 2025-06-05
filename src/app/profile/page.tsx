@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser, faSpinner, faUserPen } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser, faSpinner, faUserPen, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import CreateSpaceModal from '@/components/CreateSpaceModal';
+import EditProfileModal from '@/components/EditProfileModal';
 
 export default function Profile() {
-    const [isModalOpen, setModalOpen] = useState(false);
+    const [isCreateSpaceModalOpen, setCreateSpaceModalOpen] = useState(false);
+    const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [userEmail, setUserEmail] = useState("");
     const [userRole, setUserRole] = useState("");
@@ -87,7 +89,9 @@ export default function Profile() {
         </div>
     );
 
-    if (isModalOpen) {
+
+    // Blocca lo scroll se uno dei due modali è aperto
+    if (isCreateSpaceModalOpen || isEditProfileModalOpen) {
         document.body.style.overflow = 'hidden';
     } else {
         document.body.style.overflow = 'auto';
@@ -99,8 +103,8 @@ export default function Profile() {
                 {/* Profile Wrapper */}
                 <div className={`w-full h-full flex flex-col gap-5`}>
                     {/* Top Section */}
-                    <div className="w-full h-full p-5 flex flex-col gap-5 rounded-2xl bg-stone-100 border-1 border-stone-900/10 shadow-sm overflow-hidden
-                                    md:grid md:grid-cols-7">
+                    <div className={`w-full h-full p-5 flex flex-col gap-5 rounded-2xl bg-stone-100 border-1 border-stone-900/10 shadow-sm overflow-hidden
+                                    md:grid ${userRole === 'AGENCY' ? 'md:grid-cols-8 lg:grid-cols-9' : 'md:grid-cols-7'}`}>
                         {/* Colonna 1: Foto profilo, nome e cognome */}
                         <div className="flex items-center col-span-2 md:col-span-3 lg:col-span-2 gap-3">
                             <div className="aspect-square w-24 h-24 rounded-lg border-8 border-stone-300 flex items-center justify-center">
@@ -111,24 +115,33 @@ export default function Profile() {
                             </h1>
                         </div>
                         {/* Colonne 2 e 3: Email e Cellulare (stacked on md and up) */}
-                        <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row col-span-4 md:col-span-3 lg:col-span-4 gap-3 sm:gap-10 md:gap-3 lg:gap-0 justify-center items-center">
+                        <div className={`flex flex-col sm:flex-row md:flex-col lg:flex-row col-span-4  ${userRole === 'AGENCY' ? 'md:col-span-4 lg:col-span-6' : 'md:col-span-3 lg:col-span-4'} gap-3 sm:gap-10 md:gap-3 lg:gap-0 justify-center items-center`}>
                             {/* Email */}
                             <div className="flex flex-col justify-center items-center gap-1 w-full">
                                 <p className="text-sm font-bold w-full lg:w-auto">Email</p>
                                 <p className="text-stone-600 break-all w-full lg:w-auto">{userEmail}</p>
                             </div>
-                            {/* Cellulare */}
-                            <div className="flex flex-col justify-center items-center gap-1 w-full">
-                                <p className="text-sm font-bold w-full lg:w-auto">{userRole === 'AGENCY' ? "Telephone" : "Cellphone"}</p>
-                                <p className="text-stone-600 break-all w-full lg:w-auto">
-                                    {userRole === 'AGENCY' ? agency.telephone : client?.cellphone}
-                                </p>
+                            <div className='flex w-full'>
+                                {/* Cellulare */}
+                                <div className="flex flex-col justify-center items-center gap-1 w-full">
+                                    <p className="text-sm font-bold w-full lg:w-auto">{userRole === 'AGENCY' ? "Telephone" : "Cellphone"}</p>
+                                    <p className="text-stone-600 break-all w-full lg:w-auto">
+                                        {userRole === 'AGENCY' ? agency.telephone : client?.cellphone}
+                                    </p>
+                                </div>
+                                {/* VAT (only for AGENCY) */}
+                                {userRole === 'AGENCY' && (
+                                    <div className="flex flex-col justify-center items-center gap-1 w-full">
+                                        <p className="text-sm font-bold w-full lg:w-auto">VAT</p>
+                                        <p className="text-stone-600 break-all w-full lg:w-auto">{agency.vatNumber}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         {/* Colonna 4: Vuota */}
                         <div className={`flex md:flex-col items-end text-stone-100 ${userRole === 'AGENCY' ? 'justify-between' : 'justify-end'}`}>
                             {/* //TODO: collegare il bottone per modificare le info dell'utente */}
-                            <button
+                            <button onClick={() => setEditProfileModalOpen(true)}
                                 className='flex justify-start md:justify-end items-center rounded-lg ring-2 ring-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 text-stone-900 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                            w-10 hover:w-37 active:w-37 ease-out active:scale-90 hover:scale-110 origin-left md:origin-right group'>
                                 <p className='order-2 md:order-1 whitespace-nowrap text-xl text-start md:text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100
@@ -139,7 +152,7 @@ export default function Profile() {
                                 </div>
                             </button>
                             {userRole === 'AGENCY' && (
-                                <button onClick={() => setModalOpen(true)}
+                                <button onClick={() => setCreateSpaceModalOpen(true)}
                                     className='flex justify-end items-center rounded-lg ring-2 ring-west-side-500 bg-stone-100 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                                w-10 hover:w-43 active:w-43 ease-out active:scale-90 hover:scale-110 origin-right group'>
                                     <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100
@@ -158,8 +171,7 @@ export default function Profile() {
                         <div className="grid gap-4 p-5 h-full
                                         grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 
-                            {/* TODO: RIVEDERE BENE I BOOKINGS DEL CLIENTE */}
-                            {client.bookings && client.bookings.length > 0 ? (
+                            {userRole === 'CLIENT' && client.bookings && client.bookings.length > 0 ? (
                                 [...client.bookings]
                                     .sort((a: any, b: any) => new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime())
                                     .map((booking: any, index: number) => (
@@ -167,32 +179,54 @@ export default function Profile() {
                                             key={index}
                                             className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5 h-fit">
                                             <div>
-                                                <h2 className="text-xl font-semibold text-stone-800">Space {index + 1}</h2>
-                                                <p className="text-sm text-stone-600">City {index + 1}, Country</p>
+                                                <h2 className="text-xl font-semibold text-stone-800">{booking.space?.name}</h2>
+                                                <p className="text-sm text-stone-600">{booking.space?.address?.city}, {booking.space?.address?.country}</p>
                                             </div>
                                             <div className={`flex gap-2 justify-between`}>
-                                                {userRole === 'CLIENT' && (
-                                                    <div className='px-2 h-8 flex justify-center items-center rounded-sm font-bold text-center overflow-hidden bg-west-side-200 border-1 border-west-side-300 text-west-side-900'>
-                                                        {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: 'numeric'
-                                                        })}
-                                                    </div>
-                                                )}
-                                                <div className={`flex gap-2 items-end ${userRole === 'CLIENT' ? 'justify-end' : 'w-full justify-between'}`}>
-                                                    <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
-                                                        onClick={() => alert(`Delete space ${index + 1}`)}>
-                                                        <FontAwesomeIcon icon={faTrashCan} />
-                                                    </button>
-                                                    <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
-                                                        onClick={() => window.open(`/spaces/${index + 1}`, '_blank')}>
-                                                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                                                    </button>
+                                                <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
+                                                    onClick={() => handleBookingDelete(booking.id)}>
+                                                    <FontAwesomeIcon icon={faTrashCan} />
+                                                </button>
+                                                <div className='px-2 h-8 flex justify-center items-center rounded-sm font-bold text-center overflow-hidden bg-west-side-200 border-1 border-west-side-300 text-west-side-900'>
+                                                    {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric'
+                                                    })}
                                                 </div>
+                                                <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
+                                                    onClick={() => window.open(`/spaces/${booking.space.id}`, '_blank')}>
+                                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                                                </button>
                                             </div>
                                         </div>
                                     ))
+                            ) : userRole === 'AGENCY' && agency.spaces && agency.spaces.length > 0 ? (
+                                agency.spaces.map((space: any, index: number) => (
+                                    <div
+                                        key={index}
+                                        className="p-2 rounded-lg shadow-sm hover:shadow-md border-1 border-stone-900/10 bg-stone-100 transition-shadow flex flex-col justify-between gap-5 h-fit">
+                                        <div>
+                                            <h2 className="text-xl font-semibold text-stone-800">{space.name}</h2>
+                                            <p className="text-sm text-stone-600">{space.address?.city}, {space.address?.country}</p>
+                                        </div>
+                                        <div className="flex justify-between items-end">
+                                            <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-red-500 active:bg-red-500 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
+                                                onClick={() => handleSpaceDelete(space.id)}>
+                                                <FontAwesomeIcon icon={faTrashCan} />
+                                            </button>
+                                            <div className='flex gap-2'>
+                                                <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm">
+                                                    <FontAwesomeIcon icon={faPenToSquare} />
+                                                </button>
+                                                <button className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm"
+                                                    onClick={() => window.open(`/spaces/${space.id}`, '_blank')}>
+                                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
                             ) : (
                                 <p className="text-center text-balance text-stone-600 col-span-full">
                                     {userRole === 'CLIENT' ? 'No bookings found.' : 'No spaces found.'}
@@ -200,19 +234,31 @@ export default function Profile() {
                             )}
                         </div>
                     </div>
-                </div>
+                </div >
             </section >
-            {/* Modal */}
+            {/* Modals */}
+            <EditProfileModal
+                isOpen={isEditProfileModalOpen}
+                onClose={() => setEditProfileModalOpen(false)}
+                // userId={userRole === 'AGENCY' ? agency.userId : undefined}
+                onSubmitComplete={async (status) => {
+                    if (status === 200) {
+                        console.log('Profile updated successfully!');
+                        await fetchUserData();
+                    }
+                    setEditProfileModalOpen(false);
+                }}
+            />
             <CreateSpaceModal
-                isOpen={isModalOpen}
-                onClose={() => setModalOpen(false)}
+                isOpen={isCreateSpaceModalOpen}
+                onClose={() => setCreateSpaceModalOpen(false)}
+                userId={agency.userId}
                 onSubmitComplete={async (status) => {
                     if (status === 201)
                         console.log('Space created successfully!');
                     await fetchUserData(); // Refresh spaces after successful submission
-                    setModalOpen(false);
+                    setCreateSpaceModalOpen(false);
                 }}
-                userId={agency.userId}
             />
         </div >
     );

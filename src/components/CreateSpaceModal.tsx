@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Carousel from '@/components/Carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faSpinner, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faSpinner, faQuestion, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
 
 library.add(
@@ -52,6 +52,10 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
 
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false); // For entry transition
+    // Dropdown open state for chevron (true = menu open)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    // Track if select was open to handle toggle on click
+    const selectWasOpen = React.useRef(false);
 
     // State for services
     const [services, setServices] = useState<{
@@ -412,26 +416,52 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                             className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                                             placeholder="Enter price per day"
                                             min="1" />
-                                        <span className="flex justify-center items-center aspect-square h-10 rounded-lg border-1 border-stone-900 text-xl">€</span>
+                                        <span className="flex justify-center items-center aspect-square h-10 rounded-lg border-1 border-stone-300 bg-stone-50 text-xl">€</span>
                                     </div>
                                 </div>
                             </div>
                             {/* Space Type */}
-                            <div className="flex flex-col">
+                            <div className="flex flex-col relative">
                                 <label className="flex items-center text-sm md:text-base font-medium pl-1 pb-1 text-stone-900">
                                     Space type
                                     {errors.typology && errorDot}
                                 </label>
-                                <select
-                                    id="typology"
-                                    value={formData.typology}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50">
-                                    <option value="MEETING_ROOMS">Meeting Room</option>
-                                    <option value="PRIVATE_OFFICES">Private Office</option>
-                                    <option value="COMMON_AREAS">Common Area</option>
-                                    <option value="OUTDOOR_SPACES">Outdoor Space</option>
-                                </select>
+                                <div className="relative w-full">
+                                    <select
+                                        id="typology"
+                                        value={formData.typology}
+                                        className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50 appearance-none pr-10"
+                                        style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                                        onMouseDown={e => {
+                                            // Toggle open/close on click
+                                            if (isDropdownOpen) {
+                                                e.preventDefault(); // Prevent default open
+                                                setIsDropdownOpen(false);
+                                                selectWasOpen.current = false;
+                                            } else {
+                                                setIsDropdownOpen(true);
+                                                selectWasOpen.current = true;
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            setIsDropdownOpen(false);
+                                            selectWasOpen.current = false;
+                                        }}
+                                        onChange={e => {
+                                            handleInputChange(e);
+                                            setIsDropdownOpen(false);
+                                            selectWasOpen.current = false;
+                                        }}
+                                    >
+                                        <option value="MEETING_ROOMS">Meeting Room</option>
+                                        <option value="PRIVATE_OFFICES">Private Office</option>
+                                        <option value="COMMON_AREAS">Common Area</option>
+                                        <option value="OUTDOOR_SPACES">Outdoor Space</option>
+                                    </select>
+                                    <span className={`pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-stone-600 transition-transform duration-200 ${isDropdownOpen ? '-scale-y-100' : ''}`}>
+                                        <FontAwesomeIcon icon={faChevronDown} />
+                                    </span>
+                                </div>
                             </div>
                             {/* Description */}
                             <div className="flex flex-col">

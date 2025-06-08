@@ -6,19 +6,32 @@ const STATIC_ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/offline.html',
-  //'/css/style.css',
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Attiva immediatamente il service worker
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames =>
+      Promise.all(
+        cacheNames
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
+      )
+    )
+  );
+  self.clients.claim(); // prende subito il controllo delle pagine aperte
+});
+
 self.addEventListener('fetch', event => {
   const { request } = event;
 
-  // Non cacheare le API o le chiamate POST
+  // Esclude le API o le chiamate POST dalla cache
   if (request.url.includes('/api/') || request.method !== 'GET') {
     return;
   }

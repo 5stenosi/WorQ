@@ -5,7 +5,7 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const res = await fetch("/api/forgot-password", {
@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
         </h1>
         {sent ? (
           <p className="text-green-600 text-center font-medium">
-            Check your email for a reset link.
+            If your email is correct, a reset link has been sent to your inbox. Please check your email and follow the instructions to reset your password.
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">

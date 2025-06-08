@@ -13,11 +13,8 @@ import { useState } from "react";
 
 export default function CompleteProfile() {
   const { data: session, status } = useSession();
-  //const searchParams = useSearchParams();
-  //const [, setEmail] = useState<string | null>(null);
   const [role, setRole] = useState<"CLIENT" | "AGENCY" | "">("");
-  //const router = useRouter();
-
+  
   if (status === "loading")
     return (
       <div className="h-screen text-6xl flex justify-center items-center text-stone-600">
@@ -29,7 +26,7 @@ export default function CompleteProfile() {
     <div id="complete-profile" className="px-10">
       <section className="w-full min-h-screen flex justify-center items-center pt-28 pb-3">
         <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-5 sm:p-10 flex flex-col gap-5">
-          {/* Titolo */}
+          {/* Title */}
           <h2
             className={`text-center text-xl sm:text-2xl text-balance font-bold sm:mb-5`}
           >
@@ -85,7 +82,7 @@ export default function CompleteProfile() {
               </button>
               {role === "CLIENT" ? (
                 <ClientForm
-                  email={session?.user?.email} // da sessione OAuth
+                  email={session?.user?.email} // from OAuth session
                   requiredFields={{
                     name: true,
                     surname: true,
@@ -96,7 +93,7 @@ export default function CompleteProfile() {
                 />
               ) : (
                 <AgencyForm
-                  email={session?.user?.email} // da sessione OAuth
+                  email={session?.user?.email} // from OAuth session
                   requiredFields={{
                     name: true,
                     vatNumber: true,

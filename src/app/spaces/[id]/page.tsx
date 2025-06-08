@@ -9,6 +9,7 @@ import { faStar as faHollowStar } from '@fortawesome/free-regular-svg-icons';
 import { toast } from 'react-toastify';
 import CalendarComponent from '@/components/CalendarComponent';
 import Carousel from '@/components/Carousel';
+import { set } from 'date-fns';
 
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
@@ -42,7 +43,7 @@ type Space = {
 
 export default function SpaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
 
     const [space, setSpace] = useState<Space | null>(null);
     const [loading, setLoading] = useState(true);
@@ -65,45 +66,37 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalizza ogni parola
     };
 
-    // Funzione per recuperare i dettagli dello spazio
-    async function fetchSpace() {
+    async function loadData() {
         try {
-            setLoading(true);
-            const res = await fetch(`/api/spaces/${id}`);
-            if (!res.ok) {
+            const [spaceRes, reviewRes] = await Promise.all([
+                fetch(`/api/spaces/${id}`),
+                session && session?.user?.role !== 'AGENCY'
+                    ? fetch(`/api/reviews/check?spaceId=${id}&userId=${session?.user.id}`)
+                    : Promise.resolve({ ok: false })
+            ]);
+
+            if (!spaceRes.ok) {
                 setSpace(null);
                 return;
             }
-            const data = await res.json();
-            setSpace(data);
-            await checkUserReview();
-        } catch (err) {
-            console.error("Errore nella fetch GET:", err);
+
+            const spaceData = await spaceRes.json();
+            setSpace(spaceData);
+
+            if (reviewRes.ok && typeof (reviewRes as Response).json === 'function') {
+                const reviewData = await (reviewRes as Response).json();
+                setHasReviewed(reviewData.reviewed);
+            } else {
+                setHasReviewed(false);
+                console.log("User has not reviewed this space or is not a client.");
+            }
+        } catch (error) {
+            console.error("Errore nella fetch GET:", error);
             setSpace(null);
         } finally {
             setLoading(false);
         }
     }
-
-    // Funzione per verificare se l'utente ha già recensito lo spazio
-    async function checkUserReview() {
-        if (!session?.user || session.user.role === 'AGENCY') return false;
-        try {
-            const res = await fetch(`/api/reviews/check?spaceId=${id}`);
-            if (!res.ok) {
-                throw new Error('Failed to check review');
-            }
-            const data = await res.json();
-            setHasReviewed(data.reviewed);
-        } catch (error) {
-            console.error("Errore nella fetch GET per controllare la recensione:", error);
-            return false;
-        }
-    }
-
-    useEffect(() => {
-        fetchSpace();
-    }, [id]);
 
     const handleReviewSubmit = async () => {
         if (selectedRating === 0) {
@@ -131,9 +124,9 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                 throw new Error('Failed to submit review');
             }
 
+            await loadData();
             setReviewText('');
             setSelectedRating(0);
-            await fetchSpace(); // Refresh the space data to include the new review
             setHasReviewed(true);
             toast.success("Review submitted");
         } catch (error) {
@@ -142,7 +135,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
-    const handleBooking = async () => {        
+    const handleBooking = async () => {
         if (selectedDates.size === 0) {
             toast.error("Please select at least one date to book.");
             return;
@@ -190,6 +183,11 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             setSelectedDates(formattedDates);
         }
     };
+
+    useEffect(() => {
+        if (status === 'loading') return; // Wait for session to load
+        loadData();
+    }, [id, status]);
 
     if (loading) return (<div className="h-screen text-6xl flex justify-center items-center text-stone-600">
         <FontAwesomeIcon icon={faSpinner} className='animate-spin' />

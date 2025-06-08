@@ -12,7 +12,9 @@ library.add(
     faVideoCamera, faChild, faDog, faParking, faLock, faBolt
 );
 
-const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userId, onSubmitComplete }) => {
+const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string, spaceId: string, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userId, spaceId, onSubmitComplete }) => {
+    const [isLoading, setIsLoading] = useState(false); // Loading state for form
+    const [spaceName, setSpaceName] = useState(''); // Space name for the modal title
     const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
     const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
@@ -83,15 +85,54 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         }
     }
 
+    // Fetch space data from the server
+    const fetchData = async () => {
+        try {
+            const response = await fetch(`/api/spaces/${spaceId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch space data');
+            }
+            const data = await response.json();
+            const addressString = data.address.number ? `${data.address.street}, ${data.address.number} - ${data.address.city}, ${data.address.country}` : `${data.address.street} - ${data.address.city}, ${data.address.country}`;
+            setSpaceName(data.name); // Set space name for the modal title
+            setFormData({
+                name: data.name,
+                address: addressString,
+                fullAddress: data.fullAddress,
+                seats: data.seats,
+                price: data.price,
+                typology: data.typology,
+                description: data.description,
+                services: data.services?.map((s: any) => String(s.id)) || [],
+                images: data.images || [],
+                files: data.files || [],
+            });
+            setUploadedImages(data.images || []);
+            setSelectedServices(data.services?.map((s: any) => s.id) || []);
+            console.log('Fetched space data:', data);
+        }
+        catch (error) {
+            console.error('Error fetching space data:', error);
+        }
+    }
+
     useEffect(() => {
         let openTimeout: NodeJS.Timeout | undefined;
         let closeTimeout: NodeJS.Timeout | undefined;
         if (isOpen) {
-            fetchServices(); // Fetch services when the component mounts
+            setIsLoading(true); // Set loading state to true
             setIsVisible(false); // Reset
             openTimeout = setTimeout(() => {
                 setIsVisible(true);
             }, 10); // Wait a tick to trigger transition
+            try {
+                fetchServices(); // Fetch services when the component mounts
+                fetchData(); // Fetch any other necessary data
+            } catch (error) {
+                console.error('Error fetching services:', error);
+            } finally {
+                setIsLoading(false); // Set loading state to false after fetching
+            }
         } else {
             setIsClosing(true);
             setIsVisible(false);
@@ -187,6 +228,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         }
 
         try {
+            console.log(selectedServices);
             const formDataToSend = new FormData(); // Creates a FormData object to send data
             formDataToSend.append('metadata', JSON.stringify(formData)); // Appends form metadata as JSON
             uploadedFiles.forEach((file) => {
@@ -194,21 +236,25 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
             });
 
             // Sends the form data to the server
-            const response = await fetch('/api/spaces', {
-                method: 'POST',
+            const response = await fetch(`/api/spaces/${spaceId}`, {
+                method: 'PUT',
                 body: formDataToSend,
             });
 
             const result = await response.json(); // Parses the server response
 
+            if (!response.ok) {
+                throw new Error("Failed to update space");
+            }
+
             handleClearFields(); // Clears the form fields after successful submission
             onSubmitComplete(result.status || null); // Calls the callback with the status from the server
             onClose(); // Closes the modal
-            toast.success('Space created successfully!'); // Displays a success message
+            toast.success('Space updated successfully!'); // Displays a success message
         }
         catch (error) {
-            console.error('Error creating space:', error); // Logs any errors during submission
-            toast.error('Failed to create space. Please try again.'); // Displays an error message
+            console.error('Error updating space:', error); // Logs any errors during submission
+            toast.error('Failed to update space. Please try again.'); // Displays an error message
         }
     };
 
@@ -226,6 +272,12 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
 
     if (!isOpen && !isClosing) return null;
 
+    if (isLoading) return (
+        <div className="h-screen text-6xl flex justify-center items-center text-stone-600">
+            <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+        </div>
+    );
+
     // Red dot error indicator
     const errorDot = <div className="w-2 h-2 mx-2 rounded-full bg-red-500 animate-pulse" />;
 
@@ -241,7 +293,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
             ></div>
             <div
                 className={`overflow-y-auto bg-stone-100 rounded-l-xl rounded-r-md md:rounded-xl shadow-lg max-w-6xl max-h-full w-full p-5 relative transition-transform duration-300 ${isVisible ? 'scale-100' : 'scale-90'}`}>
-                <h2 className="text-lg sm:text-2xl font-bold mb-5 pr-10">Publish a New Space</h2>
+                <h2 className="text-lg sm:text-2xl font-bold mb-5 pr-10">Edit {spaceName}</h2>
                 <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                     <div className="flex flex-col sm:flex-row gap-5">
                         {/* Left Section */}
@@ -496,7 +548,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
 
                         <button type='submit' className='flex justify-end items-center rounded-md ring-2 ring-west-side-500 bg-stone-100 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                             w-10 hover:w-43 active:w-43 ease-out active:scale-90 hover:scale-110 origin-right group'>
-                            <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Publish space</p>
+                            <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Update space</p>
                             <div className='aspect-square bg-stone-100 group-hover:bg-west-side-500 group-active:bg-west-side-500 size-10 text-2xl rounded-md flex items-center justify-center duration-150'>
                                 <FontAwesomeIcon icon={faPlus} />
                             </div>
@@ -517,4 +569,4 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
     );
 };
 
-export default CreateSpaceModal;
+export default EditSpaceModal;

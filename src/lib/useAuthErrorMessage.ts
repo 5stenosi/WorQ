@@ -13,7 +13,7 @@ export function useAuthErrorMessage() {
       break;
     case "CredentialsSignin":
       errorMessage =
-        "Invalid credentials. Please check your email and password.";
+        "Invalid credentials. Make sure you're registered and try again.";
       break;
     case "AccessDenied":
       errorMessage = "You must be logged in to access this page.";

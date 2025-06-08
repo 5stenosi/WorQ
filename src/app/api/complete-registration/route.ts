@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       return new Response("User not found", { status: 404 });
     }
 
-    // Se l'utente ha già un profilo, restituisci errore -- serve ??
+    // Check if the user already has a profile
     if (user.client || user.agency) {
       return NextResponse.json(
         { message: "Profile already completed." },
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Importante per aggiornare il ruolo dell'utente
+    // To update the user's role
     await prisma.user.update({
       where: { email },
       data: { role },

@@ -1,23 +1,64 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Offline</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-    h1 {
-      color: #2563eb;
-    }
-  </style>
-</head>
-<body>
-  <h1>Sei offline</h1>
-  <p>Questa pagina non è disponibile al momento perché sei offline.</p>
-  <p>Riprova a connetterti più tardi.</p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline</title>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        text-align: center;
+        background-color: #ffffff;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+      }
+      h1 {
+        font-size: 1.75rem;
+        color: #2563eb;
+        margin-bottom: 1rem;
+      }
+      p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+      }
+      .retry {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #ffffff;
+        background-color: #2563eb;
+        border: none;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .retry:hover {
+        background-color: #1d4ed8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>You are offline</h1>
+      <p>This page is currently unavailable because you are offline.</p>
+      <p>Please try reconnecting later.</p>
+      <a href="/" class="retry">Retry</a>
+    </div>
+  </body>
 </html>

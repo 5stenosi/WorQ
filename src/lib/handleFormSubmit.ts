@@ -30,44 +30,34 @@ export async function handleFormSubmit<
   const payload = { ...data, email, role };
 
   try {
-  
-    if (useOAuth) {
-      const res = await fetch("/api/complete-registration", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    const endpoint = useOAuth ? "/api/complete-registration" : "/api/register";
 
-      if (res.ok) {
-        await signIn(provider, {
-          //email,
-          redirect: true,
-          callbackUrl: "/",
-          prompt: "none",
-        });
-        return;
-      } else {
-        const error = await res.json();
-        throw new Error(error?.message ?? `(${res.status}) Registration failed`);
-      }
-    }
-
-    const res = await fetch("/api/register", {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    if (res.ok) {
+    if (!res.ok) {
+      const { message } = await res.json();
+      throw new Error(message || `(${res.status}) Registration failed`);
+    }
+
+    // Sign in after successful complete registration
+    if (useOAuth && provider) {
+      await signIn(provider, {
+        redirect: true,
+        callbackUrl: "/",
+        prompt: "none",
+      });
+    } else {
+      // For non-OAuth registration, sign in with credentials
       await signIn("credentials", {
-        email: data.email,
-        password: data.password,
+        email: data.email as string,
+        password: data.password as string,
         redirect: false,
       });
       router.replace("/");
-    } else {
-      const error = await res.json();
-      throw new Error(error.message || "Registration failed");
     }
   } catch (error) {
     console.error("Registration error:", error);

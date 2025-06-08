@@ -22,7 +22,7 @@ export async function createUserAndAccount({
       email,
       oauthProvider: provider.toUpperCase() as OAuthProvider,
       oauthId: providerAccountId,
-      role, // Imposta il ruolo dell'utente (CLIENT o AGENCY)
+      role, // Set the user role (CLIENT o AGENCY)
     },
   });
 

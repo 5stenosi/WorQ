@@ -1,9 +1,16 @@
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
-import { error } from 'console';
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
+const uploadPath = path.join(process.cwd(), 'public', 'uploads');
 
 // Handles GET requests to /api/spaces/[id]
 // Returns a single space
@@ -64,54 +71,99 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             );
         }
 
-        const body = await request.json();
+        const formData = await request.formData();
 
-        // Body validation
-        if (!body || typeof body !== 'object') {
-            return NextResponse.json(
-                { error: 'Request body not valid' },
-                { status: 400 }
-            );
-        }
+        // Handle images
+        const metadata = JSON.parse(formData.get('metadata') as string);
+        const files = formData.getAll('files') as File[];
+        const savedImagePaths: string[] = [];
 
-        const updateData: any = {
-            name: body.name,
-            description: body.description,
-            seats: body.seats,
-            isFullSpaceBooking: body.isFullSpaceBooking,
-            typology: body.typology,
-            price: parseFloat(body.price) || undefined,
-            images: body.images || undefined
-        };
+        console.log('Metadata:', metadata);
+        console.log('Files:', files);
 
-        if (body.address) {
-            updateData.address = {
-                update: {
-                    street: body.address.street,
-                    number: body.address.number,
-                    city: body.address.city,
-                    zip: body.address.zip,
-                    country: body.address.country,
-                    latitude: parseFloat(body.address.latitude) || 0,
-                    longitude: parseFloat(body.address.longitude) || 0
-                }
-            };
-        }
-
-        if (body.typology && !['MEETING_ROOMS', 'PRIVATE_OFFICES', 'COMMON_AREAS', 'OUTDOOR_SPACES'].includes(body.typology)) {
-            return NextResponse.json(
-                { error: 'Tipologia non valida' },
-                { status: 400 }
-            );  
-        }
+        // Handle address
+        const nominatimAddress = metadata.fullAddress;
 
         const updatedSpace = await prisma.space.update({
             where: { id: spaceId },
-            data: updateData
+            data: {
+                name: metadata.name,
+                description: metadata.description,
+                seats: parseInt(metadata.seats),
+                isFullSpaceBooking: metadata.typology === 'MEETING_ROOMS',
+                typology: metadata.typology,
+                price: parseFloat(metadata.price),
+
+                // Include address update only if present
+                ...(nominatimAddress && {
+                    address: {
+                        update: {
+                            street: nominatimAddress.address.road || '',
+                            number: nominatimAddress.address.house_number || null,
+                            city:
+                                nominatimAddress.address.city ||
+                                nominatimAddress.address.town ||
+                                nominatimAddress.address.village ||
+                                '',
+                            zip: nominatimAddress.address.postcode || '',
+                            country: nominatimAddress.address.country || '',
+                            latitude: parseFloat(nominatimAddress.lat) || 0,
+                            longitude: parseFloat(nominatimAddress.lon) || 0,
+                        },
+                    },
+                }),
+
+                services: metadata.services && metadata.services.length > 0
+                    ? {
+                        set: metadata.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
+                    }
+                    : {
+                        set: [], // if the user has deselected all services
+                    }
+            },
         });
 
+
+        if (files && files.length > 0) {
+            const spaceFolder = `space${spaceId}`;
+            const spaceFolderPath = path.join(uploadPath, spaceFolder);
+
+            // Create the folder if it doesn't exist
+            await fs.mkdir(spaceFolderPath, { recursive: true });
+
+            // Remove existing images in the folder
+            try {
+                const existingFiles = await fs.readdir(path.join(uploadPath, spaceFolder));
+                for (const file of existingFiles) {
+                    await fs.unlink(path.join(uploadPath, spaceFolder, file));
+                }
+            } catch (fsError) {
+                console.error('Failed to clear existing images:', fsError);
+            }
+
+            // Save images
+            for (const [index, file] of files.entries()) {
+                const buffer = Buffer.from(await file.arrayBuffer());
+                const fileExtension = path.extname(file.name);
+                const fileName = `image${index + 1}${fileExtension}`;
+                const filePath = path.join(uploadPath, spaceFolder, fileName);
+
+                await fs.writeFile(filePath, buffer);
+                savedImagePaths.push(`/uploads/${spaceFolder}/${fileName}`);
+            }
+
+            // Update the space with the saved image paths
+            await prisma.space.update({
+                where: { id: spaceId },
+                data: {
+                    images: savedImagePaths,
+                }
+            });
+        }
+
         return NextResponse.json(updatedSpace);
-    } catch {
+    } catch (error) {
+        console.log('Error updating space:', error);
         return NextResponse.json({ error: 'Update failed' + error }, { status: 500 });
     }
 }
@@ -130,7 +182,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         if (session.user.role !== 'AGENCY') {
             return NextResponse.json({ error: "User not authorized" }, { status: 403 });
         }
-        
+
         const { id } = params;
 
         // Convert the ID to a number

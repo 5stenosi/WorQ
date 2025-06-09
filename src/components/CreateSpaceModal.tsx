@@ -13,6 +13,7 @@ library.add(
 );
 
 const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userId, onSubmitComplete }) => {
+    // State management for the modal
     const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
     const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
@@ -51,6 +52,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         description?: boolean;
     }>({});
 
+    // Modal transition states
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false); // For entry transition
     // Dropdown open state for chevron (true = menu open)
@@ -118,6 +120,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         return Object.keys(newErrors).length === 0;
     };
 
+    // Handles image upload and sets the preview URLs
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
@@ -129,6 +132,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
     };
 
     // Debounced fetchSuggestions
+    // Fetches address suggestions from the Nominatim API
     const fetchSuggestions = async (value: string) => {
         if (!value) return;
         setIsLoadingSuggestions(true);
@@ -157,12 +161,14 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         return () => clearTimeout(handler);
     }, [addressInput, suggestionsVisible]);
 
+    // Handles input changes for form fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: id === 'seats' || id === 'price' ? parseInt(value) : value });
         setErrors({ ...errors, [id]: false }); // Clear error for the field
     };
 
+    // Clears all form fields and resets state
     const handleClearFields = () => {
         setFormData({
             name: '',
@@ -199,16 +205,12 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                 body: formDataToSend,
             });
 
-            const result = await response.json(); // Parses the server response
-
             handleClearFields(); // Clears the form fields after successful submission
-            onSubmitComplete(result.status || null); // Calls the callback with the status from the server
+            onSubmitComplete(response.status || null); // Calls the callback with the status from the server
             onClose(); // Closes the modal
-            toast.success('Space created successfully!'); // Displays a success message
         }
         catch (error) {
             console.error('Error creating space:', error); // Logs any errors during submission
-            toast.error('Failed to create space. Please try again.'); // Displays an error message
         }
     };
 

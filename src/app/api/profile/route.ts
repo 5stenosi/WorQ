@@ -133,7 +133,7 @@ export async function PUT(request: Request) {
           agency: true
         }
       });
-      return NextResponse.json(updatedUser);
+      return NextResponse.json(updatedUser, { status: 200 });
     } else {
       return NextResponse.json({ error: "Invalid user role" }, { status: 400 });
     }

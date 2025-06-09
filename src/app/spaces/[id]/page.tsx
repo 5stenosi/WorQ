@@ -9,7 +9,6 @@ import { faStar as faHollowStar } from '@fortawesome/free-regular-svg-icons';
 import { toast } from 'react-toastify';
 import CalendarComponent from '@/components/CalendarComponent';
 import Carousel from '@/components/Carousel';
-import { set } from 'date-fns';
 
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
@@ -42,9 +41,11 @@ type Space = {
 };
 
 export default function SpaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    // Extracting the space ID from the URL parameters
     const { id } = use(params);
+    // Using NextAuth to get the session data
     const { data: session, status } = useSession();
-
+    // State variables to manage space data, loading state, review text, hover rating, and booking dates
     const [space, setSpace] = useState<Space | null>(null);
     const [loading, setLoading] = useState(true);
     const [reviewText, setReviewText] = useState('');
@@ -54,18 +55,20 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
     const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
     const [bookingDates, setBookingDates] = useState<Set<string>>(new Set());
 
+    // Placeholder images in case the space does not have any images
     const placeholderImages = [
         '/placeholder-image.jpg'
     ];
 
-    // Funzione per formattare il testo
+    // Function to format text
     const formatTypology = (typology: string) => {
         return typology
             .toLowerCase()
-            .replace(/_/g, ' ') // Sostituisce gli underscore con spazi
-            .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalizza ogni parola
+            .replace(/_/g, ' ') // Replace underscores with spaces
+            .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize each word
     };
 
+    // Function to load space data and reviews
     async function loadData() {
         try {
             const [spaceRes, reviewRes] = await Promise.all([
@@ -86,10 +89,9 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             if (reviewRes.ok && typeof (reviewRes as Response).json === 'function') {
                 const reviewData = await (reviewRes as Response).json();
                 setHasReviewed(reviewData.reviewed);
-            } else {
+            } else 
                 setHasReviewed(false);
-                console.log("User has not reviewed this space or is not a client.");
-            }
+
         } catch (error) {
             console.error("Errore nella fetch GET:", error);
             setSpace(null);
@@ -98,6 +100,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
+    // Function to handle review submission
     const handleReviewSubmit = async () => {
         if (selectedRating === 0) {
             toast.error("Please select a rating before submitting your review.");
@@ -135,6 +138,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
+    // Function to handle booking
     const handleBooking = async () => {
         if (selectedDates.size === 0) {
             toast.error("Please select at least one date to book.");
@@ -167,6 +171,7 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     }
 
+    // Function to handle date selection from the calendar component
     const handleDateSelection = (dates: Set<string>) => {
         // Saving the selected dates to state
         setBookingDates(dates);

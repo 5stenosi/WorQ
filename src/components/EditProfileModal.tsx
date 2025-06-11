@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 
 const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userData: any, userRole: String, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userData, userRole, onSubmitComplete }) => {
@@ -206,7 +206,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
                                                                 w-10 hover:w-46 active:w-46 ease-out active:scale-90 hover:scale-110 origin-right group'>
                             <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Confirm profile</p>
                             <div className='aspect-square bg-stone-100 group-hover:bg-west-side-500 group-active:bg-west-side-500 size-10 text-2xl rounded-md flex items-center justify-center duration-150'>
-                                <FontAwesomeIcon icon={faPlus} />
+                                <FontAwesomeIcon icon={faCheckCircle} />
                             </div>
                         </button>
                     </div>

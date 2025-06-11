@@ -62,7 +62,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <meta name="theme-color" content="#f3f4f6" />
       </head>
       <body className="bg-stone-200 text-stone-900 select-none">
-        <RegisterSW />
+        {/* <RegisterSW /> */}
         <nav className="z-1000 w-full p-5 fixed flex justify-center items-center gap-5">
           <div className="bg-stone-100/75 border-1 border-stone-100 px-4 backdrop-blur-xs shadow-sm rounded-3xl flex flex-col md:grid items-center transition duration-250 grid-cols-1 md:grid-cols-[1fr_auto_1fr] w-full lg:w-3/4 xl:w-2/3">
             <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
@@ -312,7 +312,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </footer>
-        <ToastContainer position="bottom-right"/>
+        <ToastContainer position="bottom-right" />
       </body>
     </html >
   );

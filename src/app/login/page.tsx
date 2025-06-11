@@ -67,26 +67,22 @@ export default function LoginPage() {
               className={`w-full flex justify-center items-center py-2 sm:py-4 border-2 hover:text-stone-100 active:text-stone-100 font-medium rounded-lg
                           motion-preset-expand motion-delay-150
                           transition-all duration-150 ease-out active:scale-90 hover:scale-105
-               ${
-                 randomNumber === 1
-                   ? "border-google-blue hover:bg-google-blue active:bg-google-blue text-google-blue"
-                   : ""
-               }
-               ${
-                 randomNumber === 2
-                   ? "border-google-red hover:bg-google-red active:bg-google-red text-google-red"
-                   : ""
-               }
-               ${
-                 randomNumber === 3
-                   ? "border-google-green hover:bg-google-green active:bg-google-green text-google-green"
-                   : ""
-               }
-               ${
-                 randomNumber === 4
-                   ? "border-google-yellow hover:bg-google-yellow active:bg-google-yellow text-google-yellow"
-                   : ""
-               }`}
+               ${randomNumber === 1
+                  ? "border-google-blue hover:bg-google-blue active:bg-google-blue text-google-blue"
+                  : ""
+                }
+               ${randomNumber === 2
+                  ? "border-google-red hover:bg-google-red active:bg-google-red text-google-red"
+                  : ""
+                }
+               ${randomNumber === 3
+                  ? "border-google-green hover:bg-google-green active:bg-google-green text-google-green"
+                  : ""
+                }
+               ${randomNumber === 4
+                  ? "border-google-yellow hover:bg-google-yellow active:bg-google-yellow text-google-yellow"
+                  : ""
+                }`}
               onClick={() => {
                 localStorage.setItem("oauth_provider", "google");
                 signIn("google");
@@ -161,14 +157,14 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
-                {/* Link Forgot Password */}
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-west-side-500 hover:underline mt-2"
-                >
-                  Forgot Password?
-                </Link>
               </div>
+              {/* Link Forgot Password */}
+              <Link
+                href="/forgot-password"
+                className="w-fit rounded-sm text-sm p-2 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 font-medium transition"
+              >
+                Forgot Password?
+              </Link>
             </div>
 
             {errorMessage && (

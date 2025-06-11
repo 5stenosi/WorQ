@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { toast } from 'react-toastify';
 
-const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userData: any, userRole: String, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userData, userRole, onSubmitComplete }) => {
+const EditProfileModal: React.FC<{ isOpen: boolean; onClose: () => void, userData: any, userRole: String, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userData, userRole, onSubmitComplete }) => {
+    // State to manage modal visibility and transitions
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false); // For entry transition
+    // Form data state
     const [formData, setFormData] = useState<{
         name: string;
         surname?: string;
@@ -13,11 +14,11 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
         telephone?: string;
         vatNumber?: string;
     }>({
-        name: userData.name || '',
-        surname: userRole === 'CLIENT' ? userData.surname || '' : undefined,
-        cellphone: userRole === 'CLIENT' ? userData.cellphone || '' : undefined,
-        telephone: userRole === 'AGENCY' ? userData.telephone || '' : undefined,
-        vatNumber: userRole === 'AGENCY' ? userData.vatNumber || '' : undefined,
+        name: '',
+        surname: userRole === 'CLIENT' ? '' : undefined,
+        cellphone: userRole === 'CLIENT' ? '' : undefined,
+        telephone: userRole === 'AGENCY' ? '' : undefined,
+        vatNumber: userRole === 'AGENCY' ? '' : undefined,
     });
 
     // Error state for required fields
@@ -29,9 +30,9 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
         vatNumber?: boolean;
     }>({});
 
+    // Clear fields function
     const handleClearFields = () => {
-        setErrors({});
-        console.log("Clearing fields");
+        setErrors({});        
         // Reset all fields to empty
         setFormData({
             name: '',
@@ -55,13 +56,13 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
         return Object.keys(newErrors).length === 0;
     };
 
+    // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) {
-            console.log("Form validation failed", errors);
+            console.error("Form validation failed", errors);
             return; // Prevent submission if validation fails
         }
-        console.log("Submitting form with data:", formData);
         try {
             const response = await fetch('/api/profile', {
                 method: 'PUT',
@@ -74,20 +75,28 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
             if (!response.ok) {
                 throw new Error("Failed to update profile");
             }
-
-            const result = await response.json();
-            onSubmitComplete(result.status || null); // Indicate success
-            toast.success("Profile updated successfully!");
+            onSubmitComplete(response.status || null); // Indicate success
         } catch (error) {
             console.error("Error updating profile", error);
-            toast.error("Failed to update profile. Please try again later.");
         }
     }
+
+    // Initialize form data with userData
+    const initializeFormData = () => {
+        setFormData({
+            name: userData.name || '',
+            surname: userRole === 'CLIENT' ? userData.surname || '' : undefined,
+            cellphone: userRole === 'CLIENT' ? userData.cellphone || '' : undefined,
+            telephone: userRole === 'AGENCY' ? userData.telephone || '' : undefined,
+            vatNumber: userRole === 'AGENCY' ? userData.vatNumber || '' : undefined,
+        });  
+    };
 
     useEffect(() => {
         let openTimeout: NodeJS.Timeout | undefined;
         let closeTimeout: NodeJS.Timeout | undefined;
         if (isOpen) {
+            initializeFormData(); // Initialize form data when modal opens
             setIsVisible(false); // Reset
             openTimeout = setTimeout(() => {
                 setIsVisible(true);
@@ -225,4 +234,4 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
     );
 };
 
-export default CreateSpaceModal;
+export default EditProfileModal;

@@ -53,6 +53,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         description?: boolean;
     }>({});
 
+    // State for modal closing and visibility
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false); // For entry transition
     // Dropdown open state for chevron (true = menu open)
@@ -159,6 +160,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         return Object.keys(newErrors).length === 0;
     };
 
+    // Handle image upload, filter for valid image types
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
@@ -170,6 +172,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
     };
 
     // Debounced fetchSuggestions
+    // Fetches address suggestions from the Nominatim API
     const fetchSuggestions = async (value: string) => {
         if (!value) return;
         setIsLoadingSuggestions(true);
@@ -198,12 +201,14 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         return () => clearTimeout(handler);
     }, [addressInput, suggestionsVisible]);
 
+    // Handle input changes for form fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: id === 'seats' || id === 'price' ? parseInt(value) : value });
         setErrors({ ...errors, [id]: false }); // Clear error for the field
     };
 
+    // Handles clearing all form fields and resetting state
     const handleClearFields = () => {
         setFormData({
             name: '',
@@ -241,20 +246,16 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                 body: formDataToSend,
             });
 
-            const result = await response.json(); // Parses the server response
-
             if (!response.ok) {
                 throw new Error("Failed to update space");
             }
 
             handleClearFields(); // Clears the form fields after successful submission
-            onSubmitComplete(result.status || null); // Calls the callback with the status from the server
+            onSubmitComplete(response.status || null); // Calls the callback with the status from the server
             onClose(); // Closes the modal
-            toast.success('Space updated successfully!'); // Displays a success message
         }
         catch (error) {
             console.error('Error updating space:', error); // Logs any errors during submission
-            toast.error('Failed to update space. Please try again.'); // Displays an error message
         }
     };
 

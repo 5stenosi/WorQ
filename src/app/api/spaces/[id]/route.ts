@@ -161,7 +161,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             });
         }
 
-        return NextResponse.json(updatedSpace);
+        return NextResponse.json(updatedSpace, { status: 200 });
     } catch (error) {
         console.log('Error updating space:', error);
         return NextResponse.json({ error: 'Update failed' + error }, { status: 500 });

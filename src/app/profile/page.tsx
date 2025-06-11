@@ -1,19 +1,20 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowUpRightFromSquare, faTrashCan, faUser, faSpinner, faUserPen, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
 import CreateSpaceModal from '@/components/CreateSpaceModal';
 import EditSpaceModal from '@/components/EditSpaceModal';
 import EditProfileModal from '@/components/EditProfileModal';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
-import { set } from 'date-fns';
 
 export default function Profile() {
+    // State variables for modals
     const [isCreateSpaceModalOpen, setCreateSpaceModalOpen] = useState(false);
     const [isEditSpaceModalOpen, setEditSpaceModalOpen] = useState(false);
     const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false);
+    // State variables for user data
     const [isLoading, setIsLoading] = useState(true);
     const [selectedSpace, setSelectedSpace] = useState<string>("");
     const [userEmail, setUserEmail] = useState("");
@@ -33,7 +34,7 @@ export default function Profile() {
     });
 
     // Fetch user data from the API
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
         try {
             const response = await fetch('/api/profile');
             const data = await response.json();
@@ -53,8 +54,9 @@ export default function Profile() {
         finally {
             setIsLoading(false);
         }
-    }
+    }, []);
 
+    // Handle booking deletion
     const handleBookingDelete = async (bookingId: string) => {
         try {
             const response = await fetch(`/api/bookings/${bookingId}`, {
@@ -64,7 +66,7 @@ export default function Profile() {
                 throw new Error('Failed to delete booking');
             }
             // Optionally, refresh the bookings after deletion
-            fetchUserData();
+            await fetchUserData();
             toast.success('Booking deleted successfully!');
         } catch (error) {
             console.error('Error deleting booking:', error);
@@ -72,6 +74,7 @@ export default function Profile() {
         }
     }
 
+    // Handle space deletion
     const handleSpaceDelete = async (spaceId: string) => {
         try {
             const response = await fetch(`/api/spaces/${spaceId}`, {
@@ -81,7 +84,7 @@ export default function Profile() {
                 throw new Error('Failed to delete space');
             }
             // Optionally, refresh the spaces after deletion
-            fetchUserData();
+            await fetchUserData();
             toast.success('Space deleted successfully!');
         } catch (error) {
             console.error('Error deleting space:', error);
@@ -91,7 +94,7 @@ export default function Profile() {
 
     useEffect(() => {
         fetchUserData();
-    }, []);
+    }, [fetchUserData]);
 
     if (isLoading) return (
         <div className="h-screen text-6xl flex justify-center items-center text-stone-600">
@@ -180,7 +183,7 @@ export default function Profile() {
                     <div className={`w-full h-full gap-5 rounded-2xl bg-stone-100 border-1 border-stone-900/10 shadow-sm overflow-hidden`}>
                         <div className="grid gap-4 p-5 h-full
                                         grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                            
+
                             {userRole === 'CLIENT' && client.bookings && client.bookings.length > 0 ? (
                                 [...client.bookings]
                                     .sort((a: any, b: any) => new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime())
@@ -228,9 +231,9 @@ export default function Profile() {
                                             </button>
                                             <div className='flex gap-2'>
                                                 <button onClick={() => {
-                                                        setEditSpaceModalOpen(true);
-                                                        setSelectedSpace(space.id);
-                                                    }}
+                                                    setEditSpaceModalOpen(true);
+                                                    setSelectedSpace(space.id);
+                                                }}
                                                     className="aspect-square flex justify-center items-center size-8 text-sm border-1 border-stone-900/10 bg-stone-100 hover:bg-stone-900 active:bg-stone-900 hover:text-stone-100 active:text-stone-100 transition rounded-sm shadow-sm">
                                                     <FontAwesomeIcon icon={faPenToSquare} />
                                                 </button>
@@ -259,8 +262,11 @@ export default function Profile() {
                 userData={userRole === 'CLIENT' ? client : agency} // Pass the appropriate user data based on role
                 userRole={userRole}
                 onSubmitComplete={async (status) => {
-                    if (status === 200)
+                    if (status === 200) {
                         await fetchUserData(); // Refresh user data after successful submission
+                        toast.success('Profile updated successfully!');
+                    } else
+                        toast.error('Failed to update profile. Please try again.');
                     setEditProfileModalOpen(false);
                 }}
             />
@@ -269,8 +275,11 @@ export default function Profile() {
                 onClose={() => setCreateSpaceModalOpen(false)}
                 userId={agency.userId}
                 onSubmitComplete={async (status) => {
-                    if (status === 201)
+                    if (status === 201){
                         await fetchUserData(); // Refresh spaces after successful submission
+                        toast.success('Space created successfully!');
+                    } else
+                        toast.error('Failed to create space. Please try again.');
                     setCreateSpaceModalOpen(false);
                 }}
             />
@@ -280,8 +289,11 @@ export default function Profile() {
                 userId={agency.userId}
                 spaceId={selectedSpace}
                 onSubmitComplete={async (status) => {
-                    if (status === 200)
+                    if (status === 200){
                         await fetchUserData(); // Refresh spaces after successful submission
+                        toast.success('Space updated successfully!');
+                    } else
+                        toast.error('Failed to update space. Please try again.');
                     setEditSpaceModalOpen(false);
                 }}
             />

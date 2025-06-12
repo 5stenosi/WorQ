@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   try {
     const { token, password } = await req.json();
 
-    // findUnique
     const user = await prisma.user.findFirst({
       where: {
         resetToken: token,

@@ -19,7 +19,7 @@ type ClientFormValues = z.infer<typeof clientRegisterSchema>;
 type ClientOAuthFormValues = z.infer<typeof clientRegisterSchemaOAuth>;
 
 type ClientFormProps = {
-  email?: string; // email precompilata (per il flusso OAuth)
+  email?: string;
   requiredFields?: {
     name?: boolean;
     surname?: boolean;
@@ -29,7 +29,6 @@ type ClientFormProps = {
   };
   layout?: "row" | "col";
   buttons?: "register" | "confirm";
-  //submitUrl?: string; // endpoint a cui inviare i dati
 };
 
 export default function ClientForm({
@@ -37,12 +36,11 @@ export default function ClientForm({
   requiredFields,
   layout = "row",
   buttons = "register",
-}: //submitUrl,
+}:
   ClientFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const searchParams = useSearchParams(); // Ottieni i parametri di ricerca dall'URL
+  const searchParams = useSearchParams(); // useSearchParams is used to access query parameters in the URL
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
-  //const [userEmail] = useState<string | undefined>(email);
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
   
   const {
@@ -129,7 +127,6 @@ export default function ClientForm({
             </label>
             <input
               {...register("email")}
-              // defaultValue={email}
               type="email"
               id="email"
               name="email"
@@ -148,7 +145,6 @@ export default function ClientForm({
             <div className="w-full relative">
               <input
                 {...register("password")}
-                // defaultValue={email}     -Davide: intendevi "{password}"?
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"

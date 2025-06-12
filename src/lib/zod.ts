@@ -1,5 +1,6 @@
 import { object, string } from "zod";
 
+// These schemas are used to validate user input during registration and login processes.
 const email = string().email("Invalid email");
 const password = string()
   .min(8, "Password must be more than 8 characters")
@@ -19,7 +20,7 @@ const vatNumber = string().regex(
   "VAT must be in the format AA12345678910"
 );
 
-// Registrazione
+// Sign in schema for both clients and agencies
 export const signInSchema = object({
   email,
   password,
@@ -37,13 +38,11 @@ export const agencyFields = {
   telephone,
 };
 
-// Registrazione cliente
 export const clientRegisterSchema = signInSchema.extend(clientFields);
 
-// Registrazione agenzia
 export const agencyRegisterSchema = signInSchema.extend(agencyFields);
 
-// Schemi OAuth (email e password opzionali)
+// Sign in schema for OAuth providers (email and password are optional)
 const optionalSignInSchema = object({
   email: email.optional(),
   password: password.optional(),

@@ -1,5 +1,6 @@
 import { useSearchParams } from "next/navigation";
 
+// Function to extract and return the error message based on the search parameters
 export function useAuthErrorMessage() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");

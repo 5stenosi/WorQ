@@ -4,7 +4,7 @@ export async function sendResetEmail(email: string, resetUrl: string) {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: false, // Gmail usa STARTTLS, quindi `false` per porta 587
+    secure: false, // false for TLS (Google uses STARTTLS), true for SSL
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,

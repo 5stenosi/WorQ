@@ -17,7 +17,7 @@ export default function RegisterPage() {
     <div id="register" className="px-10">
       <section className="w-full min-h-screen flex justify-center items-center pt-28 pb-3">
         <div className="bg-stone-100 rounded-xl shadow-sm max-w-4xl w-full p-5 sm:p-10 flex flex-col gap-5">
-          {/* Titolo */}
+          {/* Title */}
           <h2 className="text-center text-xl sm:text-2xl text-balance font-bold sm:mb-5">
             Sign up for <br className="sm:hidden" /> an account
           </h2>

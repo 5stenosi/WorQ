@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
                 }
             });
 
+            // Add the created booking to the list
             createdBookings.push(booking);
         }
 

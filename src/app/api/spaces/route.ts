@@ -4,12 +4,15 @@ import { NextResponse, NextRequest } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
+// Disable body parsing for this route
+// This is necessary to handle file uploads correctly
 export const config = {
     api: {
         bodyParser: false,
     },
 };
 
+// Define the upload path for images
 const uploadPath = path.join(process.cwd(), 'public', 'uploads');
 
 // Handles GET requests to /api/spaces
@@ -63,6 +66,7 @@ export async function GET(request: NextRequest) {
             ];
         }
 
+        // Fetch spaces from the database
         const data = await prisma.space.findMany({
             where,
             select: {
@@ -126,6 +130,7 @@ export async function POST(request: Request) {
         // Handle address
         const nominatimAddress = metadata.fullAddress;
 
+        // Create a new space in the database
         const newSpace = await prisma.space.create({
             data: {
                 name: metadata.name,
@@ -162,6 +167,7 @@ export async function POST(request: Request) {
             }
         });
 
+        // If files are provided, save them to the upload path
         if (files && files.length > 0) {
             const spaceFolder = `space${newSpace.id}`;
             const spaceFolderPath = path.join(uploadPath, spaceFolder);

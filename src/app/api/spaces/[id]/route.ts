@@ -4,12 +4,15 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 
+// Disable body parsing for this route
+// This is necessary to handle file uploads correctly
 export const config = {
     api: {
         bodyParser: false,
     },
 };
 
+// Define the upload path for images
 const uploadPath = path.join(process.cwd(), 'public', 'uploads');
 
 // Handles GET requests to /api/spaces/[id]
@@ -29,6 +32,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
             );
         }
 
+        // Fetch the space with its related data
         const space = await prisma.space.findUnique({
             where: { id: spaceId },
             include: { address: true, services: true, bookings: true, reviews: true }
@@ -84,6 +88,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         // Handle address
         const nominatimAddress = metadata.fullAddress;
 
+        // Update the space in the database
         const updatedSpace = await prisma.space.update({
             where: { id: spaceId },
             data: {
@@ -112,7 +117,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
                         },
                     },
                 }),
-
                 services: metadata.services && metadata.services.length > 0
                     ? {
                         set: metadata.services.map((serviceId: string) => ({ id: parseInt(serviceId) })),
@@ -123,7 +127,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
             },
         });
 
-
+        // If there are files, handle image uploads
         if (files && files.length > 0) {
             const spaceFolder = `space${spaceId}`;
             const spaceFolderPath = path.join(uploadPath, spaceFolder);
@@ -195,12 +199,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
             );
         }
 
+        // Delete the space from the database
         const deletedSpace = await prisma.space.delete({
             where: { id: spaceId },
         });
 
         const folderPath = path.join(process.cwd(), 'public', 'uploads', `space${id}`);
 
+        // Attempt to delete the folder containing the space's images
         try {
             await fs.rm(folderPath, { recursive: true, force: true });
         } catch (fsError) {

@@ -21,6 +21,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
             throw new Error("Booking ID is required to delete a booking.");
         }
 
+        // Delete the booking from the database
         const booking = await prisma.booking.delete({
             where: { id: bookingId }
         });

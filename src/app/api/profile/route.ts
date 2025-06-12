@@ -13,6 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
     }
 
+    // Fetch user data based on role
     if (session.user.role === "CLIENT") {
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
@@ -88,6 +89,7 @@ export async function GET() {
 // Update user data
 export async function PUT(request: Request) {
   try {
+    // Check if the user is authenticated
     const session = await auth();
 
     if (!session || !session.user) {
@@ -96,6 +98,7 @@ export async function PUT(request: Request) {
 
     const userData = await request.json();
 
+    // Update user data based on role
     if (session.user.role === "CLIENT") {
       const updatedUser = await prisma.user.update({
         where: { id: session.user.id },
@@ -150,6 +153,7 @@ export async function PUT(request: Request) {
 // Delete user account
 export async function DELETE() {
   try {
+    // Check if the user is authenticated
     const session = await auth();
 
     if (!session || !session.user) {

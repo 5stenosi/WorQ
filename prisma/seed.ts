@@ -4,7 +4,7 @@ import test from 'node:test';
 const prisma = new PrismaClient();
 
 async function main() {
-    // Ensure all services have a valid iconName during seeding
+    // List of services to be created
     const services = await Promise.all([
         prisma.service.create({ data: { id: 1, detail: 'Free Wi-Fi', iconName: 'wifi' } }),
         prisma.service.create({ data: { id: 2, detail: 'Stationery', iconName: 'pen' } }),
@@ -44,7 +44,7 @@ async function main() {
                 create: {
                     name: 'Test',
                     surname: 'Client',
-                    cellphone: '1234567890',
+                    cellphone: '3391234567',
                 },
             },
         },
@@ -63,8 +63,8 @@ async function main() {
             agency: {
                 create: {
                     name: 'Test Agency',
-                    vatNumber: '12345678901',
-                    telephone: '1234567890',
+                    vatNumber: 'IT12345678901',
+                    telephone: '0287654321',
                 },
             },
         },
@@ -75,14 +75,17 @@ async function main() {
     const spaces = await Promise.all([
         prisma.space.create({
             data: {
-                id : 1,
+                id: 1,
                 name: 'Milano Meetings',
                 agencyId: testAgencyUser.id,
-                description: 'A beautiful coworking space',
+                description:
+                    "Elegante sala riunioni situata nel centro di Milano, ideale per incontri di lavoro, colloqui o presentazioni. " +
+                    "Arredi moderni, pareti insonorizzate e tecnologia all'avanguardia con impianto video e audio. " +
+                    "La sala offre una vista panoramica sul Duomo e si trova a pochi passi da ristoranti e mezzi pubblici.",
                 seats: 10,
                 isFullSpaceBooking: true,
                 typology: 'MEETING_ROOMS',
-                price: 100.0,
+                price: 200.0,
                 avgRating: 5,
                 images: [
                     '/uploads/space1/image1.jpg',
@@ -94,7 +97,7 @@ async function main() {
                         number: '10',
                         city: 'Milano',
                         zip: '20100',
-                        country: 'Italy',
+                        country: 'Italia',
                         latitude: 45.4642,
                         longitude: 9.19,
                     },
@@ -103,67 +106,102 @@ async function main() {
                     connect: [
                         { detail: 'Free Wi-Fi' },
                         { detail: 'Printer' },
+                        { detail: 'Scanner' },
+                        { detail: 'Whiteboard' },
+                        { detail: 'Desktop' },
+                        { detail: 'Projector' },
+                        { detail: 'Disability Access' },
+                        { detail: 'Air Conditioning' },
+                        { detail: 'Video Conference' },
+                        { detail: 'Charging Stations' },
                     ],
                 },
             },
         }),
         prisma.space.create({
             data: {
-                id : 2,
-                name: 'RomOffice',
+                id: 2,
+                name: 'Rome Office',
                 agencyId: testAgencyUser.id,
-                description: 'Another coworking space',
+                description: 
+                    "Ufficio privato in un loft luminoso nel quartiere Prati di Roma. " +
+                    "Dotato di scrivania ergonomica, armadio personale e accesso all'area relax con cucina attrezzata. " +
+                    "Ideale per professionisti o piccoli team che desiderano un ambiente tranquillo a pochi minuti dal Vaticano e dalla metro.",
                 seats: 15,
                 isFullSpaceBooking: false,
                 typology: 'PRIVATE_OFFICES',
-                price: 150.0,
+                price: 85.0,
                 avgRating: null,
-                images: ['/uploads/space2/image1.jpg', '/uploads/space2/image2.jpg'],
+                images: [
+                    '/uploads/space2/image1.jpg',
+                    '/uploads/space2/image2.jpg',
+                ],
                 address: {
                     create: {
                         street: 'Via Torino',
                         number: '20',
-                        city: 'Rome',
+                        city: 'Roma',
                         zip: '00100',
-                        country: 'Italy',
+                        country: 'Italia',
                         latitude: 41.9028,
                         longitude: 12.4964,
                     },
                 },
                 services: {
                     connect: [
+                        { detail: 'Free Wi-Fi' },
+                        { detail: 'Stationery' },
+                        { detail: 'Printer' },
+                        { detail: 'Scanner' },
+                        { detail: 'Whiteboard' },
+                        { detail: 'Desktop' },                        
+                        { detail: 'Disability Access' },
                         { detail: 'Air Conditioning' },
+                        { detail: 'Quiet Zones' },
                         { detail: 'Vending Machines' },
+                        { detail: 'Lockers' },
+                        { detail: 'Kitchenette' },
                     ],
                 },
             },
         }),
         prisma.space.create({
             data: {
-                id : 3,
+                id: 3,
                 name: 'Naples Outdoor',
                 agencyId: testAgencyUser.id,
-                description: 'A modern and well-equipped space',
-                seats: 20,
-                isFullSpaceBooking: true,
+                description:
+                    "Postazioni di lavoro all'aperto immerse in una terrazza panoramica con vista sul Golfo di Napoli. " +
+                    "Ogni postazione è dotata di ombrellone, seduta ergonomica e accesso Wi-Fi. " +
+                    "Ideale per chi desidera lavorare in un ambiente rilassante e ispirante all'aria aperta. " +
+                    "Lo spazio offre anche accesso a servizi di ristorazione e zona relax.",
+                seats: 25,
+                isFullSpaceBooking: false,
                 typology: 'OUTDOOR_SPACES',
-                price: 200.0,
+                price: 50.0,
                 avgRating: null,
-                images: ['/uploads/space3/image1.jpg', '/uploads/space3/image2.jpg'],
+                images: [
+                    '/uploads/space3/image1.jpg',
+                    '/uploads/space3/image2.jpg',
+                ],
                 address: {
                     create: {
                         street: 'Corso Venezia',
                         number: '5',
-                        city: 'Naples',
+                        city: 'Napoli',
                         zip: '80100',
-                        country: 'Italy',
+                        country: 'Italia',
                         latitude: 40.8518,
                         longitude: 14.2681,
                     },
                 },
                 services: {
                     connect: [
-                        { detail: 'Projector' },
+                        { detail: 'Free Wi-Fi' },
+                        { detail: 'Catering' },
+                        { detail: 'Child-friendly' },
+                        { detail: 'Pet-friendly' },
+                        { detail: 'Parking' },
                         { detail: 'Catering' },
                     ],
                 },
@@ -186,7 +224,7 @@ async function main() {
             clientId: testClientUser.id,
             spaceId: spaces[0].id,
             rating: 5,
-            comment: 'Fantastic space!',
+            comment: 'Sala moderna e ben attrezzata, posizione centrale perfetta per riunioni.',
         },
     });
 

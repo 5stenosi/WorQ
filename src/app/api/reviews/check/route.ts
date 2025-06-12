@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
 // Handles GET requests to /api/reviews/check?spaceId
-// Checks if a user has already reviewed a space
+// Checks if a user has already reviewed a space and eventually return the review
 export async function GET(request: NextRequest) {
     try {
         const url = new URL(request.url);
@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "User not authorized" }, { status: 403 });
         }
 
+        // Check if the user has already reviewed the space and return the review if it exists
         const review = await prisma.review.findFirst({
             where: {
                 spaceId: spaceId,
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ reviewed: false }, { status: 200 });
         }
 
-        return NextResponse.json({ reviewed: true }, { status: 200 });
+        return NextResponse.json({ review, reviewed: true }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to check review' }, { status: 500 });
     }

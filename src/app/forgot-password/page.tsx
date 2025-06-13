@@ -5,7 +5,8 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    // Prevent the default form submission behavior which would cause a page reload
     e.preventDefault();
 
     const res = await fetch("/api/forgot-password", {

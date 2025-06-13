@@ -457,9 +457,9 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                             <button
                                                 onClick={handleBooking}
                                                 className={`
-                                                shrink-0 origin-top-right h-12 px-6 border-2 bg-stone-100 border-west-side-500 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-all duration-150 ease-out
-                                                fixed right-3 bottom-3 z-50 shadow-lg
-                                                md:static md:right-auto md:bottom-auto md:z-auto md:shadow-none
+                                                shrink-0 origin-bottom-right h-12 px-6 border-2 bg-stone-100 border-west-side-500 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 font-bold rounded-lg hover:scale-110 active:scale-90 transition-all duration-150 ease-out
+                                                fixed right-3 bottom-3 z-50
+                                                md:static md:right-auto md:bottom-auto md:z-auto md:origin-top-right
                                             `}
                                             >
                                                 Book now

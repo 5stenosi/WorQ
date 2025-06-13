@@ -63,20 +63,24 @@ const Carousel: React.FC<CarouselProps> = ({
                     ))}
                 </div>
 
-                {/* Pulsante per immagine precedente */}
-                <button
-                    type='button'
-                    onClick={handlePrev}
-                    className={`absolute ${buttonSize} ${chevronSize} -left-full group-hover:left-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                </button>
-                {/* Pulsante per immagine successiva */}
-                <button
-                    type='button'
-                    onClick={handleNext}
-                    className={`absolute ${buttonSize} ${chevronSize} -right-full group-hover:right-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
-                    <FontAwesomeIcon icon={faChevronRight} />
-                </button>
+                {images.length > 1 && (
+                    <>
+                        {/* Pulsante per immagine precedente */}
+                        <button
+                            type='button'
+                            onClick={handlePrev}
+                            className={`absolute ${buttonSize} ${chevronSize} -left-full group-hover:left-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </button>
+                        {/* Pulsante per immagine successiva */}
+                        <button
+                            type='button'
+                            onClick={handleNext}
+                            className={`absolute ${buttonSize} ${chevronSize} -right-full group-hover:right-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
+                            <FontAwesomeIcon icon={faChevronRight} />
+                        </button>
+                    </>
+                )}
                 {/* Bottone per eliminare tutte le immagini */}
                 {onClearImages && (
                     <button
@@ -86,15 +90,17 @@ const Carousel: React.FC<CarouselProps> = ({
                     </button>
                 )}
                 {/* Indicatori di navigazione (pallini) */}
-                <div className="absolute -bottom-full group-hover:bottom-[5%] transition-all duration-300 inset-x-0 mx-auto bg-stone-900/25 backdrop-blur-sm p-2 rounded-full flex gap-2 w-fit">
-                    {images.map((_, index) => (
-                        <div
-                            key={index}
-                            onClick={() => setCurrentImageIndex(index)}
-                            className={`${dotSize} cursor-pointer rounded-full transition-all duration-300 ${currentImageIndex === index ? 'bg-stone-100 scale-125' : 'bg-stone-100/25 hover:bg-stone-100/50'}`}>
-                        </div>
-                    ))}
-                </div>
+                {images.length > 1 && (
+                    <div className="absolute -bottom-full group-hover:bottom-[5%] transition-all duration-300 inset-x-0 mx-auto bg-stone-900/25 backdrop-blur-sm p-2 rounded-full flex gap-2 w-fit">
+                        {images.map((_, index) => (
+                            <div
+                                key={index}
+                                onClick={() => setCurrentImageIndex(index)}
+                                className={`${dotSize} cursor-pointer rounded-full transition-all duration-300 ${currentImageIndex === index ? 'bg-stone-100 scale-125' : 'bg-stone-100/25 hover:bg-stone-100/50'}`}>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

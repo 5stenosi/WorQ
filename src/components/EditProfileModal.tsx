@@ -32,7 +32,7 @@ const EditProfileModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
 
     // Clear fields function
     const handleClearFields = () => {
-        setErrors({});        
+        setErrors({});
         // Reset all fields to empty
         setFormData({
             name: '',
@@ -89,7 +89,7 @@ const EditProfileModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
             cellphone: userRole === 'CLIENT' ? userData.cellphone || '' : undefined,
             telephone: userRole === 'AGENCY' ? userData.telephone || '' : undefined,
             vatNumber: userRole === 'AGENCY' ? userData.vatNumber || '' : undefined,
-        });  
+        });
     };
 
     useEffect(() => {
@@ -143,6 +143,7 @@ const EditProfileModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
                                 id="name"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                required
                                 className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                             />
                         </div>
@@ -173,6 +174,7 @@ const EditProfileModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
                             id="telephone"
                             value={userRole === 'CLIENT' ? formData.cellphone : formData.telephone}
                             onChange={(e) => setFormData({ ...formData, [userRole === 'CLIENT' ? 'cellphone' : 'telephone']: e.target.value })}
+                            required
                             pattern='[0-9\s]+'
                             className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                         />
@@ -189,6 +191,7 @@ const EditProfileModal: React.FC<{ isOpen: boolean; onClose: () => void, userDat
                                 id="vatNumber"
                                 value={formData.vatNumber}
                                 onChange={(e) => setFormData({ ...formData, vatNumber: e.target.value })}
+                                required
                                 pattern="^[A-Z]{2}\d{11}$"
                                 className="p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                                 onInput={(e) => {

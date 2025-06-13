@@ -275,7 +275,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                             height={100}
                                         />
                                     )}
-                                    {uploadedImages.length > 1 && (
+                                    {uploadedImages.length > 0 && (
                                         <Carousel
                                             images={uploadedImages}
                                             autoPlay={true}

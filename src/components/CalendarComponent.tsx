@@ -5,11 +5,12 @@ import React, { useState, useEffect, useRef } from 'react';
 
 interface CalendarComponentProps {
     onDateSelection?: (selectedDates: Set<string>) => void;
+    selectedDates: Set<string>;
+    setSelectedDates: (dates: Set<string>) => void;
     spaceId: string;
 }
 
-const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, spaceId }) => {
-    const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
+const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, selectedDates, setSelectedDates, spaceId }) => {
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const [snake, setSnake] = useState<boolean>(false);
@@ -26,12 +27,10 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
     };
 
     const toggleDateSelection = (date: string) => {
-        setSelectedDates((prev) => {
-            const newDates = new Set(prev);
-            if (newDates.has(date)) newDates.delete(date);
-            else newDates.add(date);
-            return newDates;
-        });
+        const newDates = new Set(selectedDates);
+        if (newDates.has(date)) newDates.delete(date);
+        else newDates.add(date);
+        setSelectedDates(newDates);
     };
 
     useEffect(() => {
@@ -119,7 +118,14 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                 const visited = new Set<number>();
 
                 const animateRandomSnake = (currentIndex: number) => {
-                    if (visited.size === selectedIndices.length) return;
+                    if (visited.size === selectedIndices.length) {
+                        // Quando la snake ha visitato tutti i selezionati, deseleziona tutto e nascondi il bottone SNAKE
+                        setTimeout(() => {
+                            setSelectedDates(new Set());
+                            setSnake(false);
+                        }, snakeLength);
+                        return;
+                    }
 
                     const button = buttons[currentIndex];
                     button.classList.add('snake-hover');
@@ -130,11 +136,9 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                         const date = button.getAttribute('data-date');
                         if (date) {
                             setTimeout(() => {
-                                setSelectedDates((prev) => {
-                                    const newDates = new Set(prev);
-                                    newDates.delete(date);
-                                    return newDates;
-                                });
+                                const newDates = new Set(selectedDates);
+                                newDates.delete(date);
+                                setSelectedDates(newDates);
                             }, snakeLength);
                         }
                     }
@@ -218,27 +222,27 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
     return (
         <>
-            <div className="flex justify-between items-center">
-                <button onClick={handlePreviousMonth} className="aspect-square size-8 text-sm border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
+            <div className="flex justify-between items-center mb-3">
+                <button onClick={handlePreviousMonth} className="aspect-square size-10 border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100 rounded-lg transition">
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
 
                 {snake ? (
-                    <button onClick={triggerSnakeEffect} className="text-lg text-center px-2 font-bold rounded-lg bg-green-500 text-stone-100 hover:scale-110 active:scale-90 transition-all duration-150 ease-out">
+                    <button onClick={triggerSnakeEffect} className="text-2xl text-center px-2 font-bold rounded-lg bg-green-500 text-stone-100 hover:scale-110 active:scale-90 transition-all duration-150 ease-out">
                         SNAKE
                     </button>
                 ) : (
-                    <div className="text-lg font-bold">{monthNames[currentMonth]} {currentYear}</div>
+                    <div className="text-2xl font-bold">{monthNames[currentMonth]} {currentYear}</div>
                 )}
 
-                <button onClick={handleNextMonth} className="aspect-square size-8 text-sm border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 rounded-lg transition">
+                <button onClick={handleNextMonth} className="aspect-square size-10 border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100 rounded-lg transition">
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
             </div>
 
             <div ref={snakeRef} className="grid grid-cols-7">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName, index) => (
-                    <div key={index} className="text-center text-sm font-bold py-2">
+                    <div key={index} className="text-center text-sm sm:text-base font-bold py-2">
                         {dayName}
                     </div>
                 ))}
@@ -246,7 +250,6 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                 {/* Giorni vuoti del mese precedente */}
                 {(() => {
                     const leading = getLeadingEmptyDays(currentMonth, currentYear);
-                    if (leading === 0) return null;
                     let prevMonth = currentMonth - 1;
                     let prevYear = currentYear;
                     if (prevMonth < 0) {
@@ -258,19 +261,18 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     const handlePrevDayClick = (day: number) => {
                         setCurrentMonth(prevMonth);
                         setCurrentYear(prevYear);
-                        const date = `${prevYear}-${prevMonth + 1}-${day}`;
-                        setTimeout(() => {
-                            setSelectedDates((prev) => new Set(prev).add(date));
-                        }, 0);
+                        // opzionale: seleziona il giorno cliccato
                     };
                     return daysToShow.map((day) => {
                         const date = `${prevYear}-${prevMonth + 1}-${day}`;
+                        const isSelected = selectedDates.has(date);
                         return (
                             <button
                                 key={`prev-${day}`}
-                                className="h-10 w-10 text-stone-600 opacity-50 cursor-pointer transition"
+                                className={`aspect-square opacity-50 cursor-pointer transition ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'text-stone-600'}`}
                                 onClick={() => handlePrevDayClick(day)}
                                 data-date={date}
+                                tabIndex={-1}
                             >
                                 {day}
                             </button>
@@ -278,18 +280,60 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     });
                 })()}
 
+                {/* Giorni del mese corrente */}
                 {days.map((day) => {
                     const date = `${currentYear}-${currentMonth + 1}-${day}`;
                     const isSelected = selectedDates.has(date);
                     return (
-                        <button key={date} onClick={() => toggleDateSelection(date)}
-                            className={`snake-day flex items-center justify-center h-10 w-10 transition duration-500 hover:duration-150 delay-250 hover:delay-0
-                                ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'hover:bg-west-side-200 hover:text-west-side-900'}`}
-                            data-date={date}>
+                        <button
+                            key={date}
+                            onClick={() => toggleDateSelection(date)}
+                            className={`snake-day flex items-center justify-center aspect-square transition duration-500 hover:duration-150 active:duration-150 delay-250 hover:delay-0 active:delay-0
+                                ${isSelected
+                                    ? 'bg-west-side-500 text-stone-100 font-medium'
+                                    : 'hover:bg-west-side-200 hover:text-west-side-900 active:bg-west-side-200 active:text-west-side-900'
+                                }`}
+                            data-date={date}
+                        >
                             {day}
                         </button>
                     );
                 })}
+
+                {/* Giorni del mese successivo per completare 6 righe */}
+                {(() => {
+                    const leading = getLeadingEmptyDays(currentMonth, currentYear);
+                    const totalCells = leading + days.length;
+                    const nextDaysCount = 42 - totalCells;
+                    if (nextDaysCount <= 0) return null;
+                    let nextMonth = currentMonth + 1;
+                    let nextYear = currentYear;
+                    if (nextMonth > 11) {
+                        nextMonth = 0;
+                        nextYear++;
+                    }
+                    const handleNextDayClick = (day: number) => {
+                        setCurrentMonth(nextMonth);
+                        setCurrentYear(nextYear);
+                        // opzionale: seleziona il giorno cliccato
+                    };
+                    return Array.from({ length: nextDaysCount }, (_, i) => {
+                        const day = i + 1;
+                        const date = `${nextYear}-${nextMonth + 1}-${day}`;
+                        const isSelected = selectedDates.has(date);
+                        return (
+                            <button
+                                key={`next-${day}`}
+                                className={`aspect-square opacity-50 cursor-pointer transition ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'text-stone-600'}`}
+                                onClick={() => handleNextDayClick(day)}
+                                data-date={date}
+                                tabIndex={-1}
+                            >
+                                {day}
+                            </button>
+                        );
+                    });
+                })()}
             </div>
         </>
     );

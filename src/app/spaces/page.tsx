@@ -103,8 +103,7 @@ const Spaces = () => {
             layout='grid'
             backgroundColor="bg-stone-100"
             optionClassName="px-5 h-full flex justify-center items-center text-xs"
-            containerClassName="bg-stone-300 rounded-2xl w-full h-20 overflow-hidden grid
-                                "
+            containerClassName="bg-stone-300 rounded-2xl w-full h-20 overflow-hidden grid"
             onOptionSelect={(option) => setSelectedTypology(option)} />
         </div>
 

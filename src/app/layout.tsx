@@ -64,14 +64,14 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       <body className="bg-stone-200 text-stone-900 select-none">
         {/* <RegisterSW /> */}
         <nav className="z-1000 w-full p-5 fixed flex justify-center items-center gap-5">
-          <div className="bg-stone-100/75 border-1 border-stone-100 px-4 backdrop-blur-xs shadow-sm rounded-3xl flex flex-col md:grid items-center transition duration-250 grid-cols-1 md:grid-cols-[1fr_auto_1fr] w-full lg:w-3/4 xl:w-2/3">
+          <div className="bg-stone-100/75 border-1 border-stone-100 px-2.5 backdrop-blur-xs shadow-sm rounded-3xl flex flex-col md:grid items-center transition duration-250 grid-cols-1 md:grid-cols-[1fr_auto_1fr] w-full lg:w-3/4 xl:w-2/3">
             <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
-              <button onClick={handleScrollToMap} className="rounded-xl transition duration-250 w-full py-3
+              <button onClick={handleScrollToMap} className="rounded-2xl transition duration-250 w-full py-3
                                                             hover:bg-stone-900 hover:text-stone-100
                                                             active:bg-stone-900 active:text-stone-100">
                 Map
               </button>
-              <Link href="/spaces" className="rounded-xl transition duration-250 w-full py-3
+              <Link href="/spaces" className="rounded-2xl transition duration-250 w-full py-3
                                             hover:bg-stone-900 hover:text-stone-100
                                             active:bg-stone-900 active:text-stone-100">
                 Spaces
@@ -82,22 +82,23 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               <Link
                 href="/"
                 onClick={handleScrollToTop}
-                className="w-full md:w-auto text-3xl md:text-5xl font-bold px-6 pt-2 md:pb-4 rounded-2xl text-stone-900">
+                className="w-full md:w-auto text-3xl md:text-5xl font-bold px-6 pt-2 md:pb-4 text-stone-900">
                 Wor<span className="text-west-side-500">Q</span>
               </Link>
+
               {/* Mobile Menu */}
               <div className={`w-full flex md:hidden flex-col gap-2 overflow-hidden transition-all ${menuOpen ? "max-h-64 mt-2" : "max-h-0"}`}>
                 <div className="flex justify-evenly items-center text-stone-900 font-medium text-lg gap-2 text-center">
                   {/* Primo blocco */}
                   <button
                     onClick={e => { handleScrollToMap(); setMenuOpen(false); }}
-                    className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                    className="rounded-2xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
                     Map
                   </button>
                   <Link
                     href="/spaces"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                    className="rounded-2xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
                     Spaces
                   </Link>
                 </div>
@@ -107,13 +108,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                     <>
                       <button
                         onClick={() => signOut({ callbackUrl: "/" })}
-                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                        className="rounded-2xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
                         Logout
                       </button>
                       <Link
                         href="/profile"
                         onClick={() => setMenuOpen(false)}
-                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100 active:bg-west-side-500 active:text-stone-100">
+                        className="rounded-2xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100 active:bg-west-side-500 active:text-stone-100">
                         Profile
                       </Link>
                     </>
@@ -122,13 +123,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                       <Link
                         href="/register"
                         onClick={() => setMenuOpen(false)}
-                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
+                        className="rounded-2xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
                         Signup
                       </Link>
                       <Link
                         href="/login"
                         onClick={() => setMenuOpen(false)}
-                        className="rounded-xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100 active:bg-west-side-500 active:text-stone-100">
+                        className="rounded-2xl transition duration-250 w-full py-3 hover:bg-west-side-500 hover:text-stone-100 active:bg-west-side-500 active:text-stone-100">
                         Login
                       </Link>
                     </>
@@ -144,19 +145,17 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
-
-
             <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
               {session ? (
                 <>
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="rounded-xl transition duration-250 w-full py-3 
+                    className="rounded-2xl transition duration-250 w-full py-3 
                                                           hover:bg-stone-900 hover:text-stone-100
                                                           active:bg-stone-900 active:text-stone-100">
                     Logout
                   </button>
-                  <Link href="/profile" className="rounded-xl transition duration-250 w-full py-3 
+                  <Link href="/profile" className="rounded-2xl transition duration-250 w-full py-3 
                                                   hover:bg-west-side-500 hover:text-stone-100
                                                   active:bg-west-side-500 active:text-stone-100">
                     Profile
@@ -164,12 +163,12 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                 </>
               ) : (
                 <>
-                  <Link href="/register" className="rounded-xl transition duration-250 w-full py-3 
+                  <Link href="/register" className="rounded-2xl transition duration-250 w-full py-3 
                                                     hover:bg-stone-900 hover:text-stone-100
                                                     active:bg-stone-900 active:text-stone-100">
                     Signup
                   </Link>
-                  <Link href="/login" className="rounded-xl transition duration-250 w-full py-3 
+                  <Link href="/login" className="rounded-2xl transition duration-250 w-full py-3 
                                                  hover:bg-west-side-500 hover:text-stone-100
                                                  active:bg-west-side-500 active:text-stone-100">
                     Login
@@ -183,7 +182,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         {children}
 
         {/* Footer */}
-        <footer className="w-full bg-stone-900 text-stone-100 p-5 lg:p-20 mt-10">
+        <footer className="z-1000 w-full bg-stone-900 text-stone-100 p-5 lg:p-20 mt-10">
           <div
             className="flex gap-10 lg:gap-5 justify-between
                           flex-col lg:flex-row items-start lg:items-center">

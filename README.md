@@ -22,11 +22,13 @@ WorQ è una piattaforma digitale che connette professionisti in cerca di spazi d
 ## 🛠 Tecnologie utilizzate
 
 ### Frontend
-- **Next.js** - Framework React per rendering ibrido (SSR/SSG)
+- **Next.js** - Framework React per rendering ibrido
 - **TypeScript** - Tipizzazione statica per codice più robusto
-- **PWA** (Progressive Web App) - Esperienza mobile simile a un'app nativa
 - **Font Awesome** - Libreria di icone
 - **Design Responsive** - Adattabile a tutti i dispositivi
+- **Tailwind Rombo**
+- **Tailwind**
+- **Toastify**
 
 ### Backend
 - **Next.js API Routes** - Endpoint API integrati

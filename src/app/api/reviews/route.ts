@@ -14,6 +14,7 @@ export async function GET(request: Request) {
     }
 
     try {
+        // Get all reviews for the specified space
         const reviews = await prisma.review.findMany({
             where: { spaceId: parseInt(spaceId) },
         });
@@ -45,6 +46,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'spaceId, clientId, and rating are required' }, { status: 400 });
         }
 
+        // Create a new review
         const newReview = await prisma.review.create({
             data: {
                 spaceId: parseInt(spaceId),
@@ -54,6 +56,7 @@ export async function POST(request: Request) {
             },
         });
 
+        // Update the average rating for the space
         await updateSpaceAvgRating(newReview.spaceId);
 
         return NextResponse.json(newReview, { status: 201 });

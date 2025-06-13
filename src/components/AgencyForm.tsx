@@ -19,7 +19,7 @@ type AgencyFormValues = z.infer<typeof agencyRegisterSchema>;
 type AgencyOAuthFormValues = z.infer<typeof agencyRegisterSchemaOAuth>;
 
 type AgencyFormProps = {
-  email?: string; // email precompilata se l'utente è già loggato
+  email?: string;
   requiredFields?: {
     name?: boolean;
     vatNumber?: boolean;
@@ -29,7 +29,6 @@ type AgencyFormProps = {
   };
   layout?: "row" | "col";
   buttons?: "register" | "confirm";
-  //submitUrl?: string; // endpoint a cui inviare i dati
 };
 
 export default function AgencyForm({
@@ -37,12 +36,11 @@ export default function AgencyForm({
   requiredFields,
   layout = "row",
   buttons = "register",
-}: //submitUrl,
+}:
   AgencyFormProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const searchParams = useSearchParams(); // Ottieni i parametri di ricerca dall'URL
+  const searchParams = useSearchParams(); // useSearchParams is used to access query parameters in the URL
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
-  //const [userEmail] = useState<string | undefined>(email);
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
 
   const {

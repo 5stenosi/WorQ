@@ -43,13 +43,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/login",
   },
   session: {
-    strategy: "jwt", // importante per il provider Credentials
+    strategy: "jwt",
   },
   secret: process.env.AUTH_SECRET,
 
   callbacks: {
     async jwt({ token, user, account }) {
-      // Primo login: aggiunge info base dal provider
+      // First time login
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -58,12 +58,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.providerAccountId = account?.providerAccountId;
       }
 
-      // Sempre: aggiorna ruolo (anche dopo reload o signIn() automatico)
-      // Recupera il ruolo dal DB (puoi fare anche if token.email && !token.role, ma meglio aggiornarlo sempre)
+      // Always update the token with the user's role
       if (token.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email },
-          // include le relazioni client e agency (carica i dati correlati)
+          // Include agency and client relations (loads related data)
           include: { agency: true, client: true },
         });
         token.role = dbUser?.role ?? "defaultRole";
@@ -79,14 +78,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: token.name as string,
           email: token.email as string,
           role: token.role as string,
-          emailVerified: null, // Aggiunto per compatibilità con AdapterUser
+          emailVerified: null, // Added for compatibility with AdapterUser
         };
       }
       return session;
     },
 
     async signIn({ user, account }) {
-      // per login credenziali procedi sempre
+      // If the user is signing in with credentials, we allow it without further checks
       if (account?.provider === "credentials") {
         return true;
       }
@@ -95,7 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return false;
       }
 
-      // Cerca l'utente nel database
+      // Check if the user already exists in the database
       const existingUser = await prisma.user.findUnique({
         where: { email: user.email },
       });
@@ -107,13 +106,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           providerAccountId: account.providerAccountId,
         });
         return `/complete-profile?email=${encodeURIComponent(user.email)}`;
-      }
-
-      // Se esiste ma il provider è diverso
-      if (existingUser.oauthProvider !== account.provider.toUpperCase()) {
-        throw new Error(
-          `Account already exists with ${existingUser.oauthProvider} provider. Please sign in with that method.`
-        );
       }
 
       return true;

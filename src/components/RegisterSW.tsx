@@ -6,8 +6,8 @@ export default function RegisterSW() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .register('/sw.js')
-        .then((reg) => console.log('Service Worker registrato', reg))
-        .catch((err) => console.error('SW registration failed', err));
+        .then((reg) => console.log('Service Worker registration successful', reg))
+        .catch((err) => console.error('Service Worker registration failed', err));
     }
   }, []);
 

@@ -9,15 +9,15 @@ export async function POST(req: Request) {
     const {
       email,
       password,
-      role, // "CLIENT" o "AGENCY"
+      role, // "CLIENT" || "AGENCY"
       name,
-      surname, // solo Client
+      surname, // for Client
       cellphone,
-      vatNumber, // solo Agency
-      telephone, // solo Agency
+      vatNumber, // for Agency
+      telephone, // for Agency
     } = body;
 
-    // controlli di base
+    // validation of required fields
     if (!email || !password || !role) {
       return NextResponse.json({ message: "Missing Data" }, { status: 400 });
     }
@@ -32,14 +32,14 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // crea user
+    // create user
     const newUser = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         role,
-        oauthProvider: "APP",
-        oauthId: null, // per compatibilità con schema.prisma
+        oauthProvider: "APP", // credentials
+        oauthId: null, // for compatibility with schema.prisma
       },
     });
 
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // crea client o agency associato usando connect
+    // create profile based on role
     if (role === "CLIENT") {
       await prisma.client.create({
         data: {

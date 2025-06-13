@@ -167,6 +167,7 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {/* Error Message */}
             {errorMessage && (
               <p className="text-red-500 text-center font-medium">
                 {errorMessage}

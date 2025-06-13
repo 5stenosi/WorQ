@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server';
 
 // Handles GET requests to /api/services
 // Fetch all services
@@ -7,13 +8,10 @@ export async function GET() {
     // Fetch all services
     const services = await prisma.service.findMany();
 
-    return new Response(JSON.stringify(services), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json(services);
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: "Server error" }),
+    return NextResponse.json(
+      { error: 'Failed to fetch services' },
       { status: 500 }
     );
   }

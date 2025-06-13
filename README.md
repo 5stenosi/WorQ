@@ -1,6 +1,6 @@
 # WorQ - Coworking Space Management Platform
 
-![WorQ Logo](https://via.placeholder.com/150x50?text=WorQ-Logo) <!-- Sostituisci con il logo reale -->
+![WorQ Logo](https://placehold.co/150x50?text=WorQ-Logo) <!-- Sostituisci con il logo reale -->
 
 WorQ è una piattaforma digitale che connette professionisti in cerca di spazi di coworking con gestori che offrono tali servizi. L'applicazione offre un'esperienza completa dalla ricerca alla prenotazione degli spazi, con funzionalità differenziate per clienti e agenzie.
 
@@ -17,21 +17,21 @@ WorQ è una piattaforma digitale che connette professionisti in cerca di spazi d
 - 🏢 Registrazione come gestore verificato
 - ➕ Aggiunta di nuovi spazi di coworking (con foto, servizi, descrizioni)
 - ✏️ Modifica/Gestione degli spazi pubblicati
-- 👀 Visualizzazione delle prenotazioni ricevute
 
 ## 🛠 Tecnologie utilizzate
-
-### Frontend
 - **Next.js** - Framework React per rendering ibrido
 - **TypeScript** - Tipizzazione statica per codice più robusto
+
+### Frontend
 - **Font Awesome** - Libreria di icone
 - **Design Responsive** - Adattabile a tutti i dispositivi
-- **Tailwind Rombo**
-- **Tailwind**
-- **Toastify**
+- **Tailwind** - Framework CSS
+- **Tailwind Rombo** - Libreria di animazioni
+- **Toastify** - Libreria di notifiche
 
 ### Backend
 - **Next.js API Routes** - Endpoint API integrati
+- **Nominatim API** - Integrazione per geocodifica e ricerca indirizzi/spazi tramite OpenStreetMap
 - **Prisma** - ORM moderno per il database
 - **SQLite** - Database relazionale embedded (per sviluppo)
 - **Auth.js** - Soluzione di autenticazione completa

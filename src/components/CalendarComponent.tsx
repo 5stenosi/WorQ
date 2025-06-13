@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { set } from 'date-fns';
 
 interface CalendarComponentProps {
     onDateSelection?: (selectedDates: Set<string>) => void;
@@ -13,6 +14,7 @@ interface CalendarComponentProps {
 const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, selectedDates, setSelectedDates, spaceId }) => {
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+    const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
     const [snake, setSnake] = useState<boolean>(false);
     const [arrowSequence, setArrowSequence] = useState<string[]>([]);
     const snakeRef = useRef<HTMLDivElement | null>(null);
@@ -37,6 +39,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         if (onDateSelection) {
             onDateSelection(selectedDates);
         }
+        console.log(availableDates);
     }, [selectedDates, onDateSelection]);
 
     useEffect(() => {
@@ -44,7 +47,8 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
             try {
                 const response = await fetch(`/api/spaces/${spaceId}/availability?year=${currentYear}&month=${currentMonth + 1}`);
                 const data = await response.json();
-                console.log('Fetched availability:', data);
+                console.log('Fetched availability:', data.availableDates);
+                setAvailableDates(new Set(data.availableDates));
             } catch (error) {
                 console.error('Error fetching availability:', error);
             }
@@ -242,12 +246,12 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
             <div ref={snakeRef} className="grid grid-cols-7">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName, index) => (
-                    <div key={index} className="text-center text-sm sm:text-base font-bold py-2">
+                    <div key={index} className="text-center text-sm sm:text-base font-bold py-2 text-stone-900">
                         {dayName}
                     </div>
                 ))}
 
-                {/* Giorni vuoti del mese precedente */}
+                {/* Tutti i giorni del calendario (prev, current, next) */}
                 {(() => {
                     const leading = getLeadingEmptyDays(currentMonth, currentYear);
                     let prevMonth = currentMonth - 1;
@@ -257,76 +261,73 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                         prevYear--;
                     }
                     const lastDayPrevMonth = daysInMonth(prevMonth, prevYear);
-                    const daysToShow = Array.from({ length: leading }, (_, i) => lastDayPrevMonth - leading + i + 1);
-                    const handlePrevDayClick = (day: number) => {
-                        setCurrentMonth(prevMonth);
-                        setCurrentYear(prevYear);
-                        // opzionale: seleziona il giorno cliccato
-                    };
-                    return daysToShow.map((day) => {
-                        const date = `${prevYear}-${prevMonth + 1}-${day}`;
-                        const isSelected = selectedDates.has(date);
-                        return (
-                            <button
-                                key={`prev-${day}`}
-                                className={`aspect-square opacity-50 cursor-pointer transition ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'text-stone-600'}`}
-                                onClick={() => handlePrevDayClick(day)}
-                                data-date={date}
-                                tabIndex={-1}
-                            >
-                                {day}
-                            </button>
-                        );
-                    });
-                })()}
-
-                {/* Giorni del mese corrente */}
-                {days.map((day) => {
-                    const date = `${currentYear}-${currentMonth + 1}-${day}`;
-                    const isSelected = selectedDates.has(date);
-                    return (
-                        <button
-                            key={date}
-                            onClick={() => toggleDateSelection(date)}
-                            className={`snake-day flex items-center justify-center aspect-square transition duration-500 hover:duration-150 active:duration-150 delay-250 hover:delay-0 active:delay-0
-                                ${isSelected
-                                    ? 'bg-west-side-500 text-stone-100 font-medium'
-                                    : 'hover:bg-west-side-200 hover:text-west-side-900 active:bg-west-side-200 active:text-west-side-900'
-                                }`}
-                            data-date={date}
-                        >
-                            {day}
-                        </button>
-                    );
-                })}
-
-                {/* Giorni del mese successivo per completare 6 righe */}
-                {(() => {
-                    const leading = getLeadingEmptyDays(currentMonth, currentYear);
+                    const prevDays = Array.from({ length: leading }, (_, i) => ({
+                        year: prevYear,
+                        month: prevMonth,
+                        day: lastDayPrevMonth - leading + i + 1,
+                        type: 'prev' as const
+                    }));
+                    const currDays = days.map((day) => ({
+                        year: currentYear,
+                        month: currentMonth,
+                        day,
+                        type: 'curr' as const
+                    }));
                     const totalCells = leading + days.length;
                     const nextDaysCount = 42 - totalCells;
-                    if (nextDaysCount <= 0) return null;
                     let nextMonth = currentMonth + 1;
                     let nextYear = currentYear;
                     if (nextMonth > 11) {
                         nextMonth = 0;
                         nextYear++;
                     }
-                    const handleNextDayClick = (day: number) => {
-                        setCurrentMonth(nextMonth);
-                        setCurrentYear(nextYear);
-                        // opzionale: seleziona il giorno cliccato
-                    };
-                    return Array.from({ length: nextDaysCount }, (_, i) => {
-                        const day = i + 1;
-                        const date = `${nextYear}-${nextMonth + 1}-${day}`;
+                    const nextDays = Array.from({ length: nextDaysCount }, (_, i) => ({
+                        year: nextYear,
+                        month: nextMonth,
+                        day: i + 1,
+                        type: 'next' as const
+                    }));
+                    const allDays = [...prevDays, ...currDays, ...nextDays];
+                    const pad = (n: number) => n.toString().padStart(2, '0');
+                    return allDays.map(({ year, month, day, type }, idx) => {
+                        const date = `${year}-${pad(month + 1)}-${pad(day)}`;
                         const isSelected = selectedDates.has(date);
+                        const isAvailable = availableDates.has(date);
+                        const isCurrentMonth = type === 'curr';
+                        const handleClick = () => {
+                            if (!isAvailable) return;
+                            if (type === 'prev') {
+                                setCurrentMonth(month);
+                                setCurrentYear(year);
+                                setTimeout(() => {
+                                    setSelectedDates(new Set([date]));
+                                    if (onDateSelection) onDateSelection(new Set([date]));
+                                }, 0);
+                            } else if (type === 'next') {
+                                setCurrentMonth(month);
+                                setCurrentYear(year);
+                                setTimeout(() => {
+                                    setSelectedDates(new Set([date]));
+                                    if (onDateSelection) onDateSelection(new Set([date]));
+                                }, 0);
+                            } else {
+                                toggleDateSelection(date);
+                            }
+                        };
                         return (
                             <button
-                                key={`next-${day}`}
-                                className={`aspect-square opacity-50 cursor-pointer transition ${isSelected ? 'bg-west-side-500 text-stone-100 font-medium' : 'text-stone-600'}`}
-                                onClick={() => handleNextDayClick(day)}
+                                key={`${type}-${day}-${month}`}
+                                onClick={handleClick}
+                                className={`snake-day flex items-center justify-center aspect-square transition duration-500 hover:duration-150 active:duration-150 delay-250 hover:delay-0 active:delay-0
+                                    ${isSelected
+                                        ? 'bg-west-side-500 text-stone-100 font-medium'
+                                        : isAvailable
+                                            ? 'text-stone-900 hover:bg-west-side-200 hover:text-west-side-900 active:bg-west-side-200 active:text-west-side-900'
+                                            : 'text-stone-900 opacity-40 cursor-not-allowed hover:bg-stone-200'}
+                                        ${!isCurrentMonth ? 'opacity-50' : ''}
+                                    `}
                                 data-date={date}
+                                disabled={!isAvailable}
                                 tabIndex={-1}
                             >
                                 {day}

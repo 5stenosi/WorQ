@@ -2,8 +2,8 @@
 
 <table>
   <tr>
-    <td width="110">
-      <img src="https://i.imgur.com/42ZkNWN.png" alt="WorQ Logo" width="100" height="100"/>
+    <td width="110" valign="middle" align="center">
+      <img src="https://i.imgur.com/42ZkNWN.png" alt="WorQ Logo" style="aspect-ratio:1/1; width:100px; height:100px; object-fit:contain; border-radius:8px;" />
     </td>
     <td>
       WorQ è una piattaforma digitale che connette professionisti in cerca di spazi di coworking con gestori che offrono tali servizi. L'applicazione offre un'esperienza completa dalla ricerca alla prenotazione degli spazi, con funzionalità differenziate per clienti e agenzie.

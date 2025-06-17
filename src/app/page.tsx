@@ -443,11 +443,11 @@ const HomePage = () => {
                      mt-5 p-5 sm:p-10 md:p-15 lg:p-20 pb-5 sm:pb-5 md:pb-5 lg:pb-5 gap-5 sm:gap-10 md:gap-15 lg:gap-20">
           <div className='flex flex-col gap-5 md:gap-20 overflow-clip'>
             <h3 className='text-center sm:text-start text-3xl sm:text-5xl md:text-7xl lg:text-9xl font-bold
-                           md:intersect-once md:intersect:motion-preset-slide-right-lg md:motion-duration-300'>
+                           intersect-once md:intersect:motion-preset-slide-right-lg md:motion-duration-300'>
               <span className='underline decoration-west-side-500'>Find</span> your Space
             </h3>
             <p className='text-balance text-center sm:text-start text-base sm:text-xl md:text-3xl lg:text-4xl font-medium w-full lg:w-2/3
-                          md:intersect-once md:intersect:motion-preset-slide-right-lg md:motion-duration-300 pb-1'>
+                          intersect-once md:intersect:motion-preset-slide-right-lg md:motion-duration-300 pb-1'>
               Locate our coworking spaces easily with the interactive map below.
             </p>
           </div>

@@ -4,22 +4,31 @@ import Carousel from '@/components/Carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faSpinner, faQuestion, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
-import { toast } from 'react-toastify';
 
+// Add FontAwesome icons to the library for dynamic use
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
     faWheelchair, faSnowflake, faVolumeXmark, faCoffee, faUtensils,
     faVideoCamera, faChild, faDog, faParking, faLock, faBolt
 );
 
+// Modal for editing an existing space listing
 const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string, spaceId: string, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userId, spaceId, onSubmitComplete }) => {
-    const [isLoading, setIsLoading] = useState(false); // Loading state for form
-    const [spaceName, setSpaceName] = useState(''); // Space name for the modal title
-    const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
-    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
-    const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
+    // Loading state for the modal
+    const [isLoading, setIsLoading] = useState(false);
+    // Space name for the modal title
+    const [spaceName, setSpaceName] = useState('');
+    // State for image previews
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    // State for uploaded image files
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    // State for address suggestions
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    // Loading state for address suggestions
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-    const [suggestionsVisible, setSuggestionsVisible] = useState(false); // Control visibility only
+    // Controls visibility of suggestions dropdown
+    const [suggestionsVisible, setSuggestionsVisible] = useState(false);
+    // State for form data
     const [formData, setFormData] = useState<{
         userId?: string;
         name: string;
@@ -53,7 +62,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         description?: boolean;
     }>({});
 
-    // State for modal closing and visibility
+    // Modal transition states
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false); // For entry transition
     // Dropdown open state for chevron (true = menu open)
@@ -61,7 +70,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
     // Track if select was open to handle toggle on click
     const selectWasOpen = React.useRef(false);
 
-    // State for services
+    // State for available services
     const [services, setServices] = useState<{
         id: string;
         detail: string;
@@ -71,7 +80,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
     // State for selected services
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
-    // Fetch services from the server
+    // Fetch available services from the server
     const fetchServices = async () => {
         try {
             const response = await fetch('/api/services');
@@ -86,7 +95,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         }
     }
 
-    // Fetch space data from the server
+    // Fetch space data from the server and initialize form fields
     const fetchData = async () => {
         try {
             const response = await fetch(`/api/spaces/${spaceId}`);
@@ -117,6 +126,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         }
     }
 
+    // Handle modal open/close transitions and fetch data on open
     useEffect(() => {
         let openTimeout: NodeJS.Timeout | undefined;
         let closeTimeout: NodeJS.Timeout | undefined;
@@ -128,7 +138,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
             }, 10); // Wait a tick to trigger transition
             try {
                 fetchServices(); // Fetch services when the component mounts
-                fetchData(); // Fetch any other necessary data
+                fetchData(); // Fetch space data
             } catch (error) {
                 console.error('Error fetching services:', error);
             } finally {
@@ -160,7 +170,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         return Object.keys(newErrors).length === 0;
     };
 
-    // Handle image upload, filter for valid image types
+    // Handles image upload and sets the preview URLs
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
@@ -171,7 +181,6 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         }
     };
 
-    // Debounced fetchSuggestions
     // Fetches address suggestions from the Nominatim API
     const fetchSuggestions = async (value: string) => {
         if (!value) return;
@@ -187,7 +196,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         }
     };
 
-    // Debounce logic
+    // Debounce logic for address input
     const [addressInput, setAddressInput] = useState('');
     useEffect(() => {
         if (!suggestionsVisible) return;
@@ -201,14 +210,14 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         return () => clearTimeout(handler);
     }, [addressInput, suggestionsVisible]);
 
-    // Handle input changes for form fields
+    // Handles input changes for form fields
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
         setFormData({ ...formData, [id]: id === 'seats' || id === 'price' ? parseInt(value) : value });
         setErrors({ ...errors, [id]: false }); // Clear error for the field
     };
 
-    // Handles clearing all form fields and resetting state
+    // Clears all form fields and resets state
     const handleClearFields = () => {
         setFormData({
             name: '',
@@ -224,7 +233,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         setErrors({}); // Clear all errors
     };
 
-    // Handles form submission
+    // Handles form submission and sends data to the server
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevents the default form submission behavior
         if (!validateForm()) { // Validates the form before proceeding
@@ -270,21 +279,23 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
         });
     };
 
-
+    // If modal is not open and not closing, render nothing
     if (!isOpen && !isClosing) return null;
 
+    // Show loading spinner if loading
     if (isLoading) return (
         <div className="h-screen text-6xl flex justify-center items-center text-stone-600">
             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
         </div>
     );
 
-    // Red dot error indicator
+    // Red dot error indicator for required fields
     const errorDot = <div className="w-2 h-2 mx-2 rounded-full bg-red-500 animate-pulse" />;
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-9999 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}
                         px-5 sm:px-10 md:px-15 lg:px-20 py-5`}>
+            {/* Modal background overlay */}
             <div
                 className="w-screen h-screen bg-stone-900/75 absolute"
                 onClick={() => {
@@ -297,7 +308,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                 <h2 className="text-lg sm:text-2xl font-bold mb-5 pr-10">Edit {spaceName}</h2>
                 <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                     <div className="flex flex-col sm:flex-row gap-5">
-                        {/* Left Section */}
+                        {/* Left Section: Images and Services */}
                         <div className="flex flex-col w-full sm:w-1/2 lg:w-2/5 gap-5">
                             {/* Image Upload Section */}
                             <div className="flex flex-col">
@@ -343,7 +354,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                                 </div>
                             </div>
 
-                            {/* Services */}
+                            {/* Services selection */}
                             <div className="h-20 grow overflow-y-auto">
                                 <div className='flex flex-wrap gap-1 sm:gap-2'>
                                     {services.map((service) => (
@@ -368,7 +379,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                             </div>
                         </div>
 
-                        {/* Right Section */}
+                        {/* Right Section: Form fields */}
                         <div className="flex flex-col w-full sm:w-1/2 lg:w-3/5 gap-5">
                             {/* Name + Address */}
                             <div className="flex flex-col lg:flex-row gap-5">
@@ -413,6 +424,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                                         )}
                                     </div>
 
+                                    {/* Address suggestions dropdown */}
                                     {suggestions.length > 0 && suggestionsVisible && (
                                         <ul className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-stone-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                             {suggestions.map((s, i) => (
@@ -476,7 +488,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                                     </div>
                                 </div>
                             </div>
-                            {/* Space Type */}
+                            {/* Space Type dropdown */}
                             <div className="flex flex-col relative">
                                 <label className="flex items-center text-sm md:text-base font-medium pl-1 pb-1 text-stone-900">
                                     Space type
@@ -519,7 +531,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                                     </span>
                                 </div>
                             </div>
-                            {/* Description */}
+                            {/* Description field */}
                             <div className="flex flex-col">
                                 <label className="flex items-center text-sm md:text-base font-medium pl-1 pb-1 text-stone-900">
                                     Description
@@ -536,8 +548,9 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                             </div>
                         </div>
                     </div>
-                    {/* Buttons */}
+                    {/* Action Buttons */}
                     <div className="flex justify-between">
+                        {/* Clear fields button */}
                         <button type='button' onClick={handleClearFields}
                             className='flex justify-start items-center rounded-md ring-2 ring-red-500 bg-stone-100 hover:bg-red-500 active:bg-red-500 text-red-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                             w-10 hover:w-37 active:w-37 ease-out active:scale-90 hover:scale-110 origin-left group'>
@@ -547,6 +560,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                             <p className='whitespace-nowrap text-xl text-start w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Clear fields</p>
                         </button>
 
+                        {/* Update space button */}
                         <button type='submit' className='flex justify-end items-center rounded-md ring-2 ring-west-side-500 bg-stone-100 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                             w-10 hover:w-43 active:w-43 ease-out active:scale-90 hover:scale-110 origin-right group'>
                             <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Update space</p>
@@ -556,7 +570,7 @@ const EditSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: s
                         </button>
                     </div>
                 </form>
-                {/* Close button */}
+                {/* Close button for modal */}
                 <button
                     className="flex justify-center items-center absolute size-10 top-5 right-5 bg-stone-100 hover:bg-red-500 active:bg-red-500 border-1 border-stone-900/10 rounded-lg shadow-sm text-stone-900 hover:text-stone-100 active:text-stone-100 text-2xl transition"
                     onClick={() => {

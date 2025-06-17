@@ -2,16 +2,18 @@
 
 import { useState } from 'react';
 
+// Props for the HorizontalOptions component
 interface HorizontalOptionsProps {
-    options: string[];
-    initialSelected?: number;
-    backgroundColor?: string;
-    optionClassName?: string;
-    containerClassName?: string;
-    layout?: 'row' | 'grid';
-    onOptionSelect?: (selectedOption: string) => void;
+    options: string[]; // List of option labels
+    initialSelected?: number; // Index of initially selected option
+    backgroundColor?: string; // Background color for the moving rectangle
+    optionClassName?: string; // Additional class for each option
+    containerClassName?: string; // Additional class for the container
+    layout?: 'row' | 'grid'; // Layout type: row or grid
+    onOptionSelect?: (selectedOption: string) => void; // Callback when an option is selected
 }
 
+// HorizontalOptions component for displaying selectable options in a row or grid
 const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
     options,
     initialSelected = 0,
@@ -21,8 +23,10 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
     layout = 'row',
     onOptionSelect,
 }) => {
+    // State for the currently selected option index
     const [selectedOption, setSelectedOption] = useState<number>(initialSelected);
 
+    // Handles click on an option
     const handleOptionClick = (index: number) => {
         setSelectedOption(index);
         if (onOptionSelect) {
@@ -30,11 +34,13 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
         }
     };
 
+    // Style for the moving rectangle in row layout
     const getRowRectangleStyle = () => ({
         width: `${100 / options.length}%`,
         transform: `translateX(${selectedOption * 100}%)`,
     });
 
+    // Style for the moving rectangle in grid layout
     const getGridRectangleStyle = () => {
         let column = selectedOption % 3;
         let row = Math.floor(selectedOption / 3);
@@ -63,10 +69,11 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
         };
     };
 
+    // Render row layout
     if (layout === 'row') {
         return (
-            <div className={`relative grid grid-cols-5 items-center ${containerClassName}`}> {/* Usa grid con 4 colonne */}
-                {/* Rettangolo colorato che si sposta */}
+            <div className={`relative grid grid-cols-5 items-center ${containerClassName}`}> {/* Uses grid with 5 columns */}
+                {/* Colored rectangle that moves under the selected option */}
                 <div
                     className={`absolute top-0 left-0 h-full rounded-2xl transition-all duration-500 ${backgroundColor}`}
                     style={{
@@ -75,7 +82,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
                     }}
                 ></div>
 
-                {/* Opzioni */}
+                {/* Option labels */}
                 {options.map((option, index) => (
                     <div
                         key={index}
@@ -88,6 +95,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
         );
     }
 
+    // Render grid layout
     if (layout === 'grid') {
         return (
             <div className={`relative grid grid-cols-3 grid-rows-2 gap-2 items-center ${containerClassName}`}>
@@ -109,6 +117,7 @@ const HorizontalOptions: React.FC<HorizontalOptionsProps> = ({
         );
     }
 
+    // Fallback if layout is not recognized
     return null;
 };
 

@@ -13,10 +13,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function LoginPage() {
+  // State to store a random number for button color variation
   const [randomNumber, setRandomNumber] = useState<number | null>(null);
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  // Get authentication error message from custom hook
   const errorMessage = useAuthErrorMessage();
 
+  // Handles login with credentials (email and password)
   const credentialsAction = (formData: FormData) => {
     signIn("credentials", {
       email: formData.get("email"),
@@ -25,11 +29,13 @@ export default function LoginPage() {
     });
   };
 
+  // On mount, set a random number for button color and handle animation classes
   useEffect(() => {
-    const number = Math.floor(Math.random() * 4) + 1;
+    const number = Math.floor(Math.random() * 4) + 1; // Generate a random number between 1 and 4
     setRandomNumber(number);
     console.log("Random number:", number); // Log the random number to the console
 
+    // Remove animation classes after a delay
     const timer = setTimeout(() => {
       const googleButton = document.getElementById("google");
       const githubButton = document.getElementById("github");
@@ -55,13 +61,13 @@ export default function LoginPage() {
     <div id="login" className="px-10">
       <section className="w-full min-h-screen flex justify-center items-center pt-28 pb-3">
         <div className="bg-stone-100 rounded-xl shadow-sm max-w-2xl w-full p-5 sm:p-10 flex flex-col gap-5 sm:gap-10">
-          {/* Titolo */}
+          {/* Title */}
           <h2 className="text-center text-xl sm:text-2xl text-balance font-bold">
             Log into your account
           </h2>
-          {/* Auth */}
+          {/* OAuth Authentication Buttons */}
           <div className="flex flex-col sm:flex-row gap-5">
-            {/* Google */}
+            {/* Google Login Button */}
             <button
               id="google"
               className={`w-full flex justify-center items-center py-2 sm:py-4 border-2 hover:text-stone-100 active:text-stone-100 font-medium rounded-lg
@@ -84,23 +90,23 @@ export default function LoginPage() {
                   : ""
                 }`}
               onClick={() => {
-                localStorage.setItem("oauth_provider", "google");
-                signIn("google");
+                localStorage.setItem("oauth_provider", "google"); // Store provider in localStorage
+                signIn("google"); // Trigger Google OAuth login
               }}
             >
               <FontAwesomeIcon icon={faGoogle} className="mr-2 text-2xl" />
               <span className="sm:hidden">Login</span>
               <span className="hidden sm:inline">Login with Google</span>
             </button>
-            {/* Github */}
+            {/* Github Login Button */}
             <button
               id="github"
               className="w-full flex justify-center items-center py-2 sm:py-4 border-2 border-github hover:bg-github active:bg-github text-github hover:text-stone-100 active:text-stone-100 font-medium rounded-lg
                                 motion-preset-expand motion-delay-150
                                 transition-all duration-150 ease-out active:scale-90 hover:scale-105"
               onClick={() => {
-                localStorage.setItem("oauth_provider", "github");
-                signIn("github");
+                localStorage.setItem("oauth_provider", "github"); // Store provider in localStorage
+                signIn("github"); // Trigger GitHub OAuth login
               }}
             >
               <FontAwesomeIcon icon={faGithub} className="mr-2 text-2xl" />
@@ -108,7 +114,7 @@ export default function LoginPage() {
               <span className="hidden sm:inline">Login with GitHub</span>
             </button>
           </div>
-          {/* Form */}
+          {/* Credentials Login Form */}
           <form action={credentialsAction} className="flex flex-col gap-5">
             <div className="flex flex-col gap-5">
               <div className="w-full flex flex-col">
@@ -137,6 +143,7 @@ export default function LoginPage() {
                     className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50 pr-10"
                     placeholder="Enter your password"
                   />
+                  {/* Toggle password visibility button */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -158,7 +165,7 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
-              {/* Link Forgot Password */}
+              {/* Link to Forgot Password page */}
               <Link
                 href="/forgot-password"
                 className="w-fit rounded-sm text-sm p-2 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 font-medium transition"
@@ -167,14 +174,14 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            {/* Error Message */}
+            {/* Display error message if present */}
             {errorMessage && (
               <p className="text-red-500 text-center font-medium">
                 {errorMessage}
               </p>
             )}
 
-            {/* Buttons */}
+            {/* Action Buttons */}
             <div className="flex gap-5 mt-5">
               {/* Signup Button */}
               <Link

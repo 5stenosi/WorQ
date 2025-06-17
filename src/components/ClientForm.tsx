@@ -5,19 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { clientRegisterSchema, clientRegisterSchemaOAuth } from "@/lib/zod";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faArrowRight,
-  faCheck,
-  faEye,
-  faSlash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faCheck, faEye, faSlash } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { handleFormSubmit } from "@/lib/handleFormSubmit";
 
+// Types for form values based on Zod schemas
 type ClientFormValues = z.infer<typeof clientRegisterSchema>;
 type ClientOAuthFormValues = z.infer<typeof clientRegisterSchemaOAuth>;
 
+// Props for the ClientForm component
 type ClientFormProps = {
   email?: string;
   requiredFields?: {
@@ -38,11 +34,16 @@ export default function ClientForm({
   buttons = "register",
 }:
   ClientFormProps) {
+  // State for showing/hiding password
   const [showPassword, setShowPassword] = useState(false);
-  const searchParams = useSearchParams(); // useSearchParams is used to access query parameters in the URL
+  // Get query parameters from the URL
+  const searchParams = useSearchParams();
+  // If both email and password are not required, use OAuth schema
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
+  // Get email from props or URL
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
-  
+
+  // Setup react-hook-form with Zod validation
   const {
     register,
     handleSubmit,
@@ -58,10 +59,12 @@ export default function ClientForm({
 
   const router = useRouter();
 
+  // State for OAuth provider (google or github)
   const [provider, setProvider] = useState<"google" | "github" | undefined>(
     undefined
   );
 
+  // On mount, get OAuth provider from localStorage
   useEffect(() => {
     const savedProvider = localStorage.getItem("oauth_provider");
     if (savedProvider === "google" || savedProvider === "github") {
@@ -69,6 +72,7 @@ export default function ClientForm({
     }
   }, []);
 
+  // Handle form submission
   const onSubmit = (data: ClientFormValues) =>
     handleFormSubmit({
       data,
@@ -82,6 +86,7 @@ export default function ClientForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-5`}>
+      {/* Name and Surname fields */}
       <div className="flex flex-col sm:flex-row gap-5">
         {requiredFields?.name && (
           <div className="w-full flex flex-col text-sm sm:text-base">
@@ -118,6 +123,7 @@ export default function ClientForm({
           </div>
         )}
       </div>
+      {/* Email and Password fields (hidden if layout is col) */}
       <div className={`flex flex-col sm:flex-row gap-5 ${layout === "col" ? "hidden" : ""}`}>
         {requiredFields?.email && (
           <div className="w-full flex flex-col text-sm sm:text-base">
@@ -152,6 +158,7 @@ export default function ClientForm({
                 className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                 placeholder="Enter your password"
               />
+              {/* Toggle password visibility button */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -165,6 +172,7 @@ export default function ClientForm({
           </div>
         )}
       </div>
+      {/* Cellphone field */}
       {requiredFields?.cellphone && (
         <div className="w-full flex flex-col text-sm sm:text-base">
           <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
@@ -183,9 +191,11 @@ export default function ClientForm({
           />
         </div>
       )}
+      {/* Action buttons (register/confirm) */}
       <div className="flex gap-5 sm:mt-5">
         {buttons === "register" && (
           <>
+            {/* Link to login page */}
             <Link href={"/login"} className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900
                                                         hover:bg-stone-900 hover:text-stone-100
                                                         active:bg-stone-900 active:text-stone-100
@@ -194,6 +204,7 @@ export default function ClientForm({
               Login
               <FontAwesomeIcon icon={faArrowLeft} className="text-lg opacity-0" />
             </Link>
+            {/* Submit button for signup */}
             <button type="submit" className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500
                                                         hover:bg-west-side-500 hover:text-stone-100
                                                         active:bg-west-side-500 active:text-stone-100

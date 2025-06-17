@@ -15,9 +15,11 @@ import {
 import { useEffect, useState } from "react";
 import { handleFormSubmit } from "@/lib/handleFormSubmit";
 
+// Define types for form values based on Zod schemas
 type AgencyFormValues = z.infer<typeof agencyRegisterSchema>;
 type AgencyOAuthFormValues = z.infer<typeof agencyRegisterSchemaOAuth>;
 
+// Define props for the AgencyForm component
 type AgencyFormProps = {
   email?: string;
   requiredFields?: {
@@ -36,13 +38,20 @@ export default function AgencyForm({
   requiredFields,
   layout = "row",
   buttons = "register",
-}:
-  AgencyFormProps) {
+}: AgencyFormProps) {
+  // State to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
-  const searchParams = useSearchParams(); // useSearchParams is used to access query parameters in the URL
+
+  // Get query parameters from the URL
+  const searchParams = useSearchParams();
+
+  // Determine if OAuth is used based on required fields
   const useOAuth = !requiredFields?.email && !requiredFields?.password;
+
+  // Get user email from props or URL
   const userEmail = email ?? decodeURIComponent(searchParams.get("email") ?? "");
 
+  // Initialize react-hook-form with Zod validation
   const {
     register,
     handleSubmit,
@@ -58,10 +67,12 @@ export default function AgencyForm({
 
   const router = useRouter();
 
+  // State to store OAuth provider (google or github)
   const [provider, setProvider] = useState<"google" | "github" | undefined>(
     undefined
   );
 
+  // On mount, retrieve OAuth provider from localStorage
   useEffect(() => {
     const savedProvider = localStorage.getItem("oauth_provider");
     if (savedProvider === "google" || savedProvider === "github") {
@@ -69,6 +80,7 @@ export default function AgencyForm({
     }
   }, []);
 
+  // Handle form submission
   const onSubmit = (data: AgencyFormValues) =>
     handleFormSubmit({
       data,
@@ -82,6 +94,7 @@ export default function AgencyForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={`flex flex-col gap-5`}>
+      {/* Name and VAT fields */}
       <div className="flex flex-col sm:flex-row gap-5">
         {requiredFields?.name && (
           <div className="w-full flex flex-col text-sm sm:text-base">
@@ -122,6 +135,7 @@ export default function AgencyForm({
           </div>
         )}
       </div>
+      {/* Email and Password fields, hidden if layout is "col" */}
       <div className={`flex flex-col sm:flex-row gap-5 ${layout === "col" ? "hidden" : ""}`}>
         {requiredFields?.email && (
           <div className="w-full flex flex-col text-sm sm:text-base">
@@ -156,6 +170,7 @@ export default function AgencyForm({
                 className="w-full p-2 border rounded-lg border-stone-300 focus:outline-none focus:ring-2 focus:ring-west-side-500 bg-stone-50"
                 placeholder="Enter agency password"
               />
+              {/* Button to toggle password visibility */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -169,6 +184,7 @@ export default function AgencyForm({
           </div>
         )}
       </div>
+      {/* Telephone field */}
       {requiredFields?.telephone && (
         <div className="w-full flex flex-col text-sm sm:text-base">
           <label className="flex justify-between font-medium pl-1 pb-1 text-stone-900">
@@ -187,9 +203,11 @@ export default function AgencyForm({
           />
         </div>
       )}
+      {/* Action buttons */}
       <div className="flex gap-5 sm:mt-5">
         {buttons === "register" && (
           <>
+            {/* Link to login page */}
             <Link href={"/login"} className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-stone-900 text-stone-900
                                                         hover:bg-stone-900 hover:text-stone-100
                                                         active:bg-stone-900 active:text-stone-100
@@ -198,6 +216,7 @@ export default function AgencyForm({
               Login
               <FontAwesomeIcon icon={faArrowLeft} className="text-lg opacity-0" />
             </Link>
+            {/* Submit button for signup */}
             <button type="submit" className="w-full font-medium h-10 sm:h-12 flex justify-center items-center rounded-xl border-2 border-west-side-500 text-west-side-500 
                                                         hover:bg-west-side-500 hover:text-stone-100
                                                         active:bg-west-side-500 active:text-stone-100

@@ -2,32 +2,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { set } from 'date-fns';
 
+// Props for the CalendarComponent
 interface CalendarComponentProps {
-    onDateSelection?: (selectedDates: Set<string>) => void;
-    selectedDates: Set<string>;
-    setSelectedDates: (dates: Set<string>) => void;
-    spaceId: string;
+    onDateSelection?: (selectedDates: Set<string>) => void; // Callback when dates are selected
+    selectedDates: Set<string>; // Currently selected dates
+    setSelectedDates: (dates: Set<string>) => void; // Setter for selected dates
+    spaceId: string; // ID of the space for fetching availability
 }
 
+// Main CalendarComponent
 const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, selectedDates, setSelectedDates, spaceId }) => {
+    // State for current month and year
     const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+    // State for available dates fetched from API
     const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
+    // Easter egg state for snake mode
     const [snake, setSnake] = useState<boolean>(false);
+    // Tracks arrow key sequence for snake mode
     const [arrowSequence, setArrowSequence] = useState<string[]>([]);
+    // Ref for the calendar grid
     const snakeRef = useRef<HTMLDivElement | null>(null);
 
+    // Returns number of days in a given month/year
     const daysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
+    // Array of days for the current month
     const days = Array.from({ length: daysInMonth(currentMonth, currentYear) }, (_, i) => i + 1);
-    const columns = 7;
+    const columns = 7; // Number of columns in the calendar grid
 
+    // Calculates leading empty days for the first week (so Monday is first)
     const getLeadingEmptyDays = (month: number, year: number) => {
         const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
         return (firstDay + 6) % 7; // Shift: Monday = 0
     };
 
+    // Toggles selection of a date
     const toggleDateSelection = (date: string) => {
         const newDates = new Set(selectedDates);
         if (newDates.has(date)) newDates.delete(date);
@@ -35,6 +45,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         setSelectedDates(newDates);
     };
 
+    // Calls the callback when selectedDates changes
     useEffect(() => {
         if (onDateSelection) {
             onDateSelection(selectedDates);
@@ -42,6 +53,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         console.log(availableDates);
     }, [selectedDates, onDateSelection]);
 
+    // Fetches available dates from the API when month/year/spaceId changes
     useEffect(() => {
         const fetchAvailability = async () => {
             try {
@@ -57,6 +69,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         fetchAvailability();
     }, [spaceId, currentYear, currentMonth]);
 
+    // Handles navigation to previous month
     const handlePreviousMonth = () => {
         if (currentMonth === 0) {
             setCurrentMonth(11);
@@ -67,6 +80,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         updateArrowSequence('left');
     };
 
+    // Handles navigation to next month
     const handleNextMonth = () => {
         if (currentMonth === 11) {
             setCurrentMonth(0);
@@ -77,6 +91,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         updateArrowSequence('right');
     };
 
+    // Listens for arrow key presses to trigger snake mode
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'ArrowLeft') {
@@ -91,10 +106,12 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    // Logs the current arrow key sequence
     const logArrowSequence = (sequence: string[]) => {
         console.log(`%cArrow sequence: ${sequence.join(',')}`, 'color: yellow;');
     };
 
+    // Updates the arrow key sequence and activates snake mode if the secret code is entered
     const updateArrowSequence = (direction: string) => {
         setArrowSequence((prevSequence) => {
             const newSequence = [...prevSequence, direction].slice(-10);
@@ -107,6 +124,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         });
     };
 
+    // Triggers the snake animation effect
     const triggerSnakeEffect = () => {
         if (snakeRef.current) {
             const snakeSpeed = 250;
@@ -118,12 +136,13 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                 .filter((index) => index !== -1);
 
             if (selectedIndices.length > 0) {
+                // Snake visits all selected days and then clears selection
                 const startIndex = Math.floor(Math.random() * buttons.length);
                 const visited = new Set<number>();
 
                 const animateRandomSnake = (currentIndex: number) => {
                     if (visited.size === selectedIndices.length) {
-                        // Quando la snake ha visitato tutti i selezionati, deseleziona tutto e nascondi il bottone SNAKE
+                        // When snake has visited all selected, clear selection and hide SNAKE button
                         setTimeout(() => {
                             setSelectedDates(new Set());
                             setSnake(false);
@@ -176,7 +195,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
                 animateRandomSnake(startIndex);
             } else {
-                // 🐍 Modalità classica con offset corretto per la posizione del primo giorno
+                // Classic snake mode: animates through the calendar grid
                 const animateSnake = (index: number, direction: 'right' | 'left', stepsRemaining: number) => {
                     if (index >= buttons.length || index < 0) return;
 
@@ -198,11 +217,11 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                     }, snakeSpeed);
                 };
 
-                // Calcola la colonna del primo giorno del mese
+                // Calculate the column of the first day of the month
                 const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 0=Sunday
                 const firstCol = (firstDay + 6) % 7; // Monday=0
 
-                // Trova il bottone del primo giorno del mese
+                // Find the button for the first day of the month
                 const startIndex = buttons.findIndex((btn) => {
                     const dateAttr = btn.getAttribute('data-date');
                     if (!dateAttr) return false;
@@ -211,7 +230,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                 });
 
                 if (startIndex !== -1) {
-                    // Deve andare a destra fino a colonna 6 (inclusa)
+                    // Go right to the end of the row, then snake down
                     const initialSteps = columns - 1 - firstCol;
                     animateSnake(startIndex, 'right', initialSteps + 1);
                 }
@@ -219,6 +238,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
         }
     };
 
+    // Month names for display
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
@@ -226,6 +246,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
 
     return (
         <>
+            {/* Header with navigation and month/year display or SNAKE button */}
             <div className="flex justify-between items-center mb-3">
                 <button onClick={handlePreviousMonth} className="aspect-square size-10 border-1 border-stone-900/10 bg-stone-100 shadow-sm hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100 rounded-lg transition">
                     <FontAwesomeIcon icon={faChevronLeft} />
@@ -244,14 +265,16 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                 </button>
             </div>
 
+            {/* Calendar grid */}
             <div ref={snakeRef} className="grid grid-cols-7">
+                {/* Day names header */}
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayName, index) => (
                     <div key={index} className="text-center text-sm sm:text-base font-bold py-2 text-stone-900">
                         {dayName}
                     </div>
                 ))}
 
-                {/* Tutti i giorni del calendario (prev, current, next) */}
+                {/* All days in the calendar (previous, current, next month) */}
                 {(() => {
                     const leading = getLeadingEmptyDays(currentMonth, currentYear);
                     let prevMonth = currentMonth - 1;
@@ -294,6 +317,7 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                         const isSelected = selectedDates.has(date);
                         const isAvailable = availableDates.has(date);
                         const isCurrentMonth = type === 'curr';
+                        // Handles click on a day cell
                         const handleClick = () => {
                             if (!isAvailable) return;
                             if (type === 'prev') {
@@ -318,14 +342,14 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({ onDateSelection, 
                             <button
                                 key={`${type}-${day}-${month}`}
                                 onClick={handleClick}
-                                className={`snake-day flex items-center justify-center aspect-square transition duration-500 hover:duration-150 active:duration-150 delay-250 hover:delay-0 active:delay-0
+                                className={`snake-day flex items-center justify-center aspect-square transition duration-500 hover:duration-150 active:duration-150 delay-250 hover:delay-0 active:delay-0 
                                     ${isSelected
                                         ? 'bg-west-side-500 text-stone-100 font-medium'
                                         : isAvailable
                                             ? 'text-stone-900 hover:bg-west-side-200 hover:text-west-side-900 active:bg-west-side-200 active:text-west-side-900'
-                                            : 'text-stone-900 opacity-40 cursor-not-allowed hover:bg-stone-200'}
-                                        ${!isCurrentMonth ? 'opacity-50' : ''}
-                                    `}
+                                            : isCurrentMonth
+                                                ? 'text-stone-900 opacity-50 cursor-not-allowed hover:bg-stone-200'
+                                                : 'text-stone-900 opacity-25 cursor-not-allowed'}`}
                                 data-date={date}
                                 disabled={!isAvailable}
                                 tabIndex={-1}

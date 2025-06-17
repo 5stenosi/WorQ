@@ -41,11 +41,11 @@ type Space = {
 };
 
 export default function SpaceDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    // Funzione per rimuovere una data selezionata dalla lista (deve agire su bookingDates)
+    // Function to remove a selected date from the list (acts on bookingDates)
     const handleRemoveSelectedDate = (date: string) => {
-        // date è in formato DD/MM/YYYY, bookingDates è in formato YYYY-MM-DD
+        // date is in DD/MM/YYYY format, bookingDates is in YYYY-MM-DD format
         const [day, month, year] = date.split('/');
-        // Trova la data corrispondente in bookingDates, gestendo eventuali zeri iniziali
+        // Find the corresponding date in bookingDates, handling leading zeros
         let isoDate = '';
         for (const d of bookingDates) {
             const [y, m, dd] = d.split('-');
@@ -63,29 +63,29 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             updatedBookingDates.delete(isoDate);
             setBookingDates(updatedBookingDates);
         }
-        // selectedDates verrà aggiornato automaticamente da handleDateSelection
+        // selectedDates will be updated automatically by handleDateSelection
     };
     // Extracting the space ID from the URL parameters
     const { id } = use(params);
     // Using NextAuth to get the session data
     const { data: session, status } = useSession();
     // State variables to manage space data, loading state, review text, hover rating, and booking dates
-    const [space, setSpace] = useState<Space | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [reviewText, setReviewText] = useState('');
-    const [hoverRating, setHoverRating] = useState(0);
-    const [hasReviewed, setHasReviewed] = useState(false);
-    const [selectedRating, setSelectedRating] = useState(0);
-    const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
-    const [bookingDates, setBookingDates] = useState<Set<string>>(new Set());
-    const [userReview, setUserReview] = useState<{ id: string; rating: number; comment: string } | null>(null);
+    const [space, setSpace] = useState<Space | null>(null); // Stores the space details
+    const [loading, setLoading] = useState(true); // Loading state for data fetch
+    const [reviewText, setReviewText] = useState(''); // Stores the review text input
+    const [hoverRating, setHoverRating] = useState(0); // Stores the current hover rating for stars
+    const [hasReviewed, setHasReviewed] = useState(false); // Tracks if the user has already reviewed
+    const [selectedRating, setSelectedRating] = useState(0); // Stores the selected star rating
+    const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set()); // Stores selected dates in DD/MM/YYYY
+    const [bookingDates, setBookingDates] = useState<Set<string>>(new Set()); // Stores booking dates in YYYY-MM-DD
+    const [userReview, setUserReview] = useState<{ id: string; rating: number; comment: string } | null>(null); // Stores the user's review if present
 
     // Placeholder images in case the space does not have any images
     const placeholderImages = [
         '/placeholder-image.jpg'
     ];
 
-    // Function to format text
+    // Function to format the typology string for display
     const formatTypology = (typology: string) => {
         return typology
             .toLowerCase()
@@ -93,28 +93,23 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
             .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize each word
     };
 
-    // Function to load space data and reviews
+    // Function to load space data and reviews from the API
     async function loadData() {
         try {
-
             const spaceRes = await fetch(`/api/spaces/${id}`);
-
             if (!spaceRes.ok) {
                 setSpace(null);
                 return;
             }
-
             const spaceData = await spaceRes.json();
             setSpace(spaceData);
-
             // Check if the user has already reviewed the space
             if (session?.user?.role === 'CLIENT' && spaceData.reviews) {
                 const userReview = spaceData.reviews.find((review: any) => review.clientId === session.user.id);
                 setUserReview(userReview || null);
             }
-
         } catch (error) {
-            console.error("Errore nella fetch GET:", error);
+            console.error("Error in GET fetch:", error);
             setSpace(null);
         } finally {
             setLoading(false);
@@ -143,22 +138,20 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                     comment: reviewText,
                 }),
             });
-
             if (!res.ok) {
                 throw new Error('Failed to submit review');
             }
-
             await loadData();
             setReviewText('');
             setSelectedRating(0);
             toast.success("Review submitted");
         } catch (error) {
-            console.error("Errore nella fetch POST:", error);
+            console.error("Error in POST fetch:", error);
             toast.error("An error occurred while submitting your review. Please try again later.");
         }
     }
 
-    // Function to handle booking
+    // Function to handle booking submission
     const handleBooking = async () => {
         if (selectedDates.size === 0) {
             toast.error("Please select at least one date to book.");
@@ -176,40 +169,37 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                     clientId: session?.user.id,
                 }),
             });
-
             if (!res.ok) {
                 throw new Error('Failed to book space');
             }
-
             // Reset selected dates after booking
             setSelectedDates(new Set());
             toast.success("Booking successful!");
         }
         catch (error) {
-            console.error("Errore nella fetch POST per la prenotazione:", error);
+            console.error("Error in POST fetch for booking:", error);
             toast.error("An error occurred while booking the space. Please try again later.");
         }
     }
 
     // Function to handle date selection from the calendar component
     const handleDateSelection = (dates: Set<string>) => {
-        // Saving the selected dates to state
+        // Save the selected dates to state
         setBookingDates(dates);
-        // Formatting the dates to DD/MM/YYYY
+        // Format the dates to DD/MM/YYYY
         const formattedDates = new Set(
             Array.from(dates).map((date) => {
                 const [year, month, day] = date.split('-'); // Assuming the date is in YYYY-MM-DD format
                 return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`; // Convert to DD/MM/YYYY with leading zeros
             })
         );
-
-        // Aggiorna lo stato solo se le date sono cambiate
+        // Update state only if dates have changed
         if (JSON.stringify(Array.from(formattedDates)) !== JSON.stringify(Array.from(selectedDates))) {
             setSelectedDates(formattedDates);
         }
     };
 
-    // Funzione per scrollare alla sezione booking-section fino al bottom
+    // Function to scroll to the booking section
     const handleScrollToBooking = () => {
         if (typeof window !== "undefined") {
             const targetId = "booking-section";
@@ -229,19 +219,22 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
         }
     };
 
+    // Load data when the component mounts or when id/status changes
     useEffect(() => {
         if (status === 'loading') return; // Wait for session to load
         loadData();
     }, [id, status]);
 
+    // Show loading spinner while data is being fetched
     if (loading) return (<div className="h-screen text-6xl flex justify-center items-center text-stone-600">
         <FontAwesomeIcon icon={faSpinner} className='animate-spin' />
     </div>);
+    // Show error message if space is not found
     if (!space) return (<p className="h-screen text-2xl flex justify-center items-center text-stone-600">
         Space not found. Please check the ID or try again later.
     </p>);
 
-    // Funzione per eliminare la recensione dell'utente
+    // Function to delete the user's review
     const handleDeleteReview = async () => {
         try {
             const res = await fetch(`/api/reviews/${userReview?.id}`, {
@@ -400,7 +393,11 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                         </div>
                         {/* Write Review */}
                         {session?.user && session.user.role === "CLIENT" && !userReview && (
-                            <div className='flex justify-between gap-2 p-2'>
+                            <form className='flex justify-between gap-2 p-2'
+                                onSubmit={e => {
+                                    e.preventDefault();
+                                    handleReviewSubmit();
+                                }}>
                                 <input
                                     type="text"
                                     id='write-comment'
@@ -417,17 +414,16 @@ export default function SpaceDetailPage({ params }: { params: Promise<{ id: stri
                                             onMouseLeave={() => setHoverRating(0)}
                                             onClick={() => setSelectedRating(star)}
                                             className='cursor-pointer transition-transform duration-150 ease-out active:scale-90 hover:scale-110'>
-                                            <FontAwesomeIcon
-                                                icon={star <= (hoverRating || selectedRating) ? faStar : faHollowStar}
-                                                className={star <= selectedRating ? 'text-yellow-400' : 'text-stone-600'} />
+                                            <FontAwesomeIcon icon={star <= (hoverRating || selectedRating) ? faStar : faHollowStar} className={star <= selectedRating ? 'text-yellow-400' : 'text-stone-600'} />
                                         </span>
                                     ))}
                                 </div>
-                                <button onClick={handleReviewSubmit}
+                                <button
+                                    type="submit"
                                     className='aspect-square size-8 sm:size-10 rounded-xl text-stone-900 hover:bg-west-side-500 active:bg-west-side-500 hover:text-stone-100 active:text-stone-100 ring-1 ring-stone-900/10 shadow-sm hover:scale-110 active:scale-90 transition-all duration-150 ease-out'>
                                     <FontAwesomeIcon icon={faPaperPlane} />
                                 </button>
-                            </div>
+                            </form>
                         )}
 
                     </div>

@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import RegisterSW from "@/components/RegisterSW";
 config.autoAddCss = false;
 
+// RootLayout wraps the app with session provider and layout
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,10 +28,12 @@ export default function RootLayout({
   );
 }
 
+// InnerLayout contains the navigation, footer, and main content
 function InnerLayout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Scroll to top if already on homepage
   const handleScrollToTop = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {
       e.preventDefault();
@@ -38,6 +41,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Scroll to map section or navigate to homepage with anchor
   const handleScrollToMap = () => {
     if (typeof window !== "undefined") {
       const targetId = "map-section";
@@ -56,6 +60,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <meta name="description" content="WorQ - Your ultimate workspace solution. Explore spaces, connect, and collaborate effortlessly." />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.svg" />
         <title>WorQ</title>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
@@ -63,6 +68,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-stone-200 text-stone-900 select-none">
         {/* <RegisterSW /> */}
+        {/* Navigation bar */}
         <nav className="z-1000 w-full p-5 fixed flex justify-center items-center gap-5">
           <div className="bg-stone-100/75 border-1 border-stone-100 px-2.5 backdrop-blur-xs shadow-sm rounded-3xl flex flex-col md:grid items-center transition duration-250 grid-cols-1 md:grid-cols-[1fr_auto_1fr] w-full lg:w-3/4 xl:w-2/3">
             <div className="justify-evenly items-center text-stone-900 font-medium text-lg gap-3 text-center hidden md:flex">
@@ -89,7 +95,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               {/* Mobile Menu */}
               <div className={`w-full flex md:hidden flex-col gap-2 overflow-hidden transition-all ${menuOpen ? "max-h-64 mt-2" : "max-h-0"}`}>
                 <div className="flex justify-evenly items-center text-stone-900 font-medium text-lg gap-2 text-center">
-                  {/* Primo blocco */}
+                  {/* First block: navigation */}
                   <button
                     onClick={e => { handleScrollToMap(); setMenuOpen(false); }}
                     className="rounded-2xl transition duration-250 w-full py-3 hover:bg-stone-900 hover:text-stone-100 active:bg-stone-900 active:text-stone-100">
@@ -102,7 +108,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                     Spaces
                   </Link>
                 </div>
-                {/* Secondo blocco */}
+                {/* Second block: auth/profile */}
                 <div className="flex justify-evenly items-center text-stone-900 font-medium text-lg gap-2 text-center">
                   {session ? (
                     <>
@@ -181,7 +187,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
         {children}
 
-        {/* Footer */}
+        {/* Footer section */}
         <footer className="z-1000 w-full bg-stone-900 text-stone-100 p-5 lg:p-20 mt-10">
           <div
             className="flex gap-10 lg:gap-5 justify-between
@@ -191,7 +197,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               <h1 className="text-4xl font-bold">
                 Wor<span className="text-turquoise-blue-400">Q</span>
               </h1>
-              {/* Ho messo il numero di "Che amore di caffè" */}
+              {/* Contact phone number */}
               <p className="text-base lg:text-xl">
                 Call us{" "}
                 <a
@@ -214,7 +220,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                   info@worq.com
                 </a>
               </p>
-              {/* Contact Icons */}
+              {/* Social media icons */}
               <div className="flex gap-2">
                 <FontAwesomeIcon
                   icon={faXTwitter}
@@ -261,7 +267,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
-            {/* Newsletter */}
+            {/* Newsletter subscription */}
             <div className="flex flex-col justify-center w-full lg:w-auto gap-5 lg:gap-10">
               <h2 className="font-bold text-lg lg:text-3xl">Subscribe and stay up to date.</h2>
               <input

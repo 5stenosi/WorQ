@@ -3,6 +3,9 @@
 @plugin "tailwindcss-motion";
 @plugin "tailwindcss-intersect";
 
+/*
+  Theme color variables for custom palettes (Google, GitHub, Turquoise Blue, West Side)
+*/
 @theme {
 
   --color-google-blue: #4285F4;
@@ -36,7 +39,9 @@
   --color-west-side-950: #441c06;
 }
 
-/* Animazione di verifica della sessione */
+/*
+  Dots animation for session verification/loading indicators
+*/
 @keyframes dots {
   0% {
     content: '';
@@ -65,11 +70,16 @@
   content: '';
 }
 
-/* SNAKE */
+/*
+  Snake mode highlight for calendar
+*/
 .snake-hover {
   @apply bg-west-side-200 text-west-side-900;
 }
 
+/*
+  Custom scrollbar styles for all browsers
+*/
 *::-webkit-scrollbar {
   width: 0.5rem;
   /* Larghezza della scrollbar */
@@ -106,6 +116,9 @@
   /* Nasconde la scrollbar nei browser WebKit */
 }
 
+/*
+  Remove spinner arrows from number inputs
+*/
 .no-spinner {
   appearance: textfield;
   /* Standard property for compatibility */
@@ -120,8 +133,9 @@
   margin: 0;
 }
 
-/* Slider */
-
+/*
+  Custom styles for range sliders
+*/
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -158,10 +172,16 @@ input[type="range"]::-ms-thumb {
   cursor: pointer;
 }
 
+/*
+  Make all buttons have pointer cursor
+*/
 button {
   @apply cursor-pointer;
 }
 
+/*
+  Style for map space link
+*/
 #space-link {
   @apply text-stone-900 hover:text-stone-100 m-0
 }

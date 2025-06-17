@@ -1,5 +1,7 @@
 "use client";
 
+// This page allows users to register as either a Client or an Agency.
+// Import necessary hooks, icons, and form components.
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,8 +13,10 @@ import ClientForm from "../../components/ClientForm";
 import AgencyForm from "../../components/AgencyForm";
 
 export default function RegisterPage() {
+  // State variable to track the selected role (CLIENT or AGENCY).
   const [role, setRole] = useState<"CLIENT" | "AGENCY" | "">("");
 
+  // Main layout with a centered registration card.
   return (
     <div id="register" className="px-10">
       <section className="w-full min-h-screen flex justify-center items-center pt-28 pb-3">
@@ -22,6 +26,7 @@ export default function RegisterPage() {
             Sign up for <br className="sm:hidden" /> an account
           </h2>
 
+          {/* If no role is selected, show buttons to choose between Client and Agency. */}
           {!role ? (
             <div className="flex flex-col sm:flex-row gap-5">
               <button
@@ -61,6 +66,7 @@ export default function RegisterPage() {
             </div>
           ) : (
             <>
+              {/* If a role is selected, show a back button and the corresponding registration form. */}
               <button
                 onClick={() => setRole("")}
                 className="flex justify-center items-center absolute size-8 sm:size-10 bg-stone-100 hover:bg-stone-900 border-1 border-stone-900/10 rounded-md shadow-sm text-lg sm:text-xl transition

@@ -24,6 +24,7 @@ const reviews = [
     { name: "Mia Lopez", text: "I had a good experience booking a meeting room. The process was smooth, but the room lacked some essential equipment.", rating: 3.5 }
 ];
 
+// Renders star icons based on the rating value
 const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 !== 0;
@@ -47,23 +48,25 @@ const renderStars = (rating: number) => {
     );
 };
 
+// ReviewCarousel displays a horizontally scrollable carousel of reviews
 const ReviewCarousel = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [centeredReviewIndex, setCenteredReviewIndex] = useState<number | null>(null);
     const [leftArrowClicked, setLeftArrowClicked] = useState(false);
     const [rightArrowClicked, setRightArrowClicked] = useState(false);
 
-    // Dimensions
-    const reviewWidth = 500; // Larghezza di una recensione in px
-    const gap = 20; // Spazio tra le recensioni in px
+    // Dimensions for review card and gap
+    const reviewWidth = 500;
+    const gap = 20;
 
+    // Updates the index of the review currently centered in the viewport
     const updateCenteredReview = () => {
         if (scrollContainerRef.current) {
             const container = scrollContainerRef.current;
             const containerWidth = container.clientWidth;
             const scrollPosition = container.scrollLeft + containerWidth / 2;
 
-            // Calcola l'indice della recensione centrata
+            // Calculate the index of the centered review
             const reviewElements = Array.from(container.querySelectorAll('[data-is-review="true"]'));
             let centeredIndex = null;
 
@@ -82,6 +85,7 @@ const ReviewCarousel = () => {
         }
     };
 
+    // Scrolls to the previous review
     const scrollLeft = () => {
         if (scrollContainerRef.current && centeredReviewIndex !== null && centeredReviewIndex > 0) {
             setLeftArrowClicked(true);
@@ -102,6 +106,7 @@ const ReviewCarousel = () => {
         }
     };
 
+    // Scrolls to the next review
     const scrollRight = () => {
         if (scrollContainerRef.current && centeredReviewIndex !== null && centeredReviewIndex < reviews.length - 1) {
             setRightArrowClicked(true);
@@ -122,16 +127,17 @@ const ReviewCarousel = () => {
         }
     };
 
+    // On mount, center the initial review and set up scroll event listener
     useEffect(() => {
         const container = scrollContainerRef.current;
-        const initialReviewIndex = Math.floor(reviews.length / 2); // Indice della recensione iniziale (centrale)
+        const initialReviewIndex = Math.floor(reviews.length / 2); // Center review
         if (container) {
             const initialScrollPosition = (reviewWidth + gap) * initialReviewIndex - (container.clientWidth / 2) + (reviewWidth / 2);
             container.scrollTo({
                 left: initialScrollPosition,
                 behavior: 'auto',
             });
-            // Aggiorna lo stato dopo un breve ritardo per permettere il rendering
+            // Update state after a short delay to allow rendering
             setTimeout(updateCenteredReview, 100);
         }
 
@@ -141,11 +147,13 @@ const ReviewCarousel = () => {
         }
     }, []);
 
+    // Determine if the carousel is at the start or end
     const isAtStart = centeredReviewIndex === 0;
     const isAtEnd = centeredReviewIndex === reviews.length - 1;
 
     return (
         <div className="relative w-full">
+            {/* Scrollable container for reviews */}
             <div ref={scrollContainerRef} className="w-full overflow-x-scroll no-scrollbar snap-x snap-mandatory pl-5 sm:pl-10 md:pl-15 lg:pl-20">
                 <div className="flex gap-x-5 sm:gap-x-10 md:gap-x-15 lg:gap-x-20">
                     {reviews.map((review, index) => (
@@ -169,6 +177,7 @@ const ReviewCarousel = () => {
                 </div>
             </div>
 
+            {/* Navigation arrows */}
             <div className="flex justify-center mt-3 sm:mt-5 md:mt-7 gap-x-5 sm:gap-x-10 md:gap-x-12">
                 <button
                     onClick={scrollLeft}

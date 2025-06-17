@@ -3,36 +3,41 @@ import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
-// Aggiunto supporto per un bottone opzionale per eliminare le immagini, visibile solo in determinati contesti
+// Props for the Carousel component
 interface CarouselProps {
-    images: string[];
-    autoPlay?: boolean;
-    autoPlayInterval?: number;
-    buttonSize?: string; // Dimensione dei pulsanti di navigazione
-    dotSize?: string; // Dimensione dei pallini
-    chevronSize?: string; // Dimensione delle frecce
-    onClearImages?: () => void; // Funzione opzionale per eliminare le immagini
+    images: string[]; // Array of image URLs
+    autoPlay?: boolean; // Enable automatic slide
+    autoPlayInterval?: number; // Interval for autoPlay in ms
+    buttonSize?: string; // Size of navigation buttons
+    dotSize?: string; // Size of navigation dots
+    chevronSize?: string; // Size of chevron icons
+    onClearImages?: () => void; // Optional callback to clear all images
 }
 
+// Carousel component for displaying images with navigation and optional auto-play
 const Carousel: React.FC<CarouselProps> = ({
     images,
     autoPlay = false,
     autoPlayInterval = 10000,
-    buttonSize = '', // Valore predefinito per i pulsanti
-    dotSize = '', // Valore predefinito per i pallini
-    chevronSize = '', // Valore predefinito per le frecce
-    onClearImages, // Funzione opzionale per eliminare le immagini
+    buttonSize = '',
+    dotSize = '',
+    chevronSize = '',
+    onClearImages,
 }) => {
+    // State for the currently displayed image index
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+    // Go to next image
     const handleNext = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     };
 
+    // Go to previous image
     const handlePrev = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     };
 
+    // Auto-play effect: advances image at interval if enabled
     useEffect(() => {
         if (autoPlay) {
             const interval = setInterval(() => {
@@ -45,9 +50,9 @@ const Carousel: React.FC<CarouselProps> = ({
 
     return (
         <div className="w-full overflow-hidden h-full group">
-            {/* Contenitore principale del carosello */}
+            {/* Main carousel container */}
             <div className="relative w-full h-full flex overflow-hidden group">
-                {/* Contenitore delle immagini con transizione */}
+                {/* Image container with sliding transition */}
                 <div className="flex transition-transform duration-500 w-full h-full" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
                     {images.map((image, index) => (
                         <div key={index} className="relative w-full h-full flex-shrink-0">
@@ -65,14 +70,14 @@ const Carousel: React.FC<CarouselProps> = ({
 
                 {images.length > 1 && (
                     <>
-                        {/* Pulsante per immagine precedente */}
+                        {/* Previous image button */}
                         <button
                             type='button'
                             onClick={handlePrev}
                             className={`absolute ${buttonSize} ${chevronSize} -left-full group-hover:left-[5%] inset-y-0 my-auto bg-stone-900/25 hover:bg-stone-900/50 backdrop-blur-sm text-stone-100 rounded-full transition-all duration-300 hover:scale-110 active:scale-90`}>
                             <FontAwesomeIcon icon={faChevronLeft} />
                         </button>
-                        {/* Pulsante per immagine successiva */}
+                        {/* Next image button */}
                         <button
                             type='button'
                             onClick={handleNext}
@@ -81,7 +86,7 @@ const Carousel: React.FC<CarouselProps> = ({
                         </button>
                     </>
                 )}
-                {/* Bottone per eliminare tutte le immagini */}
+                {/* Button to clear all images (if provided) */}
                 {onClearImages && (
                     <button
                         onClick={onClearImages}
@@ -89,7 +94,7 @@ const Carousel: React.FC<CarouselProps> = ({
                         <FontAwesomeIcon icon={faTrashCan} />
                     </button>
                 )}
-                {/* Indicatori di navigazione (pallini) */}
+                {/* Navigation dots */}
                 {images.length > 1 && (
                     <div className="absolute -bottom-full group-hover:bottom-[5%] transition-all duration-300 inset-x-0 mx-auto bg-stone-900/25 backdrop-blur-sm p-2 rounded-full flex gap-2 w-fit">
                         {images.map((_, index) => (

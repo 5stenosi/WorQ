@@ -7,45 +7,46 @@ import 'leaflet/dist/leaflet.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons/faArrowUpRightFromSquare';
 
+// MapComponent displays a Leaflet map with markers for spaces fetched from the API
 const MapComponent: React.FC = () => {
     useEffect(() => {
-        let map: any = null; // Declare map variable
+        let map: any = null; // Reference to the Leaflet map instance
 
         const initializeMap = async () => {
             if (typeof window !== 'undefined') {
                 const L = (await import('leaflet')).default;
 
-                // Configura l'icona personalizzata
+                // Custom icon for map markers
                 const customIcon = L.Icon.extend({
                     options: {
                         iconUrl: "/location-dot-solid-turquoise-blue-50.svg",
-                        iconSize: [32, 32], // Dimensioni dell'icona
-                        iconAnchor: [16, 32], // Punto di ancoraggio
-                        popupAnchor: [0, -32], // Posizione del popup rispetto all'icona
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                        popupAnchor: [0, -32],
                     },
                 });
 
-                // Check if map already exists and remove it
+                // Prevent re-initialization if map already exists
                 const mapContainer = document.getElementById('map');
                 if (mapContainer && (mapContainer as any)._leaflet_id) {
-                    return; // Prevent re-initialization
+                    return;
                 }
 
-                // Initialize the map
+                // Initialize the map centered on Italy
                 map = L.map('map', {
                     zoomControl: true,
                     dragging: false,
                     scrollWheelZoom: false,
                 }).setView([43.1381, 13.0684], 6);
 
-                // Add the Stadia.AlidadeSmoothDark layer
+                // Add dark tile layer
                 L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
                     minZoom: 3,
                     maxZoom: 17,
                     attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
                 }).addTo(map);
 
-                // Fetch and add markers
+                // Fetch spaces and add markers to the map
                 const fetchSpaces = async () => {
                     try {
                         const response = await fetch('/api/map');
@@ -54,6 +55,7 @@ const MapComponent: React.FC = () => {
                         spaces.forEach((space: any) => {
                             const { latitude, longitude } = space.address;
                             if (latitude && longitude) {
+                                // Popup content for each marker
                                 const popupContent = `
                                     <div class="flex gap-3">
                                         <a id="space-link" href="/spaces/${space.id}" target="_blank" class="flex justify-center items-center aspect-square size-12 bg-stone-100 hover:bg-stone-900 shadow-sm border-1 border-stone-900/10 rounded-md transition">
@@ -79,18 +81,19 @@ const MapComponent: React.FC = () => {
 
                 fetchSpaces();
 
-                // Enable controls on map click
+                // Enable map controls (drag/zoom) on map click
                 const enableControls = () => {
                     map?.scrollWheelZoom.enable();
                     map?.dragging.enable();
                 };
 
-                // Reset controls when map loses focus
+                // Disable map controls when clicking outside
                 const resetControls = () => {
                     map?.scrollWheelZoom.disable();
                     map?.dragging.disable();
                 };
 
+                // Listen for clicks outside the map to reset controls
                 const handleClickOutside = (event: MouseEvent) => {
                     if (!(event.target as HTMLElement).closest('#map')) {
                         resetControls();
@@ -118,6 +121,7 @@ const MapComponent: React.FC = () => {
 
     return (
         <div className="flex w-full h-full">
+            {/* Map container for Leaflet */}
             <div id="map" className="w-full h-full rounded-2xl shadow-sm"></div>
         </div>
     );

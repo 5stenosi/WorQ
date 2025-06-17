@@ -7,7 +7,10 @@ import HorizontalOptions from '@/components/HorizontalOptions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faSpinner, faStar, faStarHalf } from '@fortawesome/free-solid-svg-icons';
 
+// This component renders the main page for listing available spaces.
+// It includes search, filter by price, and filter by typology functionalities.
 const Spaces = () => {
+  // State variables for search, price filter, loading, selected typology, and UI toggles.
   const [searchState, setSearchState] = useState({ searchText: '', });
   const [priceFilterState, setPriceFilterState] = useState({ maxPrice: 300, });
   const [spaces, setSpaces] = useState<Space[]>([]);
@@ -16,9 +19,11 @@ const Spaces = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false); // Stato per apertura/chiusura barra di ricerca
   const [isPriceFilterOpen, setIsPriceFilterOpen] = useState(false); // Stato per apertura/chiusura filtro prezzo
 
+  // Timeout variables for debouncing search and filter toggles.
   let searchTimeout: NodeJS.Timeout;
   let filterTimeout: NodeJS.Timeout;
 
+  // Handles toggling the search bar open/close with a slight delay to avoid UI conflicts.
   const handleSearchToggle = (isOpen: boolean) => {
     console.log(`%chandleSearchToggle called with isOpen: ${isOpen}`, 'color: green;');
     clearTimeout(searchTimeout); // Cancella eventuali timeout precedenti
@@ -34,6 +39,7 @@ const Spaces = () => {
     }, 100); // Ritardo di 100ms per evitare conflitti
   };
 
+  // Handles toggling the price filter open/close with a slight delay to avoid UI conflicts.
   const handlePriceFilterToggle = (isOpen: boolean) => {
     clearTimeout(filterTimeout); // Cancella eventuali timeout precedenti
     filterTimeout = setTimeout(() => {
@@ -45,6 +51,7 @@ const Spaces = () => {
     }, 100); // Ritardo di 100ms per evitare conflitti
   };
 
+  // Space interface defines the structure of a space object.
   interface Space {
     id: string;
     name: string;
@@ -57,6 +64,7 @@ const Spaces = () => {
     price: number;
   }
 
+  // Mapping between UI typology names and backend values.
   const typologyMapping: Record<string, string> = {
     'All Spaces': '',
     'Meeting Rooms': 'MEETING_ROOMS',
@@ -65,6 +73,7 @@ const Spaces = () => {
     'Outdoor Spaces': 'OUTDOOR_SPACES',
   };
 
+  // Fetches spaces from the backend API whenever filters or search change.
   useEffect(() => {
     async function fetchSpaces() {
       try {

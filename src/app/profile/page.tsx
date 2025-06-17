@@ -11,48 +11,48 @@ import Link from 'next/link';
 
 export default function Profile() {
     // State variables for modals
-    const [isCreateSpaceModalOpen, setCreateSpaceModalOpen] = useState(false);
-    const [isEditSpaceModalOpen, setEditSpaceModalOpen] = useState(false);
-    const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false);
+    const [isCreateSpaceModalOpen, setCreateSpaceModalOpen] = useState(false); // Controls the visibility of the Create Space modal
+    const [isEditSpaceModalOpen, setEditSpaceModalOpen] = useState(false); // Controls the visibility of the Edit Space modal
+    const [isEditProfileModalOpen, setEditProfileModalOpen] = useState(false); // Controls the visibility of the Edit Profile modal
     // State variables for user data
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedSpace, setSelectedSpace] = useState<string>("");
-    const [userEmail, setUserEmail] = useState("");
-    const [userRole, setUserRole] = useState("");
+    const [isLoading, setIsLoading] = useState(true); // Indicates if user data is being loaded
+    const [selectedSpace, setSelectedSpace] = useState<string>(""); // Stores the ID of the selected space for editing
+    const [userEmail, setUserEmail] = useState(""); // Stores the user's email
+    const [userRole, setUserRole] = useState(""); // Stores the user's role (CLIENT or AGENCY)
     const [client, setClient] = useState({
         name: 'Name',
         surname: 'Surname',
         cellphone: 'Cellphone',
         bookings: [],
-    });
+    }); // Stores client-specific data
     const [agency, setAgency] = useState({
         userId: '',
         name: 'Agency Name',
         vatNumber: 'VAT Number',
         telephone: 'Telephone',
         spaces: [],
-    });
+    }); // Stores agency-specific data
 
     // Fetch user data from the API
     const fetchUserData = useCallback(async () => {
         try {
-            const response = await fetch('/api/profile');
-            const data = await response.json();
-            setUserEmail(data.email);
-            setUserRole(data.role);
+            const response = await fetch('/api/profile'); // Fetch profile data from the API
+            const data = await response.json(); // Parse the response as JSON
+            setUserEmail(data.email); // Set the user's email
+            setUserRole(data.role); // Set the user's role
             if (data.role === "CLIENT") {
-                setClient(data.client);
+                setClient(data.client); // Set client data if user is a client
             }
             else if (data.role === 'AGENCY') {
-                setAgency(data.agency);
+                setAgency(data.agency); // Set agency data if user is an agency
             }
         }
         catch (error) {
-            console.error('Error fetching user data:', error);
+            console.error('Error fetching user data:', error); // Log any errors
             return null;
         }
         finally {
-            setIsLoading(false);
+            setIsLoading(false); // Set loading to false after fetching
         }
     }, []);
 
@@ -60,17 +60,17 @@ export default function Profile() {
     const handleBookingDelete = async (bookingId: string) => {
         try {
             const response = await fetch(`/api/bookings/${bookingId}`, {
-                method: 'DELETE',
+                method: 'DELETE', // Send a DELETE request to remove the booking
             });
             if (!response.ok) {
-                throw new Error('Failed to delete booking');
+                throw new Error('Failed to delete booking'); // Throw error if deletion fails
             }
             // Optionally, refresh the bookings after deletion
-            await fetchUserData();
-            toast.success('Booking deleted successfully!');
+            await fetchUserData(); // Refresh user data after deletion
+            toast.success('Booking deleted successfully!'); // Show success message
         } catch (error) {
-            console.error('Error deleting booking:', error);
-            toast.error('Failed to delete booking. Please try again.');
+            console.error('Error deleting booking:', error); // Log any errors
+            toast.error('Failed to delete booking. Please try again.'); // Show error message
         }
     }
 
@@ -78,17 +78,17 @@ export default function Profile() {
     const handleSpaceDelete = async (spaceId: string) => {
         try {
             const response = await fetch(`/api/spaces/${spaceId}`, {
-                method: 'DELETE',
+                method: 'DELETE', // Send a DELETE request to remove the space
             });
             if (!response.ok) {
-                throw new Error('Failed to delete space');
+                throw new Error('Failed to delete space'); // Throw error if deletion fails
             }
             // Optionally, refresh the spaces after deletion
-            await fetchUserData();
-            toast.success('Space deleted successfully!');
+            await fetchUserData(); // Refresh user data after deletion
+            toast.success('Space deleted successfully!'); // Show success message
         } catch (error) {
-            console.error('Error deleting space:', error);
-            toast.error('Failed to delete space. Please try again.');
+            console.error('Error deleting space:', error); // Log any errors
+            toast.error('Failed to delete space. Please try again.'); // Show error message
         }
     }
 
@@ -275,7 +275,7 @@ export default function Profile() {
                 onClose={() => setCreateSpaceModalOpen(false)}
                 userId={agency.userId}
                 onSubmitComplete={async (status) => {
-                    if (status === 201){
+                    if (status === 201) {
                         await fetchUserData(); // Refresh spaces after successful submission
                         toast.success('Space created successfully!');
                     } else
@@ -289,7 +289,7 @@ export default function Profile() {
                 userId={agency.userId}
                 spaceId={selectedSpace}
                 onSubmitComplete={async (status) => {
-                    if (status === 200){
+                    if (status === 200) {
                         await fetchUserData(); // Refresh spaces after successful submission
                         toast.success('Space updated successfully!');
                     } else

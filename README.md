@@ -1,20 +1,30 @@
 # WorQ - Coworking Space Management Platform
 
-![WorQ Logo](https://placehold.co/150x50?text=WorQ-Logo) <!-- Sostituisci con il logo reale -->
-
-WorQ è una piattaforma digitale che connette professionisti in cerca di spazi di coworking con gestori che offrono tali servizi. L'applicazione offre un'esperienza completa dalla ricerca alla prenotazione degli spazi, con funzionalità differenziate per clienti e agenzie.
+<table>
+  <tr>
+    <td width="110">
+      <img src="https://i.imgur.com/42ZkNWN.png" alt="WorQ Logo" width="100" height="100"/>
+    </td>
+    <td>
+      WorQ è una piattaforma digitale che connette professionisti in cerca di spazi di coworking con gestori che offrono tali servizi. L'applicazione offre un'esperienza completa dalla ricerca alla prenotazione degli spazi, con funzionalità differenziate per clienti e agenzie.
+    </td>
+  </tr>
+</table>
 
 ## 🚀 Funzionalità principali
 
-### Per Clienti
 - ✅ Registrazione/Login con diversi provider (Google/GitHub) o credenziali
 - 🔍 Esplorazione degli spazi di coworking disponibili
+- 🗺️ Consultazione spazi nella mappa
+
+### Per Clienti
+
 - 📅 Prenotazione di postazioni nei giorni desiderati
-- ✍️ Lasciare recensioni sugli spazi utilizzati
+- ✍🏻 Lasciare recensioni sugli spazi utilizzati
 - 🗂 Gestione delle prenotazioni dal proprio profilo
 
 ### Per Agenzie
-- 🏢 Registrazione come gestore verificato
+- 🏢 Registrazione come azienda verificata
 - ➕ Aggiunta di nuovi spazi di coworking (con foto, servizi, descrizioni)
 - ✏️ Modifica/Gestione degli spazi pubblicati
 
@@ -38,7 +48,7 @@ WorQ è una piattaforma digitale che connette professionisti in cerca di spazi d
   - Provider multipli (Google/GitHub + Credenziali)
   - Hashing password con bcrypt
 
-## 🏗 Architettura 
+## 🏗️ Architettura 
 
 L'applicazione è organizzata secondo una struttura modulare e scalabile basata su Next.js (App Router), Prisma come ORM, e include supporto PWA. Di seguito una panoramica dei principali folder e file:
 - **/prisma/:** contiene la definizione dello schema del database e uno script di seeding iniziale
@@ -75,7 +85,7 @@ Implementata con **Auth.js** (NextAuth) supporta:
     - In assenza di connessione e quando una risorsa non è in cache, viene mostrata una pagina offline personalizzata
 - **Installabile** su dispositivi mobile e desktop
 
-## 🛠 Comandi utili
+## 🛠️ Comandi utili
 
 ```bash
 # Avvia l'applicazione in sviluppo
@@ -93,7 +103,7 @@ npx prisma migrate dev --name "descrizione_modifica"
 
 Apri [http://localhost:3000](http://localhost:3000) con il tuo browser per vedere i risultati.
 
-## 🤝 Contributori
+## 🫱🏼‍🫲🏼 Contributori
 - **Forconi Leonardo** (mat. 122824)
 - **Marsili Davide** (mat. 123284)
 - **Medei Chiara** (mat. 123285)

@@ -4,21 +4,27 @@ import Carousel from '@/components/Carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashCan, faImages, faXmark, faWifi, faDesktop, faPen, faWheelchair, faPrint, faVideo, faUtensils, faChild, faDog, faChalkboard, faVideoCamera, faSnowflake, faCoffee, faParking, faLock, faBolt, faVolumeXmark, faSpinner, faQuestion, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { library, findIconDefinition, IconName } from '@fortawesome/fontawesome-svg-core';
-import { toast } from 'react-toastify';
 
+// Add FontAwesome icons to the library for dynamic use
 library.add(
     faWifi, faPen, faPrint, faChalkboard, faDesktop, faVideo,
     faWheelchair, faSnowflake, faVolumeXmark, faCoffee, faUtensils,
     faVideoCamera, faChild, faDog, faParking, faLock, faBolt
 );
 
+// Modal for creating a new space listing
 const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId: string, onSubmitComplete: (status: number | null) => void }> = ({ isOpen, onClose, userId, onSubmitComplete }) => {
-    // State management for the modal
-    const [uploadedImages, setUploadedImages] = useState<string[]>([]); // Preview of uploaded images
-    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // Uploaded files
-    const [suggestions, setSuggestions] = useState<any[]>([]); // Address suggestions
+    // State for image previews
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+    // State for uploaded image files
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    // State for address suggestions
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    // Loading state for address suggestions
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-    const [suggestionsVisible, setSuggestionsVisible] = useState(false); // Control visibility only
+    // Controls visibility of suggestions dropdown
+    const [suggestionsVisible, setSuggestionsVisible] = useState(false);
+    // State for form data
     const [formData, setFormData] = useState<{
         userId?: string;
         name: string;
@@ -60,7 +66,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
     // Track if select was open to handle toggle on click
     const selectWasOpen = React.useRef(false);
 
-    // State for services
+    // State for available services
     const [services, setServices] = useState<{
         id: string;
         detail: string;
@@ -70,7 +76,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
     // State for selected services
     const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
-    // Fetch services from the server
+    // Fetch available services from the server
     const fetchServices = async () => {
         try {
             const response = await fetch('/api/services');
@@ -85,6 +91,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         }
     }
 
+    // Handle modal open/close transitions and fetch services on open
     useEffect(() => {
         let openTimeout: NodeJS.Timeout | undefined;
         let closeTimeout: NodeJS.Timeout | undefined;
@@ -131,7 +138,6 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         }
     };
 
-    // Debounced fetchSuggestions
     // Fetches address suggestions from the Nominatim API
     const fetchSuggestions = async (value: string) => {
         if (!value) return;
@@ -147,7 +153,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         }
     };
 
-    // Debounce logic
+    // Debounce logic for address input
     const [addressInput, setAddressInput] = useState('');
     useEffect(() => {
         if (!suggestionsVisible) return;
@@ -225,15 +231,16 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
         });
     };
 
-
+    // If modal is not open and not closing, render nothing
     if (!isOpen && !isClosing) return null;
 
-    // Red dot error indicator
+    // Red dot error indicator for required fields
     const errorDot = <div className="w-2 h-2 mx-2 rounded-full bg-red-500 animate-pulse" />;
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center z-9999 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}
                         px-5 sm:px-10 md:px-15 lg:px-20 py-5`}>
+            {/* Modal background overlay */}
             <div
                 className="w-screen h-screen bg-stone-900/75 absolute"
                 onClick={() => {
@@ -246,7 +253,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                 <h2 className="text-lg sm:text-2xl font-bold mb-5 pr-10">Publish a New Space</h2>
                 <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
                     <div className="flex flex-col sm:flex-row gap-5">
-                        {/* Left Section */}
+                        {/* Left Section: Images and Services */}
                         <div className="flex flex-col w-full sm:w-1/2 lg:w-2/5 gap-5">
                             {/* Image Upload Section */}
                             <div className="flex flex-col">
@@ -292,7 +299,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                 </div>
                             </div>
 
-                            {/* Services */}
+                            {/* Services selection */}
                             <div className="h-20 grow overflow-y-auto">
                                 <div className='flex flex-wrap gap-1 sm:gap-2'>
                                     {services.map((service) => (
@@ -317,7 +324,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                             </div>
                         </div>
 
-                        {/* Right Section */}
+                        {/* Right Section: Form fields */}
                         <div className="flex flex-col w-full sm:w-1/2 lg:w-3/5 gap-5">
                             {/* Name + Address */}
                             <div className="flex flex-col lg:flex-row gap-5">
@@ -362,6 +369,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                         )}
                                     </div>
 
+                                    {/* Address suggestions dropdown */}
                                     {suggestions.length > 0 && suggestionsVisible && (
                                         <ul className="absolute top-full left-0 right-0 z-10 mt-1 bg-white border border-stone-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                             {suggestions.map((s, i) => (
@@ -425,7 +433,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                     </div>
                                 </div>
                             </div>
-                            {/* Space Type */}
+                            {/* Space Type dropdown */}
                             <div className="flex flex-col relative">
                                 <label className="flex items-center text-sm md:text-base font-medium pl-1 pb-1 text-stone-900">
                                     Space type
@@ -468,7 +476,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                                     </span>
                                 </div>
                             </div>
-                            {/* Description */}
+                            {/* Description field */}
                             <div className="flex flex-col">
                                 <label className="flex items-center text-sm md:text-base font-medium pl-1 pb-1 text-stone-900">
                                     Description
@@ -485,8 +493,9 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                             </div>
                         </div>
                     </div>
-                    {/* Buttons */}
+                    {/* Action Buttons */}
                     <div className="flex justify-between">
+                        {/* Clear fields button */}
                         <button type='button' onClick={handleClearFields}
                             className='flex justify-start items-center rounded-md ring-2 ring-red-500 bg-stone-100 hover:bg-red-500 active:bg-red-500 text-red-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                             w-10 hover:w-37 active:w-37 ease-out active:scale-90 hover:scale-110 origin-left group'>
@@ -496,6 +505,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                             <p className='whitespace-nowrap text-xl text-start w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Clear fields</p>
                         </button>
 
+                        {/* Publish space button */}
                         <button type='submit' className='flex justify-end items-center rounded-md ring-2 ring-west-side-500 bg-stone-100 hover:bg-west-side-500 active:bg-west-side-500 text-west-side-500 hover:text-stone-100 active:text-stone-100 shadow-sm transition-all duration-150 overflow-hidden
                                             w-10 hover:w-43 active:w-43 ease-out active:scale-90 hover:scale-110 origin-right group'>
                             <p className='whitespace-nowrap text-xl text-end w-full opacity-0 group-hover:opacity-100 group-active:opacity-100 duration-150'>Publish space</p>
@@ -505,7 +515,7 @@ const CreateSpaceModal: React.FC<{ isOpen: boolean; onClose: () => void, userId:
                         </button>
                     </div>
                 </form>
-                {/* Close button */}
+                {/* Close button for modal */}
                 <button
                     className="flex justify-center items-center absolute size-10 top-5 right-5 bg-stone-100 hover:bg-red-500 active:bg-red-500 border-1 border-stone-900/10 rounded-lg shadow-sm text-stone-900 hover:text-stone-100 active:text-stone-100 text-2xl transition"
                     onClick={() => {
